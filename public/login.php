@@ -3,14 +3,14 @@ session_start();
 
 // This is a temporary fix to ensure the config file is not required if it doesnt exist.
 // The install script should handle this, but as a fallback, we will redirect to install.php
-if (!file_exists('../config/config.php')) {
+if (!file_exists('../config_assets_manager/config.php')) {
     header('Location: install.php');
     exit;
 }
 
 
-require_once '../config/config.php';
-require_once '../src/Database.php';
+require_once '../config_assets_manager/config.php';
+require_once '../config_assets_manager/Database.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $db = new Database();
@@ -33,12 +33,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Connexion</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
+
 <body class="bg-gray-100">
     <div class="container mx-auto mt-10">
         <h1 class="text-3xl font-bold text-center">Connexion</h1>
@@ -69,4 +71,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
     </div>
 </body>
+
 </html>

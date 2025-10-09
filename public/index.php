@@ -2,7 +2,7 @@
 session_start();
 
 // Check if the config file exists
-if (!file_exists('../config/config.php')) {
+if (!file_exists('../config_assets_manager/config.php')) {
 
     if (!file_exists('install.php')) {
         // Redirect to the maintenance page
@@ -16,7 +16,7 @@ if (!file_exists('../config/config.php')) {
     exit;
 }
 
-require_once '../config/config.php';
+require_once '../config_assets_manager/config.php';
 
 // Check if the user is logged in
 if (!isset($_SESSION['user_id'])) {
@@ -24,7 +24,7 @@ if (!isset($_SESSION['user_id'])) {
     exit;
 }
 
-require_once '../src/Database.php';
+require_once '../config_assets_manager/Database.php';
 require_once '../templates/header.php';
 
 $db = new Database();

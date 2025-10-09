@@ -3,7 +3,7 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-if (file_exists('../config/config.php')) {
+if (file_exists('../config_assets_manager/config.php')) {
     header('Location: index.php');
     exit;
 }
@@ -25,7 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $config_content .= "define('DB_USER', '$db_user');\n";
     $config_content .= "define('DB_PASSWORD', '$db_password');\n";
 
-    if (file_put_contents('../config/config.php', $config_content) === false) {
+    if (file_put_contents('../config_assets_manager/config.php', $config_content) === false) {
         die("Erreur : Impossible de créer le fichier de configuration. Veuillez vérifier les autorisations du dossier.");
     }
 
@@ -37,7 +37,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Create database if it doesn't exist
         $pdo->exec("CREATE DATABASE IF NOT EXISTS `$db_name`");
         $pdo->exec("USE `$db_name`");
-
     } catch (PDOException $e) {
         die("La connexion à la base de données a échoué : " . $e->getMessage());
     }
@@ -107,12 +106,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Installation</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
+
 <body class="bg-gray-100">
     <div class="container mx-auto mt-10 p-4">
         <h1 class="text-3xl font-bold text-center">Installation</h1>
@@ -166,4 +167,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
     </div>
 </body>
+
 </html>
