@@ -1,12 +1,12 @@
 <?php
-$stmt = $pdo->prepare("SELECT first_name FROM users WHERE id = ?");
+$stmt = $pdo->prepare("SELECT first_name FROM am_users WHERE id = ?");
 $stmt->execute([$_SESSION['user_id']]);
 $user = $stmt->fetch();
 
 if ($_SESSION['user_role'] === 'admin') {
-    $student_count = $pdo->query("SELECT count(*) FROM students")->fetchColumn();
-    $material_count = $pdo->query("SELECT count(*) FROM materials")->fetchColumn();
-    $agent_count = $pdo->query("SELECT count(*) FROM users WHERE role = 'agent'")->fetchColumn();
+    $student_count = $pdo->query("SELECT count(*) FROM am_students")->fetchColumn();
+    $material_count = $pdo->query("SELECT count(*) FROM am_materials")->fetchColumn();
+    $agent_count = $pdo->query("SELECT count(*) FROM am_users WHERE role = 'agent'")->fetchColumn();
 }
 ?>
 
@@ -17,20 +17,20 @@ if ($_SESSION['user_role'] === 'admin') {
 </div>
 
 <?php if ($_SESSION['user_role'] === 'admin'): ?>
-<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
-    <div class="bg-white p-6 rounded-lg shadow-md">
-        <h2 class="text-2xl font-bold text-gray-800"><?php echo $student_count; ?></h2>
-        <p class="text-gray-600">Étudiants</p>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <h2 class="text-2xl font-bold text-gray-800"><?php echo $student_count; ?></h2>
+            <p class="text-gray-600">Étudiants</p>
+        </div>
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <h2 class="text-2xl font-bold text-gray-800"><?php echo $material_count; ?></h2>
+            <p class="text-gray-600">Matériels</p>
+        </div>
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <h2 class="text-2xl font-bold text-gray-800"><?php echo $agent_count; ?></h2>
+            <p class="text-gray-600">Agents</p>
+        </div>
     </div>
-    <div class="bg-white p-6 rounded-lg shadow-md">
-        <h2 class="text-2xl font-bold text-gray-800"><?php echo $material_count; ?></h2>
-        <p class="text-gray-600">Matériels</p>
-    </div>
-    <div class="bg-white p-6 rounded-lg shadow-md">
-        <h2 class="text-2xl font-bold text-gray-800"><?php echo $agent_count; ?></h2>
-        <p class="text-gray-600">Agents</p>
-    </div>
-</div>
 <?php endif; ?>
 
 <div class="mt-10">

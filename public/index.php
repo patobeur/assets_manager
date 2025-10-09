@@ -45,11 +45,11 @@ switch ($page) {
             $barcode = htmlspecialchars($_POST['barcode']);
 
             if ($action === 'create') {
-                $stmt = $pdo->prepare("INSERT INTO students (first_name, last_name, barcode) VALUES (?, ?, ?)");
+                $stmt = $pdo->prepare("INSERT INTO am_students (first_name, last_name, barcode) VALUES (?, ?, ?)");
                 $stmt->execute([$first_name, $last_name, $barcode]);
             } elseif ($action === 'edit') {
                 $id = intval($_POST['id']);
-                $stmt = $pdo->prepare("UPDATE students SET first_name = ?, last_name = ?, barcode = ? WHERE id = ?");
+                $stmt = $pdo->prepare("UPDATE am_students SET first_name = ?, last_name = ?, barcode = ? WHERE id = ?");
                 $stmt->execute([$first_name, $last_name, $barcode, $id]);
             }
             header('Location: ?page=students');
@@ -58,7 +58,7 @@ switch ($page) {
 
         if ($action === 'delete') {
             $id = intval($_GET['id']);
-            $stmt = $pdo->prepare("DELETE FROM students WHERE id = ?");
+            $stmt = $pdo->prepare("DELETE FROM am_students WHERE id = ?");
             $stmt->execute([$id]);
             header('Location: ?page=students');
             exit;
@@ -87,11 +87,11 @@ switch ($page) {
             $barcode = htmlspecialchars($_POST['barcode']);
 
             if ($action === 'create') {
-                $stmt = $pdo->prepare("INSERT INTO materials (name, description, status, barcode) VALUES (?, ?, ?, ?)");
+                $stmt = $pdo->prepare("INSERT INTO am_materials (name, description, status, barcode) VALUES (?, ?, ?, ?)");
                 $stmt->execute([$name, $description, $status, $barcode]);
             } elseif ($action === 'edit') {
                 $id = intval($_POST['id']);
-                $stmt = $pdo->prepare("UPDATE materials SET name = ?, description = ?, status = ?, barcode = ? WHERE id = ?");
+                $stmt = $pdo->prepare("UPDATE am_materials SET name = ?, description = ?, status = ?, barcode = ? WHERE id = ?");
                 $stmt->execute([$name, $description, $status, $barcode, $id]);
             }
             header('Location: ?page=materials');
@@ -100,7 +100,7 @@ switch ($page) {
 
         if ($action === 'delete') {
             $id = intval($_GET['id']);
-            $stmt = $pdo->prepare("DELETE FROM materials WHERE id = ?");
+            $stmt = $pdo->prepare("DELETE FROM am_materials WHERE id = ?");
             $stmt->execute([$id]);
             header('Location: ?page=materials');
             exit;
@@ -139,16 +139,16 @@ switch ($page) {
 
             if ($action === 'create') {
                 $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
-                $stmt = $pdo->prepare("INSERT INTO users (first_name, last_name, email, password, role) VALUES (?, ?, ?, ?, 'agent')");
+                $stmt = $pdo->prepare("INSERT INTO am_users (first_name, last_name, email, password, role) VALUES (?, ?, ?, ?, 'agent')");
                 $stmt->execute([$first_name, $last_name, $email, $password]);
             } elseif ($action === 'edit') {
                 $id = intval($_POST['id']);
                 if (!empty($_POST['password'])) {
                     $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
-                    $stmt = $pdo->prepare("UPDATE users SET first_name = ?, last_name = ?, email = ?, password = ? WHERE id = ?");
+                    $stmt = $pdo->prepare("UPDATE am_users SET first_name = ?, last_name = ?, email = ?, password = ? WHERE id = ?");
                     $stmt->execute([$first_name, $last_name, $email, $password, $id]);
                 } else {
-                    $stmt = $pdo->prepare("UPDATE users SET first_name = ?, last_name = ?, email = ? WHERE id = ?");
+                    $stmt = $pdo->prepare("UPDATE am_users SET first_name = ?, last_name = ?, email = ? WHERE id = ?");
                     $stmt->execute([$first_name, $last_name, $email, $id]);
                 }
             }
@@ -158,7 +158,7 @@ switch ($page) {
 
         if ($action === 'delete') {
             $id = intval($_GET['id']);
-            $stmt = $pdo->prepare("DELETE FROM users WHERE id = ?");
+            $stmt = $pdo->prepare("DELETE FROM am_users WHERE id = ?");
             $stmt->execute([$id]);
             header('Location: ?page=agents');
             exit;
@@ -183,47 +183,47 @@ switch ($page) {
             $material_barcode = htmlspecialchars($_POST['material_barcode']);
 
             // Get student id
-            $stmt = $pdo->prepare("SELECT id FROM students WHERE barcode = ?");
+            $stmt = $pdo->prepare("SELECT id FROM am_students WHERE barcode = ?");
             $stmt->execute([$student_barcode]);
             $student = $stmt->fetch();
 
             // Get material id
-            $stmt = $pdo->prepare("SELECT id, status FROM materials WHERE barcode = ?");
+            $stmt = $pdo->prepare("SELECT id, status FROM am_materials WHERE barcode = ?");
             $stmt->execute([$material_barcode]);
             $material = $stmt->fetch();
 
             if ($student && $material && $material['status'] === 'available') {
                 // Create loan
-                $stmt = $pdo->prepare("INSERT INTO loans (student_id, material_id, loan_date, loan_user_id) VALUES (?, ?, NOW(), ?)");
+                $stmt = $pdo->prepare("INSERT INTO am_loans (student_id, material_id, loan_date, loan_user_id) VALUES (?, ?, NOW(), ?)");
                 $stmt->execute([$student['id'], $material['id'], $_SESSION['user_id']]);
                 $loan_id = $pdo->lastInsertId();
 
                 // Update material status
-                $stmt = $pdo->prepare("UPDATE materials SET status = 'loaned' WHERE id = ?");
+                $stmt = $pdo->prepare("UPDATE am_materials SET status = 'loaned' WHERE id = ?");
                 $stmt->execute([$material['id']]);
 
                 // Get student info
-                $stmt = $pdo->prepare("SELECT first_name, last_name FROM students WHERE id = ?");
+                $stmt = $pdo->prepare("SELECT first_name, last_name FROM am_students WHERE id = ?");
                 $stmt->execute([$student['id']]);
                 $student_info = $stmt->fetch();
 
                 // Get material info
-                $stmt = $pdo->prepare("SELECT name FROM materials WHERE id = ?");
+                $stmt = $pdo->prepare("SELECT name FROM am_materials WHERE id = ?");
                 $stmt->execute([$material['id']]);
                 $material_info = $stmt->fetch();
 
                 // Get loan info
-                $stmt = $pdo->prepare("SELECT loan_date FROM loans WHERE id = ?");
+                $stmt = $pdo->prepare("SELECT loan_date FROM am_loans WHERE id = ?");
                 $stmt->execute([$loan_id]);
                 $loan_info = $stmt->fetch();
 
                 $success = "Le matériel \"{$material_info['name']}\" a été emprunté par {$student_info['first_name']} {$student_info['last_name']} le " . date('d/m/Y à H:i', strtotime($loan_info['loan_date'])) . ".";
 
-                // Get student's other loaned materials
+                // Get student's other loaned am_materials
                 $stmt = $pdo->prepare("
                     SELECT m.name
-                    FROM loans l
-                    JOIN materials m ON l.material_id = m.id
+                    FROM am_loans l
+                    JOIN am_materials m ON l.material_id = m.id
                     WHERE l.student_id = ? AND l.return_date IS NULL
                 ");
                 $stmt->execute([$student['id']]);
@@ -232,8 +232,8 @@ switch ($page) {
                 // Get student's loan history
                 $stmt = $pdo->prepare("
                     SELECT m.name, l.loan_date, l.return_date
-                    FROM loans l
-                    JOIN materials m ON l.material_id = m.id
+                    FROM am_loans l
+                    JOIN am_materials m ON l.material_id = m.id
                     WHERE l.student_id = ?
                     ORDER BY l.loan_date DESC
                     LIMIT 5
@@ -251,34 +251,34 @@ switch ($page) {
             $material_barcode = htmlspecialchars($_POST['material_barcode']);
 
             // Get material id
-            $stmt = $pdo->prepare("SELECT id FROM materials WHERE barcode = ?");
+            $stmt = $pdo->prepare("SELECT id FROM am_materials WHERE barcode = ?");
             $stmt->execute([$material_barcode]);
             $material = $stmt->fetch();
 
             if ($material) {
                 // Find the active loan for this material
-                $stmt = $pdo->prepare("SELECT id, student_id, loan_date FROM loans WHERE material_id = ? AND return_date IS NULL");
+                $stmt = $pdo->prepare("SELECT id, student_id, loan_date FROM am_loans WHERE material_id = ? AND return_date IS NULL");
                 $stmt->execute([$material['id']]);
                 $loan = $stmt->fetch();
 
                 if ($loan) {
                     // Update loan
-                    $stmt = $pdo->prepare("UPDATE loans SET return_date = NOW(), return_user_id = ? WHERE id = ?");
+                    $stmt = $pdo->prepare("UPDATE am_loans SET return_date = NOW(), return_user_id = ? WHERE id = ?");
                     $stmt->execute([$_SESSION['user_id'], $loan['id']]);
 
                     // Update material status
-                    $stmt = $pdo->prepare("UPDATE materials SET status = 'available' WHERE id = ?");
+                    $stmt = $pdo->prepare("UPDATE am_materials SET status = 'available' WHERE id = ?");
                     $stmt->execute([$material['id']]);
 
                     $success = "Le matériel a été retourné avec succès !";
 
                     // Get student info
-                    $stmt = $pdo->prepare("SELECT first_name, last_name FROM students WHERE id = ?");
+                    $stmt = $pdo->prepare("SELECT first_name, last_name FROM am_students WHERE id = ?");
                     $stmt->execute([$loan['student_id']]);
                     $student_info = $stmt->fetch();
 
                     // Get loan info
-                    $stmt = $pdo->prepare("SELECT loan_date, return_date FROM loans WHERE id = ?");
+                    $stmt = $pdo->prepare("SELECT loan_date, return_date FROM am_loans WHERE id = ?");
                     $stmt->execute([$loan['id']]);
                     $returned_loan = $stmt->fetch();
 
@@ -287,11 +287,11 @@ switch ($page) {
                     $return_date = new DateTime($returned_loan['return_date']);
                     $loan_duration = $loan_date->diff($return_date)->format('%a jours, %h heures et %i minutes');
 
-                    // Get student's other loaned materials
+                    // Get student's other loaned am_materials
                     $stmt = $pdo->prepare("
                         SELECT m.name
-                        FROM loans l
-                        JOIN materials m ON l.material_id = m.id
+                        FROM am_loans l
+                        JOIN am_materials m ON l.material_id = m.id
                         WHERE l.student_id = ? AND l.return_date IS NULL
                     ");
                     $stmt->execute([$loan['student_id']]);
@@ -300,8 +300,8 @@ switch ($page) {
                     // Get student's loan history
                     $stmt = $pdo->prepare("
                         SELECT m.name, l.loan_date, l.return_date
-                        FROM loans l
-                        JOIN materials m ON l.material_id = m.id
+                        FROM am_loans l
+                        JOIN am_materials m ON l.material_id = m.id
                         WHERE l.student_id = ?
                         ORDER BY l.loan_date DESC
                         LIMIT 5
@@ -323,18 +323,18 @@ switch ($page) {
         if ($action === 'export') {
             $sql = "
                 SELECT
-                    CONCAT(students.first_name, ' ', students.last_name) as student_name,
-                    materials.name as material_name,
-                    loans.loan_date,
+                    CONCAT(students.first_name, ' ', am_students.last_name) as student_name,
+                    am_materials.name as material_name,
+                    am_loans.loan_date,
                     CONCAT(loan_user.first_name, ' ', loan_user.last_name) as loan_user_name,
-                    loans.return_date,
+                    am_loans.return_date,
                     CONCAT(return_user.first_name, ' ', return_user.last_name) as return_user_name
-                FROM loans
-                JOIN students ON loans.student_id = students.id
-                JOIN materials ON loans.material_id = materials.id
-                LEFT JOIN users AS loan_user ON loans.loan_user_id = loan_user.id
-                LEFT JOIN users AS return_user ON loans.return_user_id = return_user.id
-                ORDER BY loans.loan_date DESC
+                FROM am_loans
+                JOIN am_students ON am_loans.student_id = am_students.id
+                JOIN am_materials ON am_loans.material_id = am_materials.id
+                LEFT JOIN am_users AS loan_user ON am_loans.loan_user_id = loan_user.id
+                LEFT JOIN am_users AS return_user ON am_loans.return_user_id = return_user.id
+                ORDER BY am_loans.loan_date DESC
             ";
             $stmt = $pdo->query($sql);
             $loans = $stmt->fetchAll(PDO::FETCH_ASSOC);

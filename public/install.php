@@ -55,7 +55,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Create tables
     $sql = "
-    CREATE TABLE IF NOT EXISTS users (
+    CREATE TABLE IF NOT EXISTS am_users (
         id INT(11) AUTO_INCREMENT PRIMARY KEY,
         first_name VARCHAR(255) NOT NULL,
         last_name VARCHAR(255) NOT NULL,
@@ -64,14 +64,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         role ENUM('agent', 'admin') NOT NULL
     );
 
-    CREATE TABLE IF NOT EXISTS students (
+    CREATE TABLE IF NOT EXISTS am_students (
         id INT(11) AUTO_INCREMENT PRIMARY KEY,
         first_name VARCHAR(255) NOT NULL,
         last_name VARCHAR(255) NOT NULL,
         barcode VARCHAR(255) NOT NULL UNIQUE
     );
 
-    CREATE TABLE IF NOT EXISTS materials (
+    CREATE TABLE IF NOT EXISTS am_materials (
         id INT(11) AUTO_INCREMENT PRIMARY KEY,
         name VARCHAR(255) NOT NULL,
         description TEXT,
@@ -79,7 +79,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         barcode VARCHAR(255) NOT NULL UNIQUE
     );
 
-    CREATE TABLE IF NOT EXISTS loans (
+    CREATE TABLE IF NOT EXISTS am_loans (
         id INT(11) AUTO_INCREMENT PRIMARY KEY,
         student_id INT(11) NOT NULL,
         material_id INT(11) NOT NULL,
@@ -87,10 +87,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         return_date DATETIME,
         loan_user_id INT(11) NOT NULL,
         return_user_id INT(11),
-        FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE,
-        FOREIGN KEY (material_id) REFERENCES materials(id) ON DELETE CASCADE,
-        FOREIGN KEY (loan_user_id) REFERENCES users(id) ON DELETE CASCADE,
-        FOREIGN KEY (return_user_id) REFERENCES users(id) ON DELETE CASCADE
+        FOREIGN KEY (student_id) REFERENCES am_students(id) ON DELETE CASCADE,
+        FOREIGN KEY (material_id) REFERENCES am_materials(id) ON DELETE CASCADE,
+        FOREIGN KEY (loan_user_id) REFERENCES am_users(id) ON DELETE CASCADE,
+        FOREIGN KEY (return_user_id) REFERENCES am_users(id) ON DELETE CASCADE
     );
     ";
 
@@ -103,7 +103,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Create the admin user
     try {
-        $stmt = $pdo->prepare("INSERT INTO users (first_name, last_name, email, password, role) VALUES (?, ?, ?, ?, 'admin')");
+        $stmt = $pdo->prepare("INSERT INTO am_users (first_name, last_name, email, password, role) VALUES (?, ?, ?, ?, 'admin')");
         $stmt->execute([$admin_first_name, $admin_last_name, $admin_email, $admin_password]);
     } catch (PDOException $e) {
         die("Erreur lors de la création de l'utilisateur administrateur : " . $e->getMessage());

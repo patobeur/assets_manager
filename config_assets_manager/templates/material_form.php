@@ -10,7 +10,7 @@ $is_edit = false;
 
 if (isset($_GET['id'])) {
     $is_edit = true;
-    $stmt = $pdo->prepare("SELECT * FROM materials WHERE id = ?");
+    $stmt = $pdo->prepare("SELECT * FROM am_materials WHERE id = ?");
     $stmt->execute([$_GET['id']]);
     $material = $stmt->fetch();
 }

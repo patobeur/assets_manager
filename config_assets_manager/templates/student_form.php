@@ -9,7 +9,7 @@ $is_edit = false;
 
 if (isset($_GET['id'])) {
     $is_edit = true;
-    $stmt = $pdo->prepare("SELECT * FROM students WHERE id = ?");
+    $stmt = $pdo->prepare("SELECT * FROM am_students WHERE id = ?");
     $stmt->execute([$_GET['id']]);
     $student = $stmt->fetch();
 }

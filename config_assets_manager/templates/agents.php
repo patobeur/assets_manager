@@ -7,7 +7,7 @@ if ($_SESSION['user_role'] !== 'admin') {
     return;
 }
 
-$stmt = $pdo->query("SELECT * FROM users WHERE role = 'agent'");
+$stmt = $pdo->query("SELECT * FROM am_users WHERE role = 'agent'");
 $agents = $stmt->fetchAll();
 ?>
 
