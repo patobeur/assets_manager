@@ -18,6 +18,7 @@ $materials = $stmt->fetchAll();
         <thead>
             <tr class="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
                 <th class="py-3 px-6 text-left">Nom</th>
+                <th class="py-3 px-6 text-left">Description</th>
                 <th class="py-3 px-6 text-left">Statut</th>
                 <th class="py-3 px-6 text-left">Code-barres</th>
                 <?php if ($_SESSION['user_role'] === 'admin'): ?>
@@ -29,6 +30,7 @@ $materials = $stmt->fetchAll();
             <?php foreach ($materials as $material): ?>
                 <tr class="border-b border-gray-200 hover:bg-gray-100">
                     <td class="py-3 px-6 text-left whitespace-nowrap"><?php echo htmlspecialchars($material['name']); ?></td>
+                    <td class="py-3 px-6 text-left"><?php echo htmlspecialchars($material['description']); ?></td>
                     <td class="py-3 px-6 text-left"><?php echo htmlspecialchars($material['status']); ?></td>
                     <td class="py-3 px-6 text-left"><?php echo htmlspecialchars($material['barcode']); ?></td>
                     <?php if ($_SESSION['user_role'] === 'admin'): ?>

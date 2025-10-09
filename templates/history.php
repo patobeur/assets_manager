@@ -2,13 +2,17 @@
 $sql = "
     SELECT
         loans.id,
-        students.name as student_name,
+        CONCAT(students.first_name, ' ', students.last_name) as student_name,
         materials.name as material_name,
         loans.loan_date,
-        loans.return_date
+        loans.return_date,
+        CONCAT(loan_user.first_name, ' ', loan_user.last_name) as loan_user_name,
+        CONCAT(return_user.first_name, ' ', return_user.last_name) as return_user_name
     FROM loans
     JOIN students ON loans.student_id = students.id
     JOIN materials ON loans.material_id = materials.id
+    LEFT JOIN users AS loan_user ON loans.loan_user_id = loan_user.id
+    LEFT JOIN users AS return_user ON loans.return_user_id = return_user.id
     ORDER BY loans.loan_date DESC
 ";
 
@@ -30,7 +34,9 @@ $loans = $stmt->fetchAll();
                 <th class="py-3 px-6 text-left">Étudiant</th>
                 <th class="py-3 px-6 text-left">Matériel</th>
                 <th class="py-3 px-6 text-left">Date d'emprunt</th>
+                <th class="py-3 px-6 text-left">Agent d'emprunt</th>
                 <th class="py-3 px-6 text-left">Date de retour</th>
+                <th class="py-3 px-6 text-left">Agent de retour</th>
             </tr>
         </thead>
         <tbody class="text-gray-600 text-sm font-light">
@@ -39,7 +45,9 @@ $loans = $stmt->fetchAll();
                     <td class="py-3 px-6 text-left whitespace-nowrap"><?php echo htmlspecialchars($loan['student_name']); ?></td>
                     <td class="py-3 px-6 text-left"><?php echo htmlspecialchars($loan['material_name']); ?></td>
                     <td class="py-3 px-6 text-left"><?php echo htmlspecialchars($loan['loan_date']); ?></td>
+                    <td class="py-3 px-6 text-left"><?php echo htmlspecialchars($loan['loan_user_name']); ?></td>
                     <td class="py-3 px-6 text-left"><?php echo htmlspecialchars($loan['return_date'] ?? 'Non retourné'); ?></td>
+                    <td class="py-3 px-6 text-left"><?php echo htmlspecialchars($loan['return_user_name'] ?? ''); ?></td>
                 </tr>
             <?php endforeach; ?>
         </tbody>

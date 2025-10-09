@@ -13,6 +13,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $db_name = $_POST['db_name'];
     $db_user = $_POST['db_user'];
     $db_password = $_POST['db_password'];
+    $admin_first_name = $_POST['admin_first_name'];
+    $admin_last_name = $_POST['admin_last_name'];
     $admin_email = $_POST['admin_email'];
     $admin_password = password_hash($_POST['admin_password'], PASSWORD_DEFAULT);
 
@@ -24,7 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $config_content .= "define('DB_PASSWORD', '$db_password');\n";
 
     if (file_put_contents('../config/config.php', $config_content) === false) {
-        die("Error: Unable to create the configuration file. Please check folder permissions.");
+        die("Erreur : Impossible de créer le fichier de configuration. Veuillez vérifier les autorisations du dossier.");
     }
 
     // Connect to the database
@@ -37,13 +39,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $pdo->exec("USE `$db_name`");
 
     } catch (PDOException $e) {
-        die("Database connection failed: " . $e->getMessage());
+        die("La connexion à la base de données a échoué : " . $e->getMessage());
     }
 
     // Create tables
     $sql = "
     CREATE TABLE IF NOT EXISTS users (
         id INT(11) AUTO_INCREMENT PRIMARY KEY,
+        first_name VARCHAR(255) NOT NULL,
+        last_name VARCHAR(255) NOT NULL,
         email VARCHAR(255) NOT NULL UNIQUE,
         password VARCHAR(255) NOT NULL,
         role ENUM('agent', 'admin') NOT NULL
@@ -51,13 +55,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     CREATE TABLE IF NOT EXISTS students (
         id INT(11) AUTO_INCREMENT PRIMARY KEY,
-        name VARCHAR(255) NOT NULL,
+        first_name VARCHAR(255) NOT NULL,
+        last_name VARCHAR(255) NOT NULL,
         barcode VARCHAR(255) NOT NULL UNIQUE
     );
 
     CREATE TABLE IF NOT EXISTS materials (
         id INT(11) AUTO_INCREMENT PRIMARY KEY,
         name VARCHAR(255) NOT NULL,
+        description TEXT,
         status ENUM('available', 'loaned', 'maintenance') NOT NULL DEFAULT 'available',
         barcode VARCHAR(255) NOT NULL UNIQUE
     );
@@ -68,24 +74,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         material_id INT(11) NOT NULL,
         loan_date DATETIME NOT NULL,
         return_date DATETIME,
+        loan_user_id INT(11) NOT NULL,
+        return_user_id INT(11),
         FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE,
-        FOREIGN KEY (material_id) REFERENCES materials(id) ON DELETE CASCADE
+        FOREIGN KEY (material_id) REFERENCES materials(id) ON DELETE CASCADE,
+        FOREIGN KEY (loan_user_id) REFERENCES users(id) ON DELETE CASCADE,
+        FOREIGN KEY (return_user_id) REFERENCES users(id) ON DELETE CASCADE
     );
     ";
 
     try {
         $pdo->exec($sql);
     } catch (PDOException $e) {
-        die("Error creating tables: " . $e->getMessage());
+        die("Erreur lors de la création des tables : " . $e->getMessage());
     }
 
 
     // Create the admin user
     try {
-        $stmt = $pdo->prepare("INSERT INTO users (email, password, role) VALUES (?, ?, 'admin')");
-        $stmt->execute([$admin_email, $admin_password]);
+        $stmt = $pdo->prepare("INSERT INTO users (first_name, last_name, email, password, role) VALUES (?, ?, ?, ?, 'admin')");
+        $stmt->execute([$admin_first_name, $admin_last_name, $admin_email, $admin_password]);
     } catch (PDOException $e) {
-        die("Error creating admin user: " . $e->getMessage());
+        die("Erreur lors de la création de l'utilisateur administrateur : " . $e->getMessage());
     }
 
     // Redirect to the login page
@@ -96,7 +106,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 ?>
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -109,39 +119,47 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         <div class="max-w-md mx-auto mt-10 bg-white p-8 border border-gray-300 rounded-lg shadow-md">
             <form action="install.php" method="post">
-                <h2 class="text-2xl font-bold mb-6">Database Configuration</h2>
+                <h2 class="text-2xl font-bold mb-6">Configuration de la base de données</h2>
                 <div class="mb-4">
-                    <label for="db_host" class="block text-gray-700 text-sm font-bold mb-2">Host</label>
+                    <label for="db_host" class="block text-gray-700 text-sm font-bold mb-2">Hôte</label>
                     <input type="text" id="db_host" name="db_host" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
                 </div>
                 <div class="mb-4">
-                    <label for="db_name" class="block text-gray-700 text-sm font-bold mb-2">Database Name</label>
+                    <label for="db_name" class="block text-gray-700 text-sm font-bold mb-2">Nom de la base de données</label>
                     <input type="text" id="db_name" name="db_name" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
                 </div>
                 <div class="mb-4">
-                    <label for="db_user" class="block text-gray-700 text-sm font-bold mb-2">User</label>
+                    <label for="db_user" class="block text-gray-700 text-sm font-bold mb-2">Utilisateur</label>
                     <input type="text" id="db_user" name="db_user" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
                 </div>
                 <div class="mb-6">
-                    <label for="db_password" class="block text-gray-700 text-sm font-bold mb-2">Password</label>
+                    <label for="db_password" class="block text-gray-700 text-sm font-bold mb-2">Mot de passe</label>
                     <input type="password" id="db_password" name="db_password" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline">
                 </div>
 
                 <hr class="my-6">
 
-                <h2 class="text-2xl font-bold mb-6">Administrator Account</h2>
+                <h2 class="text-2xl font-bold mb-6">Compte administrateur</h2>
+                <div class="mb-4">
+                    <label for="admin_first_name" class="block text-gray-700 text-sm font-bold mb-2">Prénom</label>
+                    <input type="text" id="admin_first_name" name="admin_first_name" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+                </div>
+                <div class="mb-4">
+                    <label for="admin_last_name" class="block text-gray-700 text-sm font-bold mb-2">Nom</label>
+                    <input type="text" id="admin_last_name" name="admin_last_name" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+                </div>
                 <div class="mb-4">
                     <label for="admin_email" class="block text-gray-700 text-sm font-bold mb-2">Email</label>
                     <input type="email" id="admin_email" name="admin_email" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
                 </div>
                 <div class="mb-6">
-                    <label for="admin_password" class="block text-gray-700 text-sm font-bold mb-2">Password</label>
+                    <label for="admin_password" class="block text-gray-700 text-sm font-bold mb-2">Mot de passe</label>
                     <input type="password" id="admin_password" name="admin_password" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline" required>
                 </div>
 
                 <div class="flex items-center justify-between">
                     <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full">
-                        Install
+                        Installer
                     </button>
                 </div>
             </form>

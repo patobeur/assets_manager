@@ -17,6 +17,7 @@ $students = $stmt->fetchAll();
     <table class="min-w-full table-auto">
         <thead>
             <tr class="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
+                <th class="py-3 px-6 text-left">Prénom</th>
                 <th class="py-3 px-6 text-left">Nom</th>
                 <th class="py-3 px-6 text-left">Code-barres</th>
                 <?php if ($_SESSION['user_role'] === 'admin'): ?>
@@ -27,7 +28,8 @@ $students = $stmt->fetchAll();
         <tbody class="text-gray-600 text-sm font-light">
             <?php foreach ($students as $student): ?>
                 <tr class="border-b border-gray-200 hover:bg-gray-100">
-                    <td class="py-3 px-6 text-left whitespace-nowrap"><?php echo htmlspecialchars($student['name']); ?></td>
+                    <td class="py-3 px-6 text-left whitespace-nowrap"><?php echo htmlspecialchars($student['first_name']); ?></td>
+                    <td class="py-3 px-6 text-left whitespace-nowrap"><?php echo htmlspecialchars($student['last_name']); ?></td>
                     <td class="py-3 px-6 text-left"><?php echo htmlspecialchars($student['barcode']); ?></td>
                     <?php if ($_SESSION['user_role'] === 'admin'): ?>
                     <td class="py-3 px-6 text-center">

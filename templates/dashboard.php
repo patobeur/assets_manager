@@ -1,5 +1,5 @@
 <?php
-$stmt = $pdo->prepare("SELECT email FROM users WHERE id = ?");
+$stmt = $pdo->prepare("SELECT first_name FROM users WHERE id = ?");
 $stmt->execute([$_SESSION['user_id']]);
 $user = $stmt->fetch();
 
@@ -13,7 +13,7 @@ if ($_SESSION['user_role'] === 'admin') {
 <h1 class="text-3xl font-bold text-gray-800">Tableau de bord</h1>
 
 <div class="mt-6">
-    <p class="text-lg text-gray-600">Content de vous revoir, <span class="font-semibold"><?php echo htmlspecialchars($user['email']); ?></span>!</p>
+    <p class="text-lg text-gray-600">Content de vous revoir, <span class="font-semibold"><?php echo htmlspecialchars($user['first_name']); ?></span>!</p>
 </div>
 
 <?php if ($_SESSION['user_role'] === 'admin'): ?>

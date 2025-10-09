@@ -41,11 +41,11 @@ switch ($page) {
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($action === 'create') {
-                $stmt = $pdo->prepare("INSERT INTO students (name, barcode) VALUES (?, ?)");
-                $stmt->execute([$_POST['name'], $_POST['barcode']]);
+                $stmt = $pdo->prepare("INSERT INTO students (first_name, last_name, barcode) VALUES (?, ?, ?)");
+                $stmt->execute([$_POST['first_name'], $_POST['last_name'], $_POST['barcode']]);
             } elseif ($action === 'edit') {
-                $stmt = $pdo->prepare("UPDATE students SET name = ?, barcode = ? WHERE id = ?");
-                $stmt->execute([$_POST['name'], $_POST['barcode'], $_POST['id']]);
+                $stmt = $pdo->prepare("UPDATE students SET first_name = ?, last_name = ?, barcode = ? WHERE id = ?");
+                $stmt->execute([$_POST['first_name'], $_POST['last_name'], $_POST['barcode'], $_POST['id']]);
             }
             header('Location: ?page=students');
             exit;
@@ -76,11 +76,11 @@ switch ($page) {
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($action === 'create') {
-                $stmt = $pdo->prepare("INSERT INTO materials (name, status, barcode) VALUES (?, ?, ?)");
-                $stmt->execute([$_POST['name'], $_POST['status'], $_POST['barcode']]);
+                $stmt = $pdo->prepare("INSERT INTO materials (name, description, status, barcode) VALUES (?, ?, ?, ?)");
+                $stmt->execute([$_POST['name'], $_POST['description'], $_POST['status'], $_POST['barcode']]);
             } elseif ($action === 'edit') {
-                $stmt = $pdo->prepare("UPDATE materials SET name = ?, status = ?, barcode = ? WHERE id = ?");
-                $stmt->execute([$_POST['name'], $_POST['status'], $_POST['barcode'], $_POST['id']]);
+                $stmt = $pdo->prepare("UPDATE materials SET name = ?, description = ?, status = ?, barcode = ? WHERE id = ?");
+                $stmt->execute([$_POST['name'], $_POST['description'], $_POST['status'], $_POST['barcode'], $_POST['id']]);
             }
             header('Location: ?page=materials');
             exit;
@@ -115,15 +115,23 @@ switch ($page) {
         }
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $first_name = $_POST['first_name'];
+            $last_name = $_POST['last_name'];
             $email = $_POST['email'];
-            $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
 
             if ($action === 'create') {
-                $stmt = $pdo->prepare("INSERT INTO users (email, password, role) VALUES (?, ?, 'agent')");
-                $stmt->execute([$email, $password]);
+                $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
+                $stmt = $pdo->prepare("INSERT INTO users (first_name, last_name, email, password, role) VALUES (?, ?, ?, ?, 'agent')");
+                $stmt->execute([$first_name, $last_name, $email, $password]);
             } elseif ($action === 'edit') {
-                $stmt = $pdo->prepare("UPDATE users SET email = ?, password = ? WHERE id = ?");
-                $stmt->execute([$email, $password, $_POST['id']]);
+                if (!empty($_POST['password'])) {
+                    $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
+                    $stmt = $pdo->prepare("UPDATE users SET first_name = ?, last_name = ?, email = ?, password = ? WHERE id = ?");
+                    $stmt->execute([$first_name, $last_name, $email, $password, $_POST['id']]);
+                } else {
+                    $stmt = $pdo->prepare("UPDATE users SET first_name = ?, last_name = ?, email = ? WHERE id = ?");
+                    $stmt->execute([$first_name, $last_name, $email, $_POST['id']]);
+                }
             }
             header('Location: ?page=agents');
             exit;
@@ -166,8 +174,8 @@ switch ($page) {
 
             if ($student && $material && $material['status'] === 'available') {
                 // Create loan
-                $stmt = $pdo->prepare("INSERT INTO loans (student_id, material_id, loan_date) VALUES (?, ?, NOW())");
-                $stmt->execute([$student['id'], $material['id']]);
+                $stmt = $pdo->prepare("INSERT INTO loans (student_id, material_id, loan_date, loan_user_id) VALUES (?, ?, NOW(), ?)");
+                $stmt->execute([$student['id'], $material['id'], $_SESSION['user_id']]);
 
                 // Update material status
                 $stmt = $pdo->prepare("UPDATE materials SET status = 'loaned' WHERE id = ?");
@@ -197,8 +205,8 @@ switch ($page) {
 
                 if ($loan) {
                     // Update loan
-                    $stmt = $pdo->prepare("UPDATE loans SET return_date = NOW() WHERE id = ?");
-                    $stmt->execute([$loan['id']]);
+                    $stmt = $pdo->prepare("UPDATE loans SET return_date = NOW(), return_user_id = ? WHERE id = ?");
+                    $stmt->execute([$_SESSION['user_id'], $loan['id']]);
 
                     // Update material status
                     $stmt = $pdo->prepare("UPDATE materials SET status = 'available' WHERE id = ?");
@@ -220,13 +228,17 @@ switch ($page) {
         if ($action === 'export') {
             $sql = "
                 SELECT
-                    students.name as student_name,
+                    CONCAT(students.first_name, ' ', students.last_name) as student_name,
                     materials.name as material_name,
                     loans.loan_date,
-                    loans.return_date
+                    CONCAT(loan_user.first_name, ' ', loan_user.last_name) as loan_user_name,
+                    loans.return_date,
+                    CONCAT(return_user.first_name, ' ', return_user.last_name) as return_user_name
                 FROM loans
                 JOIN students ON loans.student_id = students.id
                 JOIN materials ON loans.material_id = materials.id
+                LEFT JOIN users AS loan_user ON loans.loan_user_id = loan_user.id
+                LEFT JOIN users AS return_user ON loans.return_user_id = return_user.id
                 ORDER BY loans.loan_date DESC
             ";
             $stmt = $pdo->query($sql);
@@ -236,7 +248,7 @@ switch ($page) {
             header('Content-Disposition: attachment; filename="history.csv"');
 
             $output = fopen('php://output', 'w');
-            fputcsv($output, ['Student', 'Material', 'Loan Date', 'Return Date']);
+            fputcsv($output, ['Étudiant', 'Matériel', 'Date d\'emprunt', 'Agent d\'emprunt', 'Date de retour', 'Agent de retour']);
 
             foreach ($loans as $loan) {
                 fputcsv($output, $loan);

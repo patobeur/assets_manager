@@ -4,6 +4,7 @@ $material = [
     'name' => '',
     'status' => 'available',
     'barcode' => '',
+    'description' => '',
 ];
 $is_edit = false;
 
@@ -23,6 +24,10 @@ if (isset($_GET['id'])) {
         <div class="mb-4">
             <label for="name" class="block text-gray-700 text-sm font-bold mb-2">Nom</label>
             <input type="text" id="name" name="name" value="<?php echo htmlspecialchars($material['name']); ?>" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+        </div>
+        <div class="mb-4">
+            <label for="description" class="block text-gray-700 text-sm font-bold mb-2">Description</label>
+            <textarea id="description" name="description" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"><?php echo htmlspecialchars($material['description']); ?></textarea>
         </div>
         <div class="mb-4">
             <label for="status" class="block text-gray-700 text-sm font-bold mb-2">Statut</label>
