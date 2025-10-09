@@ -199,7 +199,7 @@ switch ($page) {
 
             if ($material) {
                 // Find the active loan for this material
-                $stmt = $pdo->prepare("SELECT id FROM loans WHERE material_id = ? AND return_date IS NULL");
+                $stmt = $pdo->prepare("SELECT id, student_id, loan_date FROM loans WHERE material_id = ? AND return_date IS NULL");
                 $stmt->execute([$material['id']]);
                 $loan = $stmt->fetch();
 
@@ -212,12 +212,50 @@ switch ($page) {
                     $stmt = $pdo->prepare("UPDATE materials SET status = 'available' WHERE id = ?");
                     $stmt->execute([$material['id']]);
 
-                    $success = "Material returned successfully!";
+                    $success = "Le matériel a été retourné avec succès !";
+
+                    // Get student info
+                    $stmt = $pdo->prepare("SELECT first_name, last_name FROM students WHERE id = ?");
+                    $stmt->execute([$loan['student_id']]);
+                    $student_info = $stmt->fetch();
+
+                    // Get loan info
+                    $stmt = $pdo->prepare("SELECT loan_date, return_date FROM loans WHERE id = ?");
+                    $stmt->execute([$loan['id']]);
+                    $returned_loan = $stmt->fetch();
+
+                    // Calculate loan duration
+                    $loan_date = new DateTime($returned_loan['loan_date']);
+                    $return_date = new DateTime($returned_loan['return_date']);
+                    $loan_duration = $loan_date->diff($return_date)->format('%a jours, %h heures et %i minutes');
+
+                    // Get student's other loaned materials
+                    $stmt = $pdo->prepare("
+                        SELECT m.name
+                        FROM loans l
+                        JOIN materials m ON l.material_id = m.id
+                        WHERE l.student_id = ? AND l.return_date IS NULL
+                    ");
+                    $stmt->execute([$loan['student_id']]);
+                    $other_materials = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                    // Get student's loan history
+                    $stmt = $pdo->prepare("
+                        SELECT m.name, l.loan_date, l.return_date
+                        FROM loans l
+                        JOIN materials m ON l.material_id = m.id
+                        WHERE l.student_id = ?
+                        ORDER BY l.loan_date DESC
+                        LIMIT 5
+                    ");
+                    $stmt->execute([$loan['student_id']]);
+                    $loan_history = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
                 } else {
-                    $error = "No active loan found for this material.";
+                    $error = "Aucun emprunt actif trouvé pour ce matériel.";
                 }
             } else {
-                $error = "Invalid material barcode.";
+                $error = "Code-barres du matériel non valide.";
             }
         }
         require_once '../templates/returns.php';
