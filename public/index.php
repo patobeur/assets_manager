@@ -3,10 +3,20 @@ session_start();
 
 // Check if the config file exists
 if (!file_exists('../config/config.php')) {
-    // Redirect to the installation page
-    header('Location: install.php');
+
+    if (!file_exists('install.php')) {
+        // Redirect to the maintenance page
+        header('Location: maintenance.php');
+        exit;
+    } else {
+        // Redirect to the installation page
+        header('Location: install.php');
+        exit;
+    }
     exit;
 }
+
+require_once '../config/config.php';
 
 // Check if the user is logged in
 if (!isset($_SESSION['user_id'])) {

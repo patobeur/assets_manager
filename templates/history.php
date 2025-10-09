@@ -17,9 +17,9 @@ $loans = $stmt->fetchAll();
 ?>
 
 <div class="flex justify-between items-center mb-6">
-    <h1 class="text-3xl font-bold">History</h1>
+    <h1 class="text-3xl font-bold">Historique</h1>
     <a href="?page=history&action=export" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
-        Export CSV
+        Exporter en CSV
     </a>
 </div>
 
@@ -27,10 +27,10 @@ $loans = $stmt->fetchAll();
     <table class="min-w-full table-auto">
         <thead>
             <tr class="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
-                <th class="py-3 px-6 text-left">Student</th>
-                <th class="py-3 px-6 text-left">Material</th>
-                <th class="py-3 px-6 text-left">Loan Date</th>
-                <th class="py-3 px-6 text-left">Return Date</th>
+                <th class="py-3 px-6 text-left">Étudiant</th>
+                <th class="py-3 px-6 text-left">Matériel</th>
+                <th class="py-3 px-6 text-left">Date d'emprunt</th>
+                <th class="py-3 px-6 text-left">Date de retour</th>
             </tr>
         </thead>
         <tbody class="text-gray-600 text-sm font-light">
@@ -39,7 +39,7 @@ $loans = $stmt->fetchAll();
                     <td class="py-3 px-6 text-left whitespace-nowrap"><?php echo htmlspecialchars($loan['student_name']); ?></td>
                     <td class="py-3 px-6 text-left"><?php echo htmlspecialchars($loan['material_name']); ?></td>
                     <td class="py-3 px-6 text-left"><?php echo htmlspecialchars($loan['loan_date']); ?></td>
-                    <td class="py-3 px-6 text-left"><?php echo htmlspecialchars($loan['return_date'] ?? 'Not returned'); ?></td>
+                    <td class="py-3 px-6 text-left"><?php echo htmlspecialchars($loan['return_date'] ?? 'Non retourné'); ?></td>
                 </tr>
             <?php endforeach; ?>
         </tbody>

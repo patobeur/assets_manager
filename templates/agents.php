@@ -1,8 +1,8 @@
 <?php
 if ($_SESSION['user_role'] !== 'admin') {
     echo '<div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
-        <strong class="font-bold">Access Denied!</strong>
-        <span class="block sm:inline">You do not have permission to access this page.</span>
+        <strong class="font-bold">Accès refusé !</strong>
+        <span class="block sm:inline">Vous n\'avez pas la permission d\'accéder à cette page.</span>
     </div>';
     return;
 }
@@ -14,7 +14,7 @@ $agents = $stmt->fetchAll();
 <div class="flex justify-between items-center mb-6">
     <h1 class="text-3xl font-bold">Agents</h1>
     <a href="?page=agents&action=create" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-        Add Agent
+        Ajouter un agent
     </a>
 </div>
 

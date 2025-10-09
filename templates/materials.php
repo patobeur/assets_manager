@@ -4,10 +4,10 @@ $materials = $stmt->fetchAll();
 ?>
 
 <div class="flex justify-between items-center mb-6">
-    <h1 class="text-3xl font-bold">Materials</h1>
+    <h1 class="text-3xl font-bold">Matériels</h1>
     <?php if ($_SESSION['user_role'] === 'admin'): ?>
     <a href="?page=materials&action=create" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-        Add Material
+        Ajouter du matériel
     </a>
     <?php endif; ?>
 </div>
@@ -17,9 +17,9 @@ $materials = $stmt->fetchAll();
     <table class="min-w-full table-auto">
         <thead>
             <tr class="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
-                <th class="py-3 px-6 text-left">Name</th>
-                <th class="py-3 px-6 text-left">Status</th>
-                <th class="py-3 px-6 text-left">Barcode</th>
+                <th class="py-3 px-6 text-left">Nom</th>
+                <th class="py-3 px-6 text-left">Statut</th>
+                <th class="py-3 px-6 text-left">Code-barres</th>
                 <?php if ($_SESSION['user_role'] === 'admin'): ?>
                 <th class="py-3 px-6 text-center">Actions</th>
                 <?php endif; ?>

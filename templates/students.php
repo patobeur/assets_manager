@@ -4,10 +4,10 @@ $students = $stmt->fetchAll();
 ?>
 
 <div class="flex justify-between items-center mb-6">
-    <h1 class="text-3xl font-bold">Students</h1>
+    <h1 class="text-3xl font-bold">Étudiants</h1>
     <?php if ($_SESSION['user_role'] === 'admin'): ?>
     <a href="?page=students&action=create" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-        Add Student
+        Ajouter un étudiant
     </a>
     <?php endif; ?>
 </div>
@@ -17,8 +17,8 @@ $students = $stmt->fetchAll();
     <table class="min-w-full table-auto">
         <thead>
             <tr class="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
-                <th class="py-3 px-6 text-left">Name</th>
-                <th class="py-3 px-6 text-left">Barcode</th>
+                <th class="py-3 px-6 text-left">Nom</th>
+                <th class="py-3 px-6 text-left">Code-barres</th>
                 <?php if ($_SESSION['user_role'] === 'admin'): ?>
                 <th class="py-3 px-6 text-center">Actions</th>
                 <?php endif; ?>
