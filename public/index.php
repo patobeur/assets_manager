@@ -25,7 +25,7 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 require_once '../config_assets_manager/Database.php';
-require_once '../templates/header.php';
+require_once '../config_assets_manager/templates/header.php';
 
 $db = new Database();
 $pdo = $db->getConnection();
@@ -34,7 +34,7 @@ $page = $_GET['page'] ?? 'dashboard';
 
 switch ($page) {
     case 'dashboard':
-        require_once '../templates/dashboard.php';
+        require_once '../config_assets_manager/templates/dashboard.php';
         break;
     case 'students':
         $action = $_GET['action'] ?? 'list';
@@ -60,14 +60,14 @@ switch ($page) {
 
         switch ($action) {
             case 'list':
-                require_once '../templates/students.php';
+                require_once '../config_assets_manager/templates/students.php';
                 break;
             case 'create':
             case 'edit':
-                require_once '../templates/student_form.php';
+                require_once '../config_assets_manager/templates/student_form.php';
                 break;
             default:
-                require_once '../templates/students.php';
+                require_once '../config_assets_manager/templates/students.php';
                 break;
         }
         break;
@@ -95,14 +95,14 @@ switch ($page) {
 
         switch ($action) {
             case 'list':
-                require_once '../templates/materials.php';
+                require_once '../config_assets_manager/templates/materials.php';
                 break;
             case 'create':
             case 'edit':
-                require_once '../templates/material_form.php';
+                require_once '../config_assets_manager/templates/material_form.php';
                 break;
             default:
-                require_once '../templates/materials.php';
+                require_once '../config_assets_manager/templates/materials.php';
                 break;
         }
         break;
@@ -146,14 +146,14 @@ switch ($page) {
 
         switch ($action) {
             case 'list':
-                require_once '../templates/agents.php';
+                require_once '../config_assets_manager/templates/agents.php';
                 break;
             case 'create':
             case 'edit':
-                require_once '../templates/agent_form.php';
+                require_once '../config_assets_manager/templates/agent_form.php';
                 break;
             default:
-                require_once '../templates/agents.php';
+                require_once '../config_assets_manager/templates/agents.php';
                 break;
         }
         break;
@@ -220,12 +220,11 @@ switch ($page) {
                 ");
                 $stmt->execute([$student['id']]);
                 $loan_history = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
             } else {
                 $error = "Invalid student or material barcode, or material is not available.";
             }
         }
-        require_once '../templates/loans.php';
+        require_once '../config_assets_manager/templates/loans.php';
         break;
     case 'returns':
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -289,7 +288,6 @@ switch ($page) {
                     ");
                     $stmt->execute([$loan['student_id']]);
                     $loan_history = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
                 } else {
                     $error = "Aucun emprunt actif trouvé pour ce matériel.";
                 }
@@ -297,7 +295,7 @@ switch ($page) {
                 $error = "Code-barres du matériel non valide.";
             }
         }
-        require_once '../templates/returns.php';
+        require_once '../config_assets_manager/templates/returns.php';
         break;
     case 'history':
         $action = $_GET['action'] ?? 'list';
@@ -335,12 +333,12 @@ switch ($page) {
             exit;
         }
 
-        require_once '../templates/history.php';
+        require_once '../config_assets_manager/templates/history.php';
         break;
     default:
-        require_once '../templates/dashboard.php';
+        require_once '../config_assets_manager/templates/dashboard.php';
         break;
 }
 
 
-require_once '../templates/footer.php';
+require_once '../config_assets_manager/templates/footer.php';
