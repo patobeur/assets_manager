@@ -30,3 +30,44 @@
         </div>
     </form>
 </div>
+
+<?php if (isset($student_info)): ?>
+<div class="mt-6">
+    <h2 class="text-2xl font-bold mb-4">Informations sur l'emprunt</h2>
+
+    <?php if (!empty($other_materials)): ?>
+        <div class="mb-4">
+            <h3 class="text-xl font-bold mb-2">Matériel déjà en possession de l'étudiant(e)</h3>
+            <ul class="list-disc list-inside">
+                <?php foreach ($other_materials as $material): ?>
+                    <li><?php echo htmlspecialchars($material['name']); ?></li>
+                <?php endforeach; ?>
+            </ul>
+        </div>
+    <?php endif; ?>
+
+    <?php if (!empty($loan_history)): ?>
+        <div>
+            <h3 class="text-xl font-bold mb-2">Historique des 5 derniers emprunts de l'étudiant(e)</h3>
+            <table class="min-w-full bg-white">
+                <thead>
+                    <tr>
+                        <th class="py-2 px-4 border-b">Matériel</th>
+                        <th class="py-2 px-4 border-b">Date d'emprunt</th>
+                        <th class="py-2 px-4 border-b">Date de retour</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($loan_history as $loan): ?>
+                        <tr>
+                            <td class="py-2 px-4 border-b"><?php echo htmlspecialchars($loan['name']); ?></td>
+                            <td class="py-2 px-4 border-b"><?php echo date('d/m/Y H:i', strtotime($loan['loan_date'])); ?></td>
+                            <td class="py-2 px-4 border-b"><?php echo $loan['return_date'] ? date('d/m/Y H:i', strtotime($loan['return_date'])) : 'Non retourné'; ?></td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+    <?php endif; ?>
+</div>
+<?php endif; ?>

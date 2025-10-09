@@ -176,12 +176,51 @@ switch ($page) {
                 // Create loan
                 $stmt = $pdo->prepare("INSERT INTO loans (student_id, material_id, loan_date, loan_user_id) VALUES (?, ?, NOW(), ?)");
                 $stmt->execute([$student['id'], $material['id'], $_SESSION['user_id']]);
+                $loan_id = $pdo->lastInsertId();
 
                 // Update material status
                 $stmt = $pdo->prepare("UPDATE materials SET status = 'loaned' WHERE id = ?");
                 $stmt->execute([$material['id']]);
 
-                $success = "Material loaned successfully!";
+                // Get student info
+                $stmt = $pdo->prepare("SELECT first_name, last_name FROM students WHERE id = ?");
+                $stmt->execute([$student['id']]);
+                $student_info = $stmt->fetch();
+
+                // Get material info
+                $stmt = $pdo->prepare("SELECT name FROM materials WHERE id = ?");
+                $stmt->execute([$material['id']]);
+                $material_info = $stmt->fetch();
+
+                // Get loan info
+                $stmt = $pdo->prepare("SELECT loan_date FROM loans WHERE id = ?");
+                $stmt->execute([$loan_id]);
+                $loan_info = $stmt->fetch();
+
+                $success = "Le matériel \"{$material_info['name']}\" a été emprunté par {$student_info['first_name']} {$student_info['last_name']} le " . date('d/m/Y à H:i', strtotime($loan_info['loan_date'])) . ".";
+
+                // Get student's other loaned materials
+                $stmt = $pdo->prepare("
+                    SELECT m.name
+                    FROM loans l
+                    JOIN materials m ON l.material_id = m.id
+                    WHERE l.student_id = ? AND l.return_date IS NULL
+                ");
+                $stmt->execute([$student['id']]);
+                $other_materials = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                // Get student's loan history
+                $stmt = $pdo->prepare("
+                    SELECT m.name, l.loan_date, l.return_date
+                    FROM loans l
+                    JOIN materials m ON l.material_id = m.id
+                    WHERE l.student_id = ?
+                    ORDER BY l.loan_date DESC
+                    LIMIT 5
+                ");
+                $stmt->execute([$student['id']]);
+                $loan_history = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
             } else {
                 $error = "Invalid student or material barcode, or material is not available.";
             }
