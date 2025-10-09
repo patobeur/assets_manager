@@ -40,20 +40,26 @@ switch ($page) {
         $action = $_GET['action'] ?? 'list';
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $first_name = htmlspecialchars($_POST['first_name']);
+            $last_name = htmlspecialchars($_POST['last_name']);
+            $barcode = htmlspecialchars($_POST['barcode']);
+
             if ($action === 'create') {
                 $stmt = $pdo->prepare("INSERT INTO students (first_name, last_name, barcode) VALUES (?, ?, ?)");
-                $stmt->execute([$_POST['first_name'], $_POST['last_name'], $_POST['barcode']]);
+                $stmt->execute([$first_name, $last_name, $barcode]);
             } elseif ($action === 'edit') {
+                $id = intval($_POST['id']);
                 $stmt = $pdo->prepare("UPDATE students SET first_name = ?, last_name = ?, barcode = ? WHERE id = ?");
-                $stmt->execute([$_POST['first_name'], $_POST['last_name'], $_POST['barcode'], $_POST['id']]);
+                $stmt->execute([$first_name, $last_name, $barcode, $id]);
             }
             header('Location: ?page=students');
             exit;
         }
 
         if ($action === 'delete') {
+            $id = intval($_GET['id']);
             $stmt = $pdo->prepare("DELETE FROM students WHERE id = ?");
-            $stmt->execute([$_GET['id']]);
+            $stmt->execute([$id]);
             header('Location: ?page=students');
             exit;
         }
@@ -75,20 +81,27 @@ switch ($page) {
         $action = $_GET['action'] ?? 'list';
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $name = htmlspecialchars($_POST['name']);
+            $description = htmlspecialchars($_POST['description']);
+            $status = htmlspecialchars($_POST['status']);
+            $barcode = htmlspecialchars($_POST['barcode']);
+
             if ($action === 'create') {
                 $stmt = $pdo->prepare("INSERT INTO materials (name, description, status, barcode) VALUES (?, ?, ?, ?)");
-                $stmt->execute([$_POST['name'], $_POST['description'], $_POST['status'], $_POST['barcode']]);
+                $stmt->execute([$name, $description, $status, $barcode]);
             } elseif ($action === 'edit') {
+                $id = intval($_POST['id']);
                 $stmt = $pdo->prepare("UPDATE materials SET name = ?, description = ?, status = ?, barcode = ? WHERE id = ?");
-                $stmt->execute([$_POST['name'], $_POST['description'], $_POST['status'], $_POST['barcode'], $_POST['id']]);
+                $stmt->execute([$name, $description, $status, $barcode, $id]);
             }
             header('Location: ?page=materials');
             exit;
         }
 
         if ($action === 'delete') {
+            $id = intval($_GET['id']);
             $stmt = $pdo->prepare("DELETE FROM materials WHERE id = ?");
-            $stmt->execute([$_GET['id']]);
+            $stmt->execute([$id]);
             header('Location: ?page=materials');
             exit;
         }
@@ -115,22 +128,28 @@ switch ($page) {
         }
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $first_name = $_POST['first_name'];
-            $last_name = $_POST['last_name'];
-            $email = $_POST['email'];
+            $first_name = htmlspecialchars($_POST['first_name']);
+            $last_name = htmlspecialchars($_POST['last_name']);
+            $email = filter_var($_POST['email'], FILTER_SANITIZE_EMAIL);
+
+            if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                // Or handle the error more gracefully
+                die("Invalid email address.");
+            }
 
             if ($action === 'create') {
                 $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
                 $stmt = $pdo->prepare("INSERT INTO users (first_name, last_name, email, password, role) VALUES (?, ?, ?, ?, 'agent')");
                 $stmt->execute([$first_name, $last_name, $email, $password]);
             } elseif ($action === 'edit') {
+                $id = intval($_POST['id']);
                 if (!empty($_POST['password'])) {
                     $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
                     $stmt = $pdo->prepare("UPDATE users SET first_name = ?, last_name = ?, email = ?, password = ? WHERE id = ?");
-                    $stmt->execute([$first_name, $last_name, $email, $password, $_POST['id']]);
+                    $stmt->execute([$first_name, $last_name, $email, $password, $id]);
                 } else {
                     $stmt = $pdo->prepare("UPDATE users SET first_name = ?, last_name = ?, email = ? WHERE id = ?");
-                    $stmt->execute([$first_name, $last_name, $email, $_POST['id']]);
+                    $stmt->execute([$first_name, $last_name, $email, $id]);
                 }
             }
             header('Location: ?page=agents');
@@ -138,8 +157,9 @@ switch ($page) {
         }
 
         if ($action === 'delete') {
+            $id = intval($_GET['id']);
             $stmt = $pdo->prepare("DELETE FROM users WHERE id = ?");
-            $stmt->execute([$_GET['id']]);
+            $stmt->execute([$id]);
             header('Location: ?page=agents');
             exit;
         }
@@ -159,8 +179,8 @@ switch ($page) {
         break;
     case 'loans':
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $student_barcode = $_POST['student_barcode'];
-            $material_barcode = $_POST['material_barcode'];
+            $student_barcode = htmlspecialchars($_POST['student_barcode']);
+            $material_barcode = htmlspecialchars($_POST['material_barcode']);
 
             // Get student id
             $stmt = $pdo->prepare("SELECT id FROM students WHERE barcode = ?");
@@ -228,7 +248,7 @@ switch ($page) {
         break;
     case 'returns':
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $material_barcode = $_POST['material_barcode'];
+            $material_barcode = htmlspecialchars($_POST['material_barcode']);
 
             // Get material id
             $stmt = $pdo->prepare("SELECT id FROM materials WHERE barcode = ?");

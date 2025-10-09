@@ -9,21 +9,33 @@ if (file_exists('../config_assets_manager/config.php')) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $db_host = $_POST['db_host'];
-    $db_name = $_POST['db_name'];
-    $db_user = $_POST['db_user'];
-    $db_password = $_POST['db_password'];
-    $admin_first_name = $_POST['admin_first_name'];
-    $admin_last_name = $_POST['admin_last_name'];
-    $admin_email = $_POST['admin_email'];
-    $admin_password = password_hash($_POST['admin_password'], PASSWORD_DEFAULT);
+    // Sanitize and validate input, removing backticks to prevent SQL injection in CREATE DATABASE.
+    $db_host = htmlspecialchars(str_replace('`', '', $_POST['db_host']));
+    $db_name = htmlspecialchars(str_replace('`', '', $_POST['db_name']));
+    $db_user = htmlspecialchars(str_replace('`', '', $_POST['db_user']));
+    $db_password = $_POST['db_password']; // No sanitization needed for the password, it will be hashed
+    $admin_first_name = htmlspecialchars($_POST['admin_first_name']);
+    $admin_last_name = htmlspecialchars($_POST['admin_last_name']);
+    $admin_email = filter_var($_POST['admin_email'], FILTER_SANITIZE_EMAIL);
+    $admin_password = $_POST['admin_password'];
 
-    // Create the config file
+    // Basic validation
+    if (empty($db_host) || empty($db_name) || empty($db_user) || empty($admin_first_name) || empty($admin_last_name) || empty($admin_email) || empty($admin_password)) {
+        die("Erreur : Tous les champs sont obligatoires.");
+    }
+
+    if (!filter_var($admin_email, FILTER_VALIDATE_EMAIL)) {
+        die("Erreur : Adresse email invalide.");
+    }
+
+    $admin_password = password_hash($admin_password, PASSWORD_DEFAULT);
+
+    // Create the config file with escaped values
     $config_content = "<?php\n\n";
-    $config_content .= "define('DB_HOST', '$db_host');\n";
-    $config_content .= "define('DB_NAME', '$db_name');\n";
-    $config_content .= "define('DB_USER', '$db_user');\n";
-    $config_content .= "define('DB_PASSWORD', '$db_password');\n";
+    $config_content .= "define('DB_HOST', '" . addslashes($db_host) . "');\n";
+    $config_content .= "define('DB_NAME', '" . addslashes($db_name) . "');\n";
+    $config_content .= "define('DB_USER', '" . addslashes($db_user) . "');\n";
+    $config_content .= "define('DB_PASSWORD', '" . addslashes($db_password) . "');\n";
 
     if (file_put_contents('../config_assets_manager/config.php', $config_content) === false) {
         die("Erreur : Impossible de créer le fichier de configuration. Veuillez vérifier les autorisations du dossier.");
