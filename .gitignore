@@ -1,0 +1,5 @@
+config/config.php
+jules-scratch/
+php_server.log
+vendor/
+composer.lock
