@@ -29,16 +29,38 @@
                     <div id="gestion-dropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-20">
                         <a href="?page=students" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Étudiants</a>
                         <a href="?page=materials" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Matériels</a>
+                        <a href="?page=history" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Historique</a>
                         <?php if ($_SESSION['user_role'] === 'admin'): ?>
                             <a href="?page=agents" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Agents</a>
                             <a href="?page=hydration" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Hydratation</a>
                         <?php endif; ?>
-                        <a href="?page=history" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Historique</a>
                     </div>
                 </div>
 
-                <a href="?page=loans" class="text-gray-600 hover:text-gray-900">Emprunt</a>
-                <a href="?page=returns" class="text-gray-600 hover:text-gray-900">Retour</a>
+                <!-- Dropdown for Actions -->
+                <div class="relative" id="actions-dropdown-menu">
+                    <button id="actions-dropdown-button" class="text-gray-600 hover:text-gray-900 focus:outline-none">
+                        Actions
+                    </button>
+                    <div id="actions-dropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-20">
+                        <a href="?page=loans" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Emprunt</a>
+                        <a href="?page=returns" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Retour</a>
+                    </div>
+                </div>
+
+                <?php if ($_SESSION['user_role'] === 'admin'): ?>
+                    <!-- Dropdown for Admin -->
+                    <div class="relative" id="admin-dropdown-menu">
+                        <button id="admin-dropdown-button" class="text-gray-600 hover:text-gray-900 focus:outline-none">
+                            Admin
+                        </button>
+                        <div id="admin-dropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-20">
+                            <a href="?page=agents" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Agents</a>
+                            <a href="?page=hydration" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Hydratation</a>
+                        </div>
+                    </div>
+                <?php endif; ?>
+
 
                 <?php if (isset($_SESSION['user_id'])): ?>
                     <!-- Dropdown for Profil -->
@@ -67,13 +89,17 @@
             <div class="py-2 px-4 text-sm text-gray-500">Gestion</div>
             <a href="?page=students" class="block py-2 pl-8 pr-4 text-sm text-gray-600 hover:bg-gray-200">Étudiants</a>
             <a href="?page=materials" class="block py-2 pl-8 pr-4 text-sm text-gray-600 hover:bg-gray-200">Matériels</a>
-            <?php if ($_SESSION['user_role'] === 'admin'): ?>
-                <a href="?page=agents" class="block py-2 pl-8 pr-4 text-sm text-gray-600 hover:bg-gray-200">Agents</a>
-            <?php endif; ?>
+            <a href="?page=history" class="block py-2 pl-8 pr-4 text-sm text-gray-600 hover:bg-gray-200">Historique</a>
 
-            <a href="?page=loans" class="block py-2 px-4 text-sm text-gray-600 hover:bg-gray-200">Emprunt</a>
-            <a href="?page=returns" class="block py-2 px-4 text-sm text-gray-600 hover:bg-gray-200">Retour</a>
-            <a href="?page=history" class="block py-2 px-4 text-sm text-gray-600 hover:bg-gray-200">Historique</a>
+            <div class="py-2 px-4 text-sm text-gray-500">Actions</div>
+            <a href="?page=loans" class="block py-2 pl-8 pr-4 text-sm text-gray-600 hover:bg-gray-200">Emprunt</a>
+            <a href="?page=returns" class="block py-2 pl-8 pr-4 text-sm text-gray-600 hover:bg-gray-200">Retour</a>
+
+            <?php if ($_SESSION['user_role'] === 'admin'): ?>
+                <div class="py-2 px-4 text-sm text-gray-500">Admin</div>
+                <a href="?page=agents" class="block py-2 pl-8 pr-4 text-sm text-gray-600 hover:bg-gray-200">Agents</a>
+                <a href="?page=hydration" class="block py-2 pl-8 pr-4 text-sm text-gray-600 hover:bg-gray-200">Hydratation</a>
+            <?php endif; ?>
 
             <?php if (isset($_SESSION['user_id'])): ?>
                 <div class="py-2 px-4 text-sm text-gray-500">Profil</div>
@@ -108,13 +134,21 @@
         }
 
         setupDropdown('gestion-dropdown-button', 'gestion-dropdown');
+        setupDropdown('actions-dropdown-button', 'actions-dropdown');
+        setupDropdown('admin-dropdown-button', 'admin-dropdown');
         setupDropdown('profil-dropdown-button', 'profil-dropdown');
 
 
         // Close dropdowns when clicking outside
         document.addEventListener('click', (event) => {
+            if (!document.getElementById('admin-dropdown-menu').contains(event.target)) {
+                document.getElementById('admin-dropdown').classList.add('hidden');
+            }
             if (!document.getElementById('gestion-dropdown-menu').contains(event.target)) {
                 document.getElementById('gestion-dropdown').classList.add('hidden');
+            }
+            if (!document.getElementById('actions-dropdown-menu').contains(event.target)) {
+                document.getElementById('actions-dropdown').classList.add('hidden');
             }
             if (!document.getElementById('profil-dropdown-menu').contains(event.target)) {
                 document.getElementById('profil-dropdown').classList.add('hidden');
