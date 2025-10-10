@@ -21,18 +21,34 @@
             <div class="hidden md:flex items-center space-x-4">
                 <a href="?page=dashboard" class="text-gray-600 hover:text-gray-900">Tableau de bord</a>
 
-                <a href="?page=students" class="text-gray-600 hover:text-gray-900">Étudiants</a>
-                <a href="?page=materials" class="text-gray-600 hover:text-gray-900">Matériels</a>
-                <?php if ($_SESSION['user_role'] === 'admin'): ?>
-                    <a href="?page=agents" class="text-gray-600 hover:text-gray-900">Agents</a>
-                <?php endif; ?>
+                <!-- Dropdown for Gestion -->
+                <div class="relative" id="gestion-dropdown-menu">
+                    <button id="gestion-dropdown-button" class="text-gray-600 hover:text-gray-900 focus:outline-none">
+                        Gestion
+                    </button>
+                    <div id="gestion-dropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-20">
+                        <a href="?page=students" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Étudiants</a>
+                        <a href="?page=materials" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Matériels</a>
+                        <?php if ($_SESSION['user_role'] === 'admin'): ?>
+                            <a href="?page=agents" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Agents</a>
+                        <?php endif; ?>
+                        <a href="?page=history" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Historique</a>
+                    </div>
+                </div>
 
                 <a href="?page=loans" class="text-gray-600 hover:text-gray-900">Emprunt</a>
                 <a href="?page=returns" class="text-gray-600 hover:text-gray-900">Retour</a>
-                <a href="?page=history" class="text-gray-600 hover:text-gray-900">Historique</a>
 
                 <?php if (isset($_SESSION['user_id'])): ?>
-                    <a href="logout.php" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">Déconnexion</a>
+                    <!-- Dropdown for Profil -->
+                    <div class="relative" id="profil-dropdown-menu">
+                        <button id="profil-dropdown-button" class="text-gray-600 hover:text-gray-900 focus:outline-none">
+                            <?php echo htmlspecialchars($_SESSION['user_first_name']); ?>
+                        </button>
+                        <div id="profil-dropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-20">
+                            <a href="logout.php" class="block px-4 py-2 text-sm text-red-500 hover:bg-gray-100">Déconnexion</a>
+                        </div>
+                    </div>
                 <?php endif; ?>
             </div>
             <div class="md:hidden">
@@ -43,27 +59,65 @@
                 </button>
             </div>
         </div>
+        <!-- Mobile Menu -->
         <div id="mobile-menu" class="hidden md:hidden">
             <a href="?page=dashboard" class="block py-2 px-4 text-sm text-gray-600 hover:bg-gray-200">Tableau de bord</a>
+
+            <div class="py-2 px-4 text-sm text-gray-500">Gestion</div>
+            <a href="?page=students" class="block py-2 pl-8 pr-4 text-sm text-gray-600 hover:bg-gray-200">Étudiants</a>
+            <a href="?page=materials" class="block py-2 pl-8 pr-4 text-sm text-gray-600 hover:bg-gray-200">Matériels</a>
             <?php if ($_SESSION['user_role'] === 'admin'): ?>
-                <a href="?page=students" class="block py-2 px-4 text-sm text-gray-600 hover:bg-gray-200">Étudiants</a>
-                <a href="?page=materials" class="block py-2 px-4 text-sm text-gray-600 hover:bg-gray-200">Matériels</a>
-                <a href="?page=agents" class="block py-2 px-4 text-sm text-gray-600 hover:bg-gray-200">Agents</a>
+                <a href="?page=agents" class="block py-2 pl-8 pr-4 text-sm text-gray-600 hover:bg-gray-200">Agents</a>
             <?php endif; ?>
+
             <a href="?page=loans" class="block py-2 px-4 text-sm text-gray-600 hover:bg-gray-200">Emprunt</a>
             <a href="?page=returns" class="block py-2 px-4 text-sm text-gray-600 hover:bg-gray-200">Retour</a>
             <a href="?page=history" class="block py-2 px-4 text-sm text-gray-600 hover:bg-gray-200">Historique</a>
+
             <?php if (isset($_SESSION['user_id'])): ?>
-                <a href="logout.php" class="block py-2 px-4 text-sm text-red-500 hover:bg-gray-200">Déconnexion</a>
+                <div class="py-2 px-4 text-sm text-gray-500">Profil</div>
+                <a href="logout.php" class="block py-2 pl-8 pr-4 text-sm text-red-500 hover:bg-gray-200">Déconnexion</a>
             <?php endif; ?>
         </div>
     </nav>
     <script>
+        // Mobile menu toggle
         const mobileMenuButton = document.getElementById('mobile-menu-button');
         const mobileMenu = document.getElementById('mobile-menu');
-
         mobileMenuButton.addEventListener('click', () => {
             mobileMenu.classList.toggle('hidden');
+        });
+
+        // Dropdown toggle function
+        function setupDropdown(buttonId, dropdownId) {
+            const button = document.getElementById(buttonId);
+            const dropdown = document.getElementById(dropdownId);
+            if (button) {
+                button.addEventListener('click', (event) => {
+                    event.stopPropagation();
+                    // Close other dropdowns
+                    document.querySelectorAll('.relative > div[id$="-dropdown"]').forEach(d => {
+                        if (d.id !== dropdownId) {
+                            d.classList.add('hidden');
+                        }
+                    });
+                    dropdown.classList.toggle('hidden');
+                });
+            }
+        }
+
+        setupDropdown('gestion-dropdown-button', 'gestion-dropdown');
+        setupDropdown('profil-dropdown-button', 'profil-dropdown');
+
+
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', (event) => {
+            if (!document.getElementById('gestion-dropdown-menu').contains(event.target)) {
+                document.getElementById('gestion-dropdown').classList.add('hidden');
+            }
+            if (!document.getElementById('profil-dropdown-menu').contains(event.target)) {
+                document.getElementById('profil-dropdown').classList.add('hidden');
+            }
         });
     </script>
     <main class="flex-grow container mx-auto mt-24 p-4">
