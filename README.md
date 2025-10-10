@@ -37,7 +37,7 @@
 1. **Clonez le dépôt :**
 
    ```bash
-   git clone https://github.com/ProfLambda/assets_manager.git
+   git clone https://github.com/patobeur/assets_manager.git
    cd assets_manager
    ```
 
