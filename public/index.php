@@ -365,12 +365,25 @@ switch ($page) {
         $hydration = new Hydration($pdo);
         $action = $_GET['action'] ?? null;
 
+        // Server-side validation
+        $stmt = $pdo->prepare("SELECT COUNT(*) FROM am_students WHERE barcode LIKE 'HYDRATION-%'");
+        $stmt->execute();
+        $isHydrated = $stmt->fetchColumn() > 0;
+
         if ($action === 'populate') {
-            $hydration->populateTables();
-            $success = "Les données de démonstration ont été ajoutées.";
+            if ($isHydrated) {
+                $error = "Les données de démonstration existent déjà.";
+            } else {
+                $hydration->populateTables();
+                $success = "Les données de démonstration ont été ajoutées.";
+            }
         } elseif ($action === 'clear') {
-            $hydration->clearTables();
-            $success = "Les données de démonstration ont été supprimées.";
+            if (!$isHydrated) {
+                $error = "Il n'y a pas de données de démonstration à supprimer.";
+            } else {
+                $hydration->clearTables();
+                $success = "Les données de démonstration ont été supprimées.";
+            }
         }
 
         require_once '../config_assets_manager/templates/hydration.php';
