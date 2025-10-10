@@ -31,6 +31,7 @@
                         <a href="?page=materials" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Matériels</a>
                         <?php if ($_SESSION['user_role'] === 'admin'): ?>
                             <a href="?page=agents" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Agents</a>
+                            <a href="?page=hydration" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Hydratation</a>
                         <?php endif; ?>
                         <a href="?page=history" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Historique</a>
                     </div>

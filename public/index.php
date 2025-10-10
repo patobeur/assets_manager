@@ -355,6 +355,26 @@ switch ($page) {
 
         require_once '../config_assets_manager/templates/history.php';
         break;
+    case 'hydration':
+        if ($_SESSION['user_role'] !== 'admin') {
+            header('Location: ?page=dashboard');
+            exit;
+        }
+
+        require_once '../config_assets_manager/hydration.php';
+        $hydration = new Hydration($pdo);
+        $action = $_GET['action'] ?? null;
+
+        if ($action === 'populate') {
+            $hydration->populateTables();
+            $success = "Les données de démonstration ont été ajoutées.";
+        } elseif ($action === 'clear') {
+            $hydration->clearTables();
+            $success = "Les données de démonstration ont été supprimées.";
+        }
+
+        require_once '../config_assets_manager/templates/hydration.php';
+        break;
     default:
         require_once '../config_assets_manager/templates/dashboard.php';
         break;
