@@ -17,7 +17,10 @@
 <body class="bg-gray-100 flex flex-col min-h-screen">
     <nav class="navbar bg-white bg-opacity-75 p-4 fixed w-full top-0 z-10 shadow-md">
         <div class="container mx-auto flex justify-between items-center">
-            <a href="/" class="text-xl font-bold text-gray-800">Gestionnaire d'actifs scolaires</a>
+            <a href="/" class="text-xl font-bold text-gray-800 flex items-center">
+                <img src="/assets/assets_manager_logo_64.png" alt="Logo" class="h-8 mr-2">
+                Gestionnaire d'actifs scolaires
+            </a>
             <div class="hidden md:flex items-center space-x-4">
                 <a href="?page=dashboard" class="text-gray-600 hover:text-gray-900">Tableau de bord</a>
 
