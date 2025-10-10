@@ -5,11 +5,16 @@ $students = $stmt->fetchAll();
 
 <div class="flex justify-between items-center mb-6">
     <h1 class="text-3xl font-bold">Étudiants</h1>
-    <?php if ($_SESSION['user_role'] === 'admin'): ?>
-        <a href="?page=students&action=create" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-            Ajouter un étudiant
+    <div class="flex space-x-4">
+        <a href="?page=students&action=export" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+            Exporter en CSV
         </a>
-    <?php endif; ?>
+        <?php if ($_SESSION['user_role'] === 'admin'): ?>
+            <a href="?page=students&action=create" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                Ajouter un étudiant
+            </a>
+        <?php endif; ?>
+    </div>
 </div>
 
 

@@ -3,7 +3,6 @@ session_start();
 
 // Check if the config file exists
 if (!file_exists('../config_assets_manager/config.php')) {
-
     if (!file_exists('install.php')) {
         // Redirect to the maintenance page
         header('Location: maintenance.php');
@@ -25,20 +24,92 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 require_once '../config_assets_manager/Database.php';
-require_once '../config_assets_manager/templates/header.php';
 
 $db = new Database();
 $pdo = $db->getConnection();
 
 $page = $_GET['page'] ?? 'dashboard';
+$action = $_GET['action'] ?? 'list';
 
+// Handle all CSV exports before any HTML output
+if ($action === 'export') {
+    $items = [];
+    $filename = 'export.csv';
+    $headers = [];
+
+    switch ($page) {
+        case 'students':
+            $stmt = $pdo->query("SELECT id, first_name, last_name, barcode FROM am_students ORDER BY last_name, first_name");
+            $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $filename = 'etudiants.csv';
+            $headers = ['ID', 'Prénom', 'Nom', 'Code-barres'];
+            break;
+
+        case 'materials':
+            $stmt = $pdo->query("SELECT id, name, description, status, barcode FROM am_materials ORDER BY name");
+            $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $filename = 'materiels.csv';
+            $headers = ['ID', 'Nom', 'Description', 'Statut', 'Code-barres'];
+            break;
+
+        case 'agents':
+            if ($_SESSION['user_role'] !== 'admin') {
+                die('Accès non autorisé.');
+            }
+            $stmt = $pdo->query("SELECT id, first_name, last_name, email, role FROM am_users WHERE role = 'agent' ORDER BY last_name, first_name");
+            $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $filename = 'agents.csv';
+            $headers = ['ID', 'Prénom', 'Nom', 'Email', 'Rôle'];
+            break;
+
+        case 'history':
+            $sql = "
+                SELECT
+                    CONCAT(am_students.first_name, ' ', am_students.last_name) as student_name,
+                    am_materials.name as material_name,
+                    am_loans.loan_date,
+                    CONCAT(loan_user.first_name, ' ', loan_user.last_name) as loan_user_name,
+                    am_loans.return_date,
+                    CONCAT(return_user.first_name, ' ', return_user.last_name) as return_user_name
+                FROM am_loans
+                JOIN am_students ON am_loans.student_id = am_students.id
+                JOIN am_materials ON am_loans.material_id = am_materials.id
+                LEFT JOIN am_users AS loan_user ON am_loans.loan_user_id = loan_user.id
+                LEFT JOIN am_users AS return_user ON am_loans.return_user_id = return_user.id
+                ORDER BY am_loans.loan_date DESC
+            ";
+            $stmt = $pdo->query($sql);
+            $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $filename = 'history.csv';
+            $headers = ['Étudiant', 'Matériel', 'Date d\'emprunt', 'Agent d\'emprunt', 'Date de retour', 'Agent de retour'];
+            break;
+    }
+
+    if (!empty($items)) {
+        header('Content-Type: text/csv; charset=utf-8');
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
+
+        $output = fopen('php://output', 'w');
+        fputcsv($output, $headers);
+
+        foreach ($items as $item) {
+            fputcsv($output, $item);
+        }
+
+        fclose($output);
+        exit;
+    }
+}
+
+// If we reach here, it's a normal page view, so we include the header.
+require_once '../config_assets_manager/templates/header.php';
+
+// The rest of the page logic for displaying HTML
 switch ($page) {
     case 'dashboard':
         require_once '../config_assets_manager/templates/dashboard.php';
         break;
     case 'students':
-        $action = $_GET['action'] ?? 'list';
-
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $first_name = $_POST['first_name'];
             $last_name = $_POST['last_name'];
@@ -78,8 +149,6 @@ switch ($page) {
         }
         break;
     case 'materials':
-        $action = $_GET['action'] ?? 'list';
-
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $name = $_POST['name'];
             $description = $_POST['description'];
@@ -120,8 +189,6 @@ switch ($page) {
         }
         break;
     case 'agents':
-        $action = $_GET['action'] ?? 'list';
-
         if ($_SESSION['user_role'] !== 'admin') {
             header('Location: ?page=dashboard');
             exit;
@@ -133,7 +200,6 @@ switch ($page) {
             $email = filter_var($_POST['email'], FILTER_SANITIZE_EMAIL);
 
             if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                // Or handle the error more gracefully
                 die("Invalid email address.");
             }
 
@@ -318,41 +384,6 @@ switch ($page) {
         require_once '../config_assets_manager/templates/returns.php';
         break;
     case 'history':
-        $action = $_GET['action'] ?? 'list';
-
-        if ($action === 'export') {
-            $sql = "
-                SELECT
-                    CONCAT(students.first_name, ' ', am_students.last_name) as student_name,
-                    am_materials.name as material_name,
-                    am_loans.loan_date,
-                    CONCAT(loan_user.first_name, ' ', loan_user.last_name) as loan_user_name,
-                    am_loans.return_date,
-                    CONCAT(return_user.first_name, ' ', return_user.last_name) as return_user_name
-                FROM am_loans
-                JOIN am_students ON am_loans.student_id = am_students.id
-                JOIN am_materials ON am_loans.material_id = am_materials.id
-                LEFT JOIN am_users AS loan_user ON am_loans.loan_user_id = loan_user.id
-                LEFT JOIN am_users AS return_user ON am_loans.return_user_id = return_user.id
-                ORDER BY am_loans.loan_date DESC
-            ";
-            $stmt = $pdo->query($sql);
-            $loans = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-            header('Content-Type: text/csv');
-            header('Content-Disposition: attachment; filename="history.csv"');
-
-            $output = fopen('php://output', 'w');
-            fputcsv($output, ['Étudiant', 'Matériel', 'Date d\'emprunt', 'Agent d\'emprunt', 'Date de retour', 'Agent de retour']);
-
-            foreach ($loans as $loan) {
-                fputcsv($output, $loan);
-            }
-
-            fclose($output);
-            exit;
-        }
-
         require_once '../config_assets_manager/templates/history.php';
         break;
     case 'hydration':
@@ -392,6 +423,5 @@ switch ($page) {
         require_once '../config_assets_manager/templates/dashboard.php';
         break;
 }
-
 
 require_once '../config_assets_manager/templates/footer.php';
