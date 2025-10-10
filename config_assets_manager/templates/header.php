@@ -1,16 +1,19 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestionnaire d'actifs scolaires</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="alternate icon" type="image/png" href="/assets/assets_manager_logo_64.png">
     <style>
         .navbar {
             backdrop-filter: blur(10px);
         }
     </style>
 </head>
+
 <body class="bg-gray-100 flex flex-col min-h-screen">
     <nav class="navbar bg-white bg-opacity-75 p-4 fixed w-full top-0 z-10 shadow-md">
         <div class="container mx-auto flex justify-between items-center">
