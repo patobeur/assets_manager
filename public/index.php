@@ -40,9 +40,9 @@ switch ($page) {
         $action = $_GET['action'] ?? 'list';
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $first_name = htmlspecialchars($_POST['first_name']);
-            $last_name = htmlspecialchars($_POST['last_name']);
-            $barcode = htmlspecialchars($_POST['barcode']);
+            $first_name = $_POST['first_name'];
+            $last_name = $_POST['last_name'];
+            $barcode = $_POST['barcode'];
 
             if ($action === 'create') {
                 $stmt = $pdo->prepare("INSERT INTO am_students (first_name, last_name, barcode) VALUES (?, ?, ?)");
@@ -81,10 +81,10 @@ switch ($page) {
         $action = $_GET['action'] ?? 'list';
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $name = htmlspecialchars($_POST['name']);
-            $description = htmlspecialchars($_POST['description']);
-            $status = htmlspecialchars($_POST['status']);
-            $barcode = htmlspecialchars($_POST['barcode']);
+            $name = $_POST['name'];
+            $description = $_POST['description'];
+            $status = $_POST['status'];
+            $barcode = $_POST['barcode'];
 
             if ($action === 'create') {
                 $stmt = $pdo->prepare("INSERT INTO am_materials (name, description, status, barcode) VALUES (?, ?, ?, ?)");
@@ -128,8 +128,8 @@ switch ($page) {
         }
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $first_name = htmlspecialchars($_POST['first_name']);
-            $last_name = htmlspecialchars($_POST['last_name']);
+            $first_name = $_POST['first_name'];
+            $last_name = $_POST['last_name'];
             $email = filter_var($_POST['email'], FILTER_SANITIZE_EMAIL);
 
             if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
@@ -179,8 +179,8 @@ switch ($page) {
         break;
     case 'loans':
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $student_barcode = htmlspecialchars($_POST['student_barcode']);
-            $material_barcode = htmlspecialchars($_POST['material_barcode']);
+            $student_barcode = $_POST['student_barcode'];
+            $material_barcode = $_POST['material_barcode'];
 
             // Get student id
             $stmt = $pdo->prepare("SELECT id FROM am_students WHERE barcode = ?");
@@ -248,7 +248,7 @@ switch ($page) {
         break;
     case 'returns':
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $material_barcode = htmlspecialchars($_POST['material_barcode']);
+            $material_barcode = $_POST['material_barcode'];
 
             // Get material id
             $stmt = $pdo->prepare("SELECT id FROM am_materials WHERE barcode = ?");
