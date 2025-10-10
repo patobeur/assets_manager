@@ -30,10 +30,6 @@
                         <a href="?page=students" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Étudiants</a>
                         <a href="?page=materials" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Matériels</a>
                         <a href="?page=history" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Historique</a>
-                        <?php if ($_SESSION['user_role'] === 'admin'): ?>
-                            <a href="?page=agents" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Agents</a>
-                            <a href="?page=hydration" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Hydratation</a>
-                        <?php endif; ?>
                     </div>
                 </div>
 
@@ -69,7 +65,7 @@
                             <?php echo htmlspecialchars($_SESSION['user_first_name']); ?>
                         </button>
                         <div id="profil-dropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-20">
-                            <a href="logout.php" class="block px-4 py-2 text-sm text-red-500 hover:bg-gray-100">Déconnexion</a>
+                            <a href="logout.php" class="block px-4 py-2 text-sm text-orange-500 hover:bg-gray-100">Déconnexion</a>
                         </div>
                     </div>
                 <?php endif; ?>
