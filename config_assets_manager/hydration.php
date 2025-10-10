@@ -72,7 +72,8 @@ class Hydration
             $update_material_status_stmt = $this->pdo->prepare("UPDATE am_materials SET status = ? WHERE id = ?");
 
             for ($i = 0; $i < 15; $i++) {
-                $loan_date = date('Y-m-d H:i:s', strtotime("-$i days"));
+                $time = $i * 10;
+                $loan_date = date('Y-m-d H:i:s', strtotime("-$time days"));
                 $is_returned = $i >= 5; // First 5 are active, the rest are returned
 
                 $return_date = null;
@@ -80,7 +81,7 @@ class Hydration
                 $material_status = 'loaned';
 
                 if ($is_returned) {
-                    $return_date = date('Y-m-d H:i:s', strtotime("-$i days + 5 hours"));
+                    $return_date = date('Y-m-d H:i:s', strtotime("-$time days + 5 hours"));
                     $return_user_id = $admin_user_id;
                     $material_status = 'available';
                 }
