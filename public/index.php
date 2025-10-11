@@ -149,9 +149,16 @@ if (($_SERVER['REQUEST_METHOD'] === 'POST' && ($action === 'create' || $action =
         case 'students':
             if ($action === 'delete') {
                 $id = intval($_GET['id']);
-                $stmt = $pdo->prepare("DELETE FROM am_students WHERE id = ?");
+                // Check for active loans
+                $stmt = $pdo->prepare("SELECT COUNT(*) FROM am_loans WHERE student_id = ? AND return_date IS NULL");
                 $stmt->execute([$id]);
-                $_SESSION['success_message'] = "Étudiant supprimé avec succès.";
+                if ($stmt->fetchColumn() > 0) {
+                    $_SESSION['error_message'] = "Impossible de supprimer l'étudiant car il a des prêts en cours.";
+                } else {
+                    $stmt = $pdo->prepare("DELETE FROM am_students WHERE id = ?");
+                    $stmt->execute([$id]);
+                    $_SESSION['success_message'] = "Étudiant supprimé avec succès.";
+                }
             } else { // POST request for create or edit
                 $first_name = $_POST['first_name'];
                 $last_name = $_POST['last_name'];
@@ -174,9 +181,18 @@ if (($_SERVER['REQUEST_METHOD'] === 'POST' && ($action === 'create' || $action =
         case 'materials':
             if ($action === 'delete') {
                 $id = intval($_GET['id']);
-                $stmt = $pdo->prepare("DELETE FROM am_materials WHERE id = ?");
+                // Check material status
+                $stmt = $pdo->prepare("SELECT status FROM am_materials WHERE id = ?");
                 $stmt->execute([$id]);
-                $_SESSION['success_message'] = "Matériel supprimé avec succès.";
+                $status = $stmt->fetchColumn();
+
+                if ($status !== 'available') {
+                    $_SESSION['error_message'] = "Impossible de supprimer le matériel car il n'est pas disponible (statut : " . htmlspecialchars($status) . ").";
+                } else {
+                    $stmt = $pdo->prepare("DELETE FROM am_materials WHERE id = ?");
+                    $stmt->execute([$id]);
+                    $_SESSION['success_message'] = "Matériel supprimé avec succès.";
+                }
             } else { // POST request for create or edit
                 $name = $_POST['name'];
                 $description = $_POST['description'];
@@ -266,6 +282,39 @@ if (isset($_SESSION['error_message'])) {
 switch ($page) {
     case 'dashboard':
         require_once '../config_assets_manager/templates/dashboard.php';
+        break;
+
+    case 'student':
+        if (isset($_GET['id'])) {
+            $student_id = intval($_GET['id']);
+
+            // Fetch student information
+            $stmt = $pdo->prepare("SELECT * FROM am_students WHERE id = ?");
+            $stmt->execute([$student_id]);
+            $student = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if ($student) {
+                // Fetch student's loan history
+                $stmt = $pdo->prepare("
+                    SELECT
+                        m.name AS material_name,
+                        l.loan_date,
+                        l.return_date
+                    FROM am_loans l
+                    JOIN am_materials m ON l.material_id = m.id
+                    WHERE l.student_id = ?
+                    ORDER BY l.loan_date DESC
+                ");
+                $stmt->execute([$student_id]);
+                $loans = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                require_once '../config_assets_manager/templates/student_details.php';
+            } else {
+                echo "Étudiant non trouvé.";
+            }
+        } else {
+            echo "ID de l'étudiant non fourni.";
+        }
         break;
     case 'students':
         switch ($action) {
