@@ -30,17 +30,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $admin_password = password_hash($admin_password, PASSWORD_DEFAULT);
 
-    // Create the config file with escaped values
-    $config_content = "<?php\n\n";
-    $config_content .= "define('DB_HOST', '" . addslashes($db_host) . "');\n";
-    $config_content .= "define('DB_NAME', '" . addslashes($db_name) . "');\n";
-    $config_content .= "define('DB_USER', '" . addslashes($db_user) . "');\n";
-    $config_content .= "define('DB_PASSWORD', '" . addslashes($db_password) . "');\n";
-
-    if (file_put_contents('../config_assets_manager/config.php', $config_content) === false) {
-        die("Erreur : Impossible de créer le fichier de configuration. Veuillez vérifier les autorisations du dossier.");
-    }
-
     // Connect to the database
     try {
         $pdo = new PDO("mysql:host=$db_host", $db_user, $db_password);
@@ -81,7 +70,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         barcode VARCHAR(255) NOT NULL UNIQUE,
         email VARCHAR(255) NOT NULL UNIQUE,
         promo_id INT(11) NOT NULL,
-        section_id INT(11) NOT NULL
+        section_id INT(11) NOT NULL,
+        FOREIGN KEY (promo_id) REFERENCES am_promos(id) ON DELETE CASCADE,
+        FOREIGN KEY (section_id) REFERENCES am_sections(id) ON DELETE CASCADE
     );
 
     CREATE TABLE IF NOT EXISTS am_materials (
@@ -113,6 +104,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         die("Erreur lors de la création des tables : " . $e->getMessage());
     }
 
+    // Insert default data
+    try {
+        $pdo->exec("INSERT INTO am_promos (title) VALUES ('00-00'), ('25-27');");
+        $pdo->exec("INSERT INTO am_sections (title) VALUES ('Bachelor RC'), ('BTS COM');");
+    } catch (PDOException $e) {
+        die("Erreur lors de l'insertion des données par défaut : " . $e->getMessage());
+    }
+
 
     // Create the admin user
     try {
@@ -120,6 +119,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->execute([$admin_first_name, $admin_last_name, $admin_email, $admin_password]);
     } catch (PDOException $e) {
         die("Erreur lors de la création de l'utilisateur administrateur : " . $e->getMessage());
+    }
+
+    // Create the config file only if all previous steps were successful
+    $config_content = "<?php\n\n";
+    $config_content .= "define('DB_HOST', '" . addslashes($db_host) . "');\n";
+    $config_content .= "define('DB_NAME', '" . addslashes($db_name) . "');\n";
+    $config_content .= "define('DB_USER', '" . addslashes($db_user) . "');\n";
+    $config_content .= "define('DB_PASSWORD', '" . addslashes($db_password) . "');\n";
+
+    if (file_put_contents('../config_assets_manager/config.php', $config_content) === false) {
+        die("Erreur : Impossible de créer le fichier de configuration. Veuillez vérifier les autorisations du dossier.");
     }
 
     // Redirect to the login page
