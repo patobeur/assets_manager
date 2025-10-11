@@ -118,13 +118,23 @@ $materials = $stmt->fetchAll();
         <tbody class="text-gray-600 text-sm font-light">
             <?php foreach ($materials as $material): ?>
                 <tr class="border-b border-gray-200 hover:bg-gray-100">
-                    <td class="py-3 px-6 text-left whitespace-nowrap"><?php echo htmlspecialchars($material['name']); ?></td>
+                    <td class="py-3 px-6 text-left whitespace-nowrap">
+                        <a href="?page=material&id=<?php echo $material['id']; ?>" class="text-blue-500 hover:underline">
+                            <?php echo htmlspecialchars($material['name']); ?>
+                        </a>
+                    </td>
                     <td class="py-3 px-6 text-left"><?php echo htmlspecialchars($material['description']); ?></td>
                     <td class="py-3 px-6 text-left"><?php echo htmlspecialchars($material['status']); ?></td>
                     <td class="py-3 px-6 text-left"><?php echo htmlspecialchars($material['barcode']); ?></td>
                     <?php if ($_SESSION['user_role'] === 'admin'): ?>
                         <td class="py-3 px-6 text-center">
                             <div class="flex item-center justify-center">
+                                <a href="?page=material&id=<?php echo $material['id']; ?>" class="w-4 mr-2 transform hover:text-blue-500 hover:scale-110" title="Voir la fiche">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                    </svg>
+                                </a>
                                 <a href="?page=materials&action=edit&id=<?php echo $material['id']; ?>" class="w-4 mr-2 transform hover:text-purple-500 hover:scale-110">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.5L16.732 3.732z" />
@@ -145,25 +155,25 @@ $materials = $stmt->fetchAll();
 </div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener('DOMContentLoaded', function() {
         const deleteModal = document.getElementById('delete-modal-materials');
         const confirmDeleteBtn = document.getElementById('confirm-delete-btn-materials');
         const cancelDeleteBtn = document.getElementById('cancel-delete-btn-materials');
         let materialIdToDelete = null;
 
         document.querySelectorAll('.delete-btn-materials').forEach(button => {
-            button.addEventListener('click', function () {
+            button.addEventListener('click', function() {
                 materialIdToDelete = this.dataset.id;
                 deleteModal.classList.remove('hidden');
             });
         });
 
-        cancelDeleteBtn.addEventListener('click', function () {
+        cancelDeleteBtn.addEventListener('click', function() {
             deleteModal.classList.add('hidden');
             materialIdToDelete = null;
         });
 
-        confirmDeleteBtn.addEventListener('click', function (e) {
+        confirmDeleteBtn.addEventListener('click', function(e) {
             e.preventDefault();
             if (materialIdToDelete) {
                 window.location.href = `?page=materials&action=delete&id=${materialIdToDelete}`;
