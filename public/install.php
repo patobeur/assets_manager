@@ -64,11 +64,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         role ENUM('agent', 'admin') NOT NULL
     );
 
+    CREATE TABLE IF NOT EXISTS am_promos (
+        id INT(11) AUTO_INCREMENT PRIMARY KEY,
+        title VARCHAR(255) NOT NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS am_sections (
+        id INT(11) AUTO_INCREMENT PRIMARY KEY,
+        title VARCHAR(255) NOT NULL
+    );
+
     CREATE TABLE IF NOT EXISTS am_students (
         id INT(11) AUTO_INCREMENT PRIMARY KEY,
         first_name VARCHAR(255) NOT NULL,
         last_name VARCHAR(255) NOT NULL,
-        barcode VARCHAR(255) NOT NULL UNIQUE
+        barcode VARCHAR(255) NOT NULL UNIQUE,
+        email VARCHAR(255) NOT NULL UNIQUE,
+        promo_id INT(11) NOT NULL,
+        section_id INT(11) NOT NULL
     );
 
     CREATE TABLE IF NOT EXISTS am_materials (
@@ -135,15 +148,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <h2 class="text-2xl font-bold mb-6">Configuration de la base de données</h2>
                 <div class="mb-4">
                     <label for="db_host" class="block text-gray-700 text-sm font-bold mb-2">Hôte</label>
-                    <input type="text" id="db_host" name="db_host" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+                    <input value="localhost" type="text" id="db_host" name="db_host" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
                 </div>
                 <div class="mb-4">
                     <label for="db_name" class="block text-gray-700 text-sm font-bold mb-2">Nom de la base de données</label>
-                    <input type="text" id="db_name" name="db_name" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+                    <input value="assets_manager" type="text" id="db_name" name="db_name" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
                 </div>
                 <div class="mb-4">
                     <label for="db_user" class="block text-gray-700 text-sm font-bold mb-2">Utilisateur</label>
-                    <input type="text" id="db_user" name="db_user" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+                    <input value="root" type="text" id="db_user" name="db_user" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
                 </div>
                 <div class="mb-6">
                     <label for="db_password" class="block text-gray-700 text-sm font-bold mb-2">Mot de passe</label>
@@ -155,15 +168,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <h2 class="text-2xl font-bold mb-6">Compte administrateur</h2>
                 <div class="mb-4">
                     <label for="admin_first_name" class="block text-gray-700 text-sm font-bold mb-2">Prénom</label>
-                    <input type="text" id="admin_first_name" name="admin_first_name" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+                    <input value="Patobeur" type="text" id="admin_first_name" name="admin_first_name" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
                 </div>
                 <div class="mb-4">
                     <label for="admin_last_name" class="block text-gray-700 text-sm font-bold mb-2">Nom</label>
-                    <input type="text" id="admin_last_name" name="admin_last_name" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+                    <input value="Etlardons" type="text" id="admin_last_name" name="admin_last_name" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
                 </div>
                 <div class="mb-4">
                     <label for="admin_email" class="block text-gray-700 text-sm font-bold mb-2">Email</label>
-                    <input type="email" id="admin_email" name="admin_email" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+                    <input value="patobeur@patobeur.pat" type="email" id="admin_email" name="admin_email" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
                 </div>
                 <div class="mb-6">
                     <label for="admin_password" class="block text-gray-700 text-sm font-bold mb-2">Mot de passe</label>
