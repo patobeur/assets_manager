@@ -3,7 +3,7 @@ $stmt = $pdo->prepare("SELECT first_name FROM am_users WHERE id = ?");
 $stmt->execute([$_SESSION['user_id']]);
 $user = $stmt->fetch();
 
-if ($_SESSION['user_role'] === 'admin') {
+if ($_SESSION['user_role'] === 'admin' || $_SESSION['user_role'] === 'agent') {
     $student_count = $pdo->query("SELECT count(*) FROM am_students")->fetchColumn();
     $material_count = $pdo->query("SELECT count(*) FROM am_materials")->fetchColumn();
     $agent_count = $pdo->query("SELECT count(*) FROM am_users WHERE role = 'agent'")->fetchColumn();
@@ -18,7 +18,7 @@ if ($_SESSION['user_role'] === 'admin') {
     <p class="text-lg text-gray-600">Content de vous revoir, <span class="font-semibold"><?php echo htmlspecialchars($user['first_name']); ?></span>!</p>
 </div>
 
-<?php if ($_SESSION['user_role'] === 'admin'): ?>
+<?php if ($_SESSION['user_role'] === 'admin' || $_SESSION['user_role'] === 'agent'): ?>
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-6">
         <div class="bg-white p-6 rounded-lg shadow-md">
             <h2 class="text-2xl font-bold text-gray-800"><?php echo $student_count; ?></h2>
@@ -56,7 +56,7 @@ if ($_SESSION['user_role'] === 'admin') {
 </div>
 
 <?php
-if ($_SESSION['user_role'] === 'admin') {
+if ($_SESSION['user_role'] === 'admin' || $_SESSION['user_role'] === 'agent') {
     $stmt = $pdo->query("
         SELECT l.loan_date, s.first_name AS student_first_name, s.last_name AS student_last_name, m.name AS material_name
         FROM am_loans l
@@ -69,7 +69,7 @@ if ($_SESSION['user_role'] === 'admin') {
 }
 ?>
 
-<?php if ($_SESSION['user_role'] === 'admin' && !empty($recent_loans)): ?>
+<?php if (($_SESSION['user_role'] === 'admin' || $_SESSION['user_role'] === 'agent') && !empty($recent_loans)): ?>
     <div class="mt-10">
         <h2 class="text-2xl font-bold text-gray-800 mb-4">Derniers emprunts</h2>
         <div class="bg-white p-6 rounded-lg shadow-md">
@@ -96,7 +96,7 @@ if ($_SESSION['user_role'] === 'admin') {
 <?php endif; ?>
 
 <?php
-if ($_SESSION['user_role'] === 'admin') {
+if ($_SESSION['user_role'] === 'admin' || $_SESSION['user_role'] === 'agent') {
     $stmt = $pdo->query("
         SELECT l.loan_date, s.first_name AS student_first_name, s.last_name AS student_last_name, m.name AS material_name
         FROM am_loans l
@@ -109,7 +109,7 @@ if ($_SESSION['user_role'] === 'admin') {
 }
 ?>
 
-<?php if ($_SESSION['user_role'] === 'admin' && !empty($overdue_loans)): ?>
+<?php if (($_SESSION['user_role'] === 'admin' || $_SESSION['user_role'] === 'agent') && !empty($overdue_loans)): ?>
     <div class="mt-10">
         <h2 class="text-2xl font-bold text-red-600 mb-4">Emprunts en retard (>7jours)</h2>
         <div class="bg-white p-6 rounded-lg shadow-md border border-red-200">

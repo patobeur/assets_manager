@@ -143,6 +143,105 @@ if ($action === 'export') {
     }
 }
 
+// Handle POST actions (create, edit) and GET actions (delete) before any HTML is output
+if (($_SERVER['REQUEST_METHOD'] === 'POST' && ($action === 'create' || $action === 'edit')) || $action === 'delete') {
+    switch ($page) {
+        case 'students':
+            if ($action === 'delete') {
+                $id = intval($_GET['id']);
+                $stmt = $pdo->prepare("DELETE FROM am_students WHERE id = ?");
+                $stmt->execute([$id]);
+                $_SESSION['success_message'] = "Étudiant supprimé avec succès.";
+            } else { // POST request for create or edit
+                $first_name = $_POST['first_name'];
+                $last_name = $_POST['last_name'];
+                $barcode = $_POST['barcode'];
+
+                if ($action === 'create') {
+                    $stmt = $pdo->prepare("INSERT INTO am_students (first_name, last_name, barcode) VALUES (?, ?, ?)");
+                    $stmt->execute([$first_name, $last_name, $barcode]);
+                    $_SESSION['success_message'] = "Étudiant créé avec succès.";
+                } elseif ($action === 'edit') {
+                    $id = intval($_POST['id']);
+                    $stmt = $pdo->prepare("UPDATE am_students SET first_name = ?, last_name = ?, barcode = ? WHERE id = ?");
+                    $stmt->execute([$first_name, $last_name, $barcode, $id]);
+                    $_SESSION['success_message'] = "Étudiant mis à jour avec succès.";
+                }
+            }
+            header('Location: ?page=students');
+            exit;
+
+        case 'materials':
+            if ($action === 'delete') {
+                $id = intval($_GET['id']);
+                $stmt = $pdo->prepare("DELETE FROM am_materials WHERE id = ?");
+                $stmt->execute([$id]);
+                $_SESSION['success_message'] = "Matériel supprimé avec succès.";
+            } else { // POST request for create or edit
+                $name = $_POST['name'];
+                $description = $_POST['description'];
+                $status = $_POST['status'];
+                $barcode = $_POST['barcode'];
+
+                if ($action === 'create') {
+                    $stmt = $pdo->prepare("INSERT INTO am_materials (name, description, status, barcode) VALUES (?, ?, ?, ?)");
+                    $stmt->execute([$name, $description, $status, $barcode]);
+                    $_SESSION['success_message'] = "Matériel créé avec succès.";
+                } elseif ($action === 'edit') {
+                    $id = intval($_POST['id']);
+                    $stmt = $pdo->prepare("UPDATE am_materials SET name = ?, description = ?, status = ?, barcode = ? WHERE id = ?");
+                    $stmt->execute([$name, $description, $status, $barcode, $id]);
+                    $_SESSION['success_message'] = "Matériel mis à jour avec succès.";
+                }
+            }
+            header('Location: ?page=materials');
+            exit;
+
+        case 'agents':
+            if ($_SESSION['user_role'] !== 'admin') {
+                header('Location: ?page=dashboard');
+                exit;
+            }
+
+            if ($action === 'delete') {
+                $id = intval($_GET['id']);
+                $stmt = $pdo->prepare("DELETE FROM am_users WHERE id = ?");
+                $stmt->execute([$id]);
+                $_SESSION['success_message'] = "Agent supprimé avec succès.";
+            } else { // POST request for create or edit
+                $first_name = $_POST['first_name'];
+                $last_name = $_POST['last_name'];
+                $email = filter_var($_POST['email'], FILTER_SANITIZE_EMAIL);
+
+                if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                    $_SESSION['error_message'] = "Adresse email invalide.";
+                    header('Location: ?page=agents&action=' . $action . (isset($_POST['id']) ? '&id=' . $_POST['id'] : ''));
+                    exit;
+                }
+
+                if ($action === 'create') {
+                    $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
+                    $stmt = $pdo->prepare("INSERT INTO am_users (first_name, last_name, email, password, role) VALUES (?, ?, ?, ?, 'agent')");
+                    $stmt->execute([$first_name, $last_name, $email, $password]);
+                    $_SESSION['success_message'] = "Agent créé avec succès.";
+                } elseif ($action === 'edit') {
+                    $id = intval($_POST['id']);
+                    if (!empty($_POST['password'])) {
+                        $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
+                        $stmt = $pdo->prepare("UPDATE am_users SET first_name = ?, last_name = ?, email = ?, password = ? WHERE id = ?");
+                        $stmt->execute([$first_name, $last_name, $email, $password, $id]);
+                    } else {
+                        $stmt = $pdo->prepare("UPDATE am_users SET first_name = ?, last_name = ?, email = ? WHERE id = ?");
+                        $stmt->execute([$first_name, $last_name, $email, $id]);
+                    }
+                    $_SESSION['success_message'] = "Agent mis à jour avec succès.";
+                }
+            }
+            header('Location: ?page=agents');
+            exit;
+    }
+}
+
 // If we reach here, it's a normal page view, so we include the header.
 require_once '../config_assets_manager/templates/header.php';
 
@@ -150,7 +249,7 @@ require_once '../config_assets_manager/templates/header.php';
 if (isset($_SESSION['success_message'])) {
     echo '<div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">';
     echo '<strong class="font-bold">Succès !</strong>';
-    echo '<span class="block sm:inline">' . $_SESSION['success_message'] . '</span>';
+    echo '<span class="block sm:inline">' . htmlspecialchars($_SESSION['success_message'], ENT_QUOTES, 'UTF-8') . '</span>';
     echo '</div>';
     unset($_SESSION['success_message']);
 }
@@ -158,7 +257,7 @@ if (isset($_SESSION['success_message'])) {
 if (isset($_SESSION['error_message'])) {
     echo '<div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">';
     echo '<strong class="font-bold">Erreur !</strong>';
-    echo '<span class="block sm:inline">' . $_SESSION['error_message'] . '</span>';
+    echo '<span class="block sm:inline">' . htmlspecialchars($_SESSION['error_message'], ENT_QUOTES, 'UTF-8') . '</span>';
     echo '</div>';
     unset($_SESSION['error_message']);
 }
@@ -169,31 +268,6 @@ switch ($page) {
         require_once '../config_assets_manager/templates/dashboard.php';
         break;
     case 'students':
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $first_name = $_POST['first_name'];
-            $last_name = $_POST['last_name'];
-            $barcode = $_POST['barcode'];
-
-            if ($action === 'create') {
-                $stmt = $pdo->prepare("INSERT INTO am_students (first_name, last_name, barcode) VALUES (?, ?, ?)");
-                $stmt->execute([$first_name, $last_name, $barcode]);
-            } elseif ($action === 'edit') {
-                $id = intval($_POST['id']);
-                $stmt = $pdo->prepare("UPDATE am_students SET first_name = ?, last_name = ?, barcode = ? WHERE id = ?");
-                $stmt->execute([$first_name, $last_name, $barcode, $id]);
-            }
-            header('Location: ?page=students');
-            exit;
-        }
-
-        if ($action === 'delete') {
-            $id = intval($_GET['id']);
-            $stmt = $pdo->prepare("DELETE FROM am_students WHERE id = ?");
-            $stmt->execute([$id]);
-            header('Location: ?page=students');
-            exit;
-        }
-
         switch ($action) {
             case 'list':
                 require_once '../config_assets_manager/templates/students.php';
@@ -208,32 +282,6 @@ switch ($page) {
         }
         break;
     case 'materials':
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $name = $_POST['name'];
-            $description = $_POST['description'];
-            $status = $_POST['status'];
-            $barcode = $_POST['barcode'];
-
-            if ($action === 'create') {
-                $stmt = $pdo->prepare("INSERT INTO am_materials (name, description, status, barcode) VALUES (?, ?, ?, ?)");
-                $stmt->execute([$name, $description, $status, $barcode]);
-            } elseif ($action === 'edit') {
-                $id = intval($_POST['id']);
-                $stmt = $pdo->prepare("UPDATE am_materials SET name = ?, description = ?, status = ?, barcode = ? WHERE id = ?");
-                $stmt->execute([$name, $description, $status, $barcode, $id]);
-            }
-            header('Location: ?page=materials');
-            exit;
-        }
-
-        if ($action === 'delete') {
-            $id = intval($_GET['id']);
-            $stmt = $pdo->prepare("DELETE FROM am_materials WHERE id = ?");
-            $stmt->execute([$id]);
-            header('Location: ?page=materials');
-            exit;
-        }
-
         switch ($action) {
             case 'list':
                 require_once '../config_assets_manager/templates/materials.php';
@@ -250,42 +298,6 @@ switch ($page) {
     case 'agents':
         if ($_SESSION['user_role'] !== 'admin') {
             header('Location: ?page=dashboard');
-            exit;
-        }
-
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $first_name = $_POST['first_name'];
-            $last_name = $_POST['last_name'];
-            $email = filter_var($_POST['email'], FILTER_SANITIZE_EMAIL);
-
-            if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                die("Invalid email address.");
-            }
-
-            if ($action === 'create') {
-                $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
-                $stmt = $pdo->prepare("INSERT INTO am_users (first_name, last_name, email, password, role) VALUES (?, ?, ?, ?, 'agent')");
-                $stmt->execute([$first_name, $last_name, $email, $password]);
-            } elseif ($action === 'edit') {
-                $id = intval($_POST['id']);
-                if (!empty($_POST['password'])) {
-                    $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
-                    $stmt = $pdo->prepare("UPDATE am_users SET first_name = ?, last_name = ?, email = ?, password = ? WHERE id = ?");
-                    $stmt->execute([$first_name, $last_name, $email, $password, $id]);
-                } else {
-                    $stmt = $pdo->prepare("UPDATE am_users SET first_name = ?, last_name = ?, email = ? WHERE id = ?");
-                    $stmt->execute([$first_name, $last_name, $email, $id]);
-                }
-            }
-            header('Location: ?page=agents');
-            exit;
-        }
-
-        if ($action === 'delete') {
-            $id = intval($_GET['id']);
-            $stmt = $pdo->prepare("DELETE FROM am_users WHERE id = ?");
-            $stmt->execute([$id]);
-            header('Location: ?page=agents');
             exit;
         }
 
