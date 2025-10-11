@@ -31,6 +31,48 @@ $pdo = $db->getConnection();
 $page = $_GET['page'] ?? 'dashboard';
 $action = $_GET['action'] ?? 'list';
 
+// Handle CSV import
+if ($action === 'import' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (isset($_FILES['csv_file']) && $_FILES['csv_file']['error'] == UPLOAD_ERR_OK) {
+        $csvFile = $_FILES['csv_file']['tmp_name'];
+
+        if (($handle = fopen($csvFile, "r")) !== FALSE) {
+            $pdo->beginTransaction();
+            try {
+                // Skip header row
+                fgetcsv($handle, 1000, ",");
+
+                if ($page === 'students') {
+                    $stmt = $pdo->prepare("INSERT INTO am_students (first_name, last_name, barcode) VALUES (?, ?, ?)");
+                    while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
+                        // Assuming CSV columns are: first_name, last_name, barcode
+                        $stmt->execute([$data[0], $data[1], $data[2]]);
+                    }
+                } elseif ($page === 'materials') {
+                    $stmt = $pdo->prepare("INSERT INTO am_materials (name, description, status, barcode) VALUES (?, ?, ?, ?)");
+                    while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
+                        // Assuming CSV columns are: name, description, status, barcode
+                        $stmt->execute([$data[0], $data[1], $data[2], $data[3]]);
+                    }
+                }
+
+                $pdo->commit();
+                $_SESSION['success_message'] = "Importation réussie.";
+            } catch (Exception $e) {
+                $pdo->rollBack();
+                $_SESSION['error_message'] = "Erreur lors de l'importation : " . $e->getMessage();
+            }
+            fclose($handle);
+        } else {
+            $_SESSION['error_message'] = "Erreur lors de l'ouverture du fichier CSV.";
+        }
+    } else {
+        $_SESSION['error_message'] = "Aucun fichier n'a été téléversé ou une erreur s'est produite.";
+    }
+    header('Location: ?page=' . $page);
+    exit;
+}
+
 // Handle all CSV exports before any HTML output
 if ($action === 'export') {
     $items = [];
@@ -103,6 +145,23 @@ if ($action === 'export') {
 
 // If we reach here, it's a normal page view, so we include the header.
 require_once '../config_assets_manager/templates/header.php';
+
+// Display success/error messages
+if (isset($_SESSION['success_message'])) {
+    echo '<div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">';
+    echo '<strong class="font-bold">Succès !</strong>';
+    echo '<span class="block sm:inline">' . $_SESSION['success_message'] . '</span>';
+    echo '</div>';
+    unset($_SESSION['success_message']);
+}
+
+if (isset($_SESSION['error_message'])) {
+    echo '<div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">';
+    echo '<strong class="font-bold">Erreur !</strong>';
+    echo '<span class="block sm:inline">' . $_SESSION['error_message'] . '</span>';
+    echo '</div>';
+    unset($_SESSION['error_message']);
+}
 
 // The rest of the page logic for displaying HTML
 switch ($page) {
