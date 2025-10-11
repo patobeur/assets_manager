@@ -35,7 +35,7 @@ $students = $stmt->fetchAll();
                     </h3>
                     <div class="mt-2">
                         <p class="text-sm text-gray-500">
-                            Le fichier CSV doit avoir les colonnes : first_name, last_name, barcode. <a href="examples/students_example.csv" class="text-blue-500 hover:underline" download>Télécharger un exemple</a>.
+                            Le fichier CSV doit avoir les colonnes : first_name,last_name,barcode,email,promo_id,section_id. <a href="examples/students_example.csv" class="text-blue-500 hover:underline" download>Télécharger un exemple</a>.
                         </p>
                         <input type="file" name="csv_file" accept=".csv" class="mt-2">
                     </div>

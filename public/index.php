@@ -43,10 +43,10 @@ if ($action === 'import' && $_SERVER['REQUEST_METHOD'] === 'POST') {
                 fgetcsv($handle, 1000, ",");
 
                 if ($page === 'students') {
-                    $stmt = $pdo->prepare("INSERT INTO am_students (first_name, last_name, barcode) VALUES (?, ?, ?)");
+                    $stmt = $pdo->prepare("INSERT INTO am_students (first_name, last_name, barcode, email, promo_id, section_id) VALUES (?, ?, ?, ?, ?, ?)");
                     while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
                         // Assuming CSV columns are: first_name, last_name, barcode
-                        $stmt->execute([$data[0], $data[1], $data[2]]);
+                        $stmt->execute([$data[0], $data[1], $data[2], $data[3], $data[4], $data[5]]);
                     }
                 } elseif ($page === 'materials') {
                     $stmt = $pdo->prepare("INSERT INTO am_materials (name, description, status, barcode) VALUES (?, ?, ?, ?)");
