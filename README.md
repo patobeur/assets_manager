@@ -9,7 +9,31 @@
 -  **Gestion du matériel**: Suivez tous les matériaux disponibles, leurs descriptions et leur statut (disponible, prêté ou en maintenance).
 -  **Gestion des prêts**: Enregistrez les prêts, y compris l'étudiant qui a emprunté le matériel, la date du prêt et la date de retour.
 -  **Hydratation des données**: Une fonctionnalité permettant aux administrateurs de peupler la base de données avec des données de démonstration et de la nettoyer lorsqu'elle n'est plus nécessaire.
+-  **Import et Export CSV**: Importez et exportez facilement des listes d'étudiants et de matériel.
 -  **Interface conviviale**: Une interface simple et intuitive créée avec Tailwind CSS.
+
+### Import de Données via CSV
+
+L'application permet d'importer des listes d'étudiants et de matériel en utilisant des fichiers CSV. Cette fonctionnalité est accessible aux administrateurs depuis les pages de gestion des étudiants et du matériel.
+
+**Important :** Pour que l'importation fonctionne correctement, l'ordre des colonnes dans votre fichier CSV doit impérativement correspondre au format attendu par l'application. La première ligne du fichier (contenant les en-têtes) est ignorée lors de l'importation.
+
+-  **Format pour les étudiants :**
+
+   1. `Prénom`
+   2. `Nom`
+   3. `Email`
+   4. `Promo` (le nom de la promotion, ex: "25-27")
+   5. `Section` (le nom de la section, ex: "BTS COM")
+   6. `Code-barres`
+
+-  **Format pour le matériel :**
+   1. `Nom`
+   2. `Description`
+   3. `Statut` (doit être `available`, `loaned`, ou `maintenance`)
+   4. `Code-barres`
+
+Des fichiers d'exemple sont disponibles au téléchargement directement depuis l'interface d'importation pour vous aider à préparer vos données.
 
 ## Stack Technologique
 

@@ -43,10 +43,30 @@ if ($action === 'import' && $_SERVER['REQUEST_METHOD'] === 'POST') {
                 fgetcsv($handle, 1000, ",");
 
                 if ($page === 'students') {
-                    $stmt = $pdo->prepare("INSERT INTO am_students (first_name, last_name, barcode, email, promo_id, section_id) VALUES (?, ?, ?, ?, ?, ?)");
+                    // Prepare statements for getting promo and section IDs
+                    $promo_stmt = $pdo->prepare("SELECT id FROM am_promos WHERE title = ?");
+                    $section_stmt = $pdo->prepare("SELECT id FROM am_sections WHERE title = ?");
+
+                    $student_stmt = $pdo->prepare("INSERT INTO am_students (first_name, last_name, email, barcode, promo_id, section_id) VALUES (?, ?, ?, ?, ?, ?)");
+
                     while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
-                        // Assuming CSV columns are: first_name, last_name, barcode
-                        $stmt->execute([$data[0], $data[1], $data[2], $data[3], $data[4], $data[5]]);
+                        // CSV columns: first_name, last_name, email, promo_name, section_name, barcode
+                        $first_name = $data[0];
+                        $last_name = $data[1];
+                        $email = $data[2];
+                        $promo_name = $data[3];
+                        $section_name = $data[4];
+                        $barcode = $data[5];
+
+                        // Get promo ID
+                        $promo_stmt->execute([$promo_name]);
+                        $promo_id = $promo_stmt->fetchColumn() ?: null;
+
+                        // Get section ID
+                        $section_stmt->execute([$section_name]);
+                        $section_id = $section_stmt->fetchColumn() ?: null;
+
+                        $student_stmt->execute([$first_name, $last_name, $email, $barcode, $promo_id, $section_id]);
                     }
                 } elseif ($page === 'materials') {
                     $stmt = $pdo->prepare("INSERT INTO am_materials (name, description, status, barcode) VALUES (?, ?, ?, ?)");
@@ -81,10 +101,16 @@ if ($action === 'export') {
 
     switch ($page) {
         case 'students':
-            $stmt = $pdo->query("SELECT id, first_name, last_name, barcode FROM am_students ORDER BY last_name, first_name");
+            $stmt = $pdo->query("
+                SELECT s.id, s.first_name, s.last_name, s.email, p.title as promo_name, sec.title as section_name, s.barcode
+                FROM am_students s
+                LEFT JOIN am_promos p ON s.promo_id = p.id
+                LEFT JOIN am_sections sec ON s.section_id = sec.id
+                ORDER BY s.last_name, s.first_name
+            ");
             $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
             $filename = 'etudiants.csv';
-            $headers = ['ID', 'Prénom', 'Nom', 'Code-barres'];
+            $headers = ['ID', 'Prénom', 'Nom', 'Email', 'Promo', 'Section', 'Code-barres'];
             break;
 
         case 'materials':
@@ -162,16 +188,25 @@ if (($_SERVER['REQUEST_METHOD'] === 'POST' && ($action === 'create' || $action =
             } else { // POST request for create or edit
                 $first_name = $_POST['first_name'];
                 $last_name = $_POST['last_name'];
+                $email = filter_var($_POST['email'], FILTER_SANITIZE_EMAIL);
                 $barcode = $_POST['barcode'];
+                $promo_id = !empty($_POST['promo_id']) ? intval($_POST['promo_id']) : null;
+                $section_id = !empty($_POST['section_id']) ? intval($_POST['section_id']) : null;
+
+                if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                    $_SESSION['error_message'] = "Adresse email de l'étudiant invalide.";
+                    header('Location: ?page=students&action=' . $action . (isset($_POST['id']) ? '&id=' . $_POST['id'] : ''));
+                    exit;
+                }
 
                 if ($action === 'create') {
-                    $stmt = $pdo->prepare("INSERT INTO am_students (first_name, last_name, barcode) VALUES (?, ?, ?)");
-                    $stmt->execute([$first_name, $last_name, $barcode]);
+                    $stmt = $pdo->prepare("INSERT INTO am_students (first_name, last_name, email, barcode, promo_id, section_id) VALUES (?, ?, ?, ?, ?, ?)");
+                    $stmt->execute([$first_name, $last_name, $email, $barcode, $promo_id, $section_id]);
                     $_SESSION['success_message'] = "Étudiant créé avec succès.";
                 } elseif ($action === 'edit') {
                     $id = intval($_POST['id']);
-                    $stmt = $pdo->prepare("UPDATE am_students SET first_name = ?, last_name = ?, barcode = ? WHERE id = ?");
-                    $stmt->execute([$first_name, $last_name, $barcode, $id]);
+                    $stmt = $pdo->prepare("UPDATE am_students SET first_name = ?, last_name = ?, email = ?, barcode = ?, promo_id = ?, section_id = ? WHERE id = ?");
+                    $stmt->execute([$first_name, $last_name, $email, $barcode, $promo_id, $section_id, $id]);
                     $_SESSION['success_message'] = "Étudiant mis à jour avec succès.";
                 }
             }
@@ -289,7 +324,13 @@ switch ($page) {
             $student_id = intval($_GET['id']);
 
             // Fetch student information
-            $stmt = $pdo->prepare("SELECT * FROM am_students WHERE id = ?");
+            $stmt = $pdo->prepare("
+                SELECT s.*, p.title as promo_name, sec.title as section_name
+                FROM am_students s
+                LEFT JOIN am_promos p ON s.promo_id = p.id
+                LEFT JOIN am_sections sec ON s.section_id = sec.id
+                WHERE s.id = ?
+            ");
             $stmt->execute([$student_id]);
             $student = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -356,6 +397,13 @@ switch ($page) {
                 break;
             case 'create':
             case 'edit':
+                // Fetch promos and sections for the form
+                $promos_stmt = $pdo->query("SELECT * FROM am_promos ORDER BY title");
+                $promos = $promos_stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                $sections_stmt = $pdo->query("SELECT * FROM am_sections ORDER BY title");
+                $sections = $sections_stmt->fetchAll(PDO::FETCH_ASSOC);
+
                 require_once '../config_assets_manager/templates/student_form.php';
                 break;
             default:

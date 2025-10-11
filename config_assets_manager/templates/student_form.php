@@ -4,6 +4,9 @@ $student = [
     'first_name' => '',
     'last_name' => '',
     'barcode' => '',
+    'email' => '',
+    'promo_id' => null,
+    'section_id' => null,
 ];
 $is_edit = false;
 
@@ -27,6 +30,32 @@ if (isset($_GET['id'])) {
         <div class="mb-4">
             <label for="last_name" class="block text-gray-700 text-sm font-bold mb-2">Nom</label>
             <input type="text" id="last_name" name="last_name" value="<?php echo htmlspecialchars($student['last_name']); ?>" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+        </div>
+        <div class="mb-4">
+            <label for="email" class="block text-gray-700 text-sm font-bold mb-2">Email</label>
+            <input type="email" id="email" name="email" value="<?php echo htmlspecialchars($student['email']); ?>" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+        </div>
+        <div class="mb-4">
+            <label for="promo_id" class="block text-gray-700 text-sm font-bold mb-2">Promo</label>
+            <select id="promo_id" name="promo_id" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                <option value="">Sélectionner une promo</option>
+                <?php foreach ($promos as $promo): ?>
+                    <option value="<?php echo $promo['id']; ?>" <?php echo (isset($student['promo_id']) && $student['promo_id'] == $promo['id']) ? 'selected' : ''; ?>>
+                        <?php echo htmlspecialchars($promo['title']); ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
+        </div>
+        <div class="mb-4">
+            <label for="section_id" class="block text-gray-700 text-sm font-bold mb-2">Section</label>
+            <select id="section_id" name="section_id" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                <option value="">Sélectionner une section</option>
+                <?php foreach ($sections as $section): ?>
+                    <option value="<?php echo $section['id']; ?>" <?php echo (isset($student['section_id']) && $student['section_id'] == $section['id']) ? 'selected' : ''; ?>>
+                        <?php echo htmlspecialchars($section['title']); ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
         </div>
         <div class="mb-6">
             <label for="barcode" class="block text-gray-700 text-sm font-bold mb-2">Code-barres</label>

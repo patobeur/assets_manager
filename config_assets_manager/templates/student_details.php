@@ -7,6 +7,11 @@
             <div>
                 <p class="text-gray-600"><strong>Prénom:</strong> <?php echo htmlspecialchars($student['first_name']); ?></p>
                 <p class="text-gray-600"><strong>Nom:</strong> <?php echo htmlspecialchars($student['last_name']); ?></p>
+                <p class="text-gray-600"><strong>Email:</strong> <?php echo htmlspecialchars($student['email']); ?></p>
+            </div>
+            <div>
+                <p class="text-gray-600"><strong>Promo:</strong> <?php echo htmlspecialchars($student['promo_name'] ?? 'N/A'); ?></p>
+                <p class="text-gray-600"><strong>Section:</strong> <?php echo htmlspecialchars($student['section_name'] ?? 'N/A'); ?></p>
             </div>
             <div>
                 <p class="text-gray-600"><strong>Code-barres:</strong> <?php echo htmlspecialchars($student['barcode']); ?></p>

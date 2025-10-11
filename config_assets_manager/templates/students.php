@@ -1,6 +1,12 @@
 <?php
-$stmt = $pdo->query("SELECT * FROM am_students");
-$students = $stmt->fetchAll();
+$stmt = $pdo->query("
+    SELECT s.*, p.title as promo_name, sec.title as section_name
+    FROM am_students s
+    LEFT JOIN am_promos p ON s.promo_id = p.id
+    LEFT JOIN am_sections sec ON s.section_id = sec.id
+    ORDER BY s.last_name, s.first_name
+");
+$students = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
 <div class="flex justify-between items-center mb-6">
@@ -35,7 +41,7 @@ $students = $stmt->fetchAll();
                     </h3>
                     <div class="mt-2">
                         <p class="text-sm text-gray-500">
-                            Le fichier CSV doit avoir les colonnes : first_name,last_name,barcode,email,promo_id,section_id. <a href="examples/students_example.csv" class="text-blue-500 hover:underline" download>Télécharger un exemple</a>.
+                            Le fichier CSV doit avoir les colonnes : Prénom, Nom, Email, Promo, Section, Code-barres. <a href="examples/students_example.csv" class="text-blue-500 hover:underline" download>Télécharger un exemple</a>.
                         </p>
                         <input type="file" name="csv_file" accept=".csv" class="mt-2">
                     </div>
@@ -109,6 +115,8 @@ $students = $stmt->fetchAll();
             <tr class="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
                 <th class="py-3 px-6 text-left">Prénom</th>
                 <th class="py-3 px-6 text-left">Nom</th>
+                <th class="py-3 px-6 text-left">Promo</th>
+                <th class="py-3 px-6 text-left">Section</th>
                 <th class="py-3 px-6 text-left">Code-barres</th>
                 <?php if ($_SESSION['user_role'] === 'admin'): ?>
                     <th class="py-3 px-6 text-center">Actions</th>
@@ -129,7 +137,8 @@ $students = $stmt->fetchAll();
                             <?php echo htmlspecialchars($student['last_name']); ?>
                         </a>
                     </td>
-
+                    <td class="py-3 px-6 text-left"><?php echo htmlspecialchars($student['promo_name'] ?? 'N/A'); ?></td>
+                    <td class="py-3 px-6 text-left"><?php echo htmlspecialchars($student['section_name'] ?? 'N/A'); ?></td>
                     <td class="py-3 px-6 text-left"><?php echo htmlspecialchars($student['barcode']); ?></td>
                     <?php if ($_SESSION['user_role'] === 'admin'): ?>
                         <td class="py-3 px-6 text-center">
