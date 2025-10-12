@@ -623,6 +623,12 @@ switch ($page) {
 
         require_once CONFIG_PATH . '/templates/hydration.php';
         break;
+    case 'terms':
+        require_once CONFIG_PATH . '/templates/terms.php';
+        break;
+    case 'privacy':
+        require_once CONFIG_PATH . '/templates/privacy.php';
+        break;
     default:
         require_once CONFIG_PATH . '/templates/dashboard.php';
         break;
