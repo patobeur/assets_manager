@@ -12,6 +12,7 @@
             </div>
         </div>
     </footer>
+
     <?php
     // Load modules footer
     $modules_dir = __DIR__ . '/../modules';

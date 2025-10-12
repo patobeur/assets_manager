@@ -12,6 +12,7 @@
             backdrop-filter: blur(10px);
         }
     </style>
+
     <?php
     // Load modules header
     $modules_dir = __DIR__ . '/../modules';
@@ -28,6 +29,7 @@
 </head>
 
 <body class="bg-gray-100 flex flex-col min-h-screen">
+    <?php if (!isset($isLoginPage)): ?>
     <nav class="navbar bg-white bg-opacity-75 p-4 fixed w-full top-0 z-10 shadow-md">
         <div class="container mx-auto flex justify-between items-center">
             <a href="?page=dashboard" class="text-xl font-bold text-gray-800 flex items-center">
@@ -168,3 +170,6 @@
         });
     </script>
     <main class="flex-grow container mx-auto mt-24 p-4">
+    <?php else: ?>
+    <main class="flex-grow container mx-auto p-4">
+    <?php endif; ?>
