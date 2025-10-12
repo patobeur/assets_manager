@@ -12,6 +12,19 @@
             </div>
         </div>
     </footer>
+    <?php
+    // Load modules footer
+    $modules_dir = __DIR__ . '/../modules';
+    if (is_dir($modules_dir)) {
+        $modules = array_filter(glob($modules_dir . '/*'), 'is_dir');
+        foreach ($modules as $module) {
+            $footer_file = $module . '/footer.php';
+            if (file_exists($footer_file)) {
+                include $footer_file;
+            }
+        }
+    }
+    ?>
     </body>
 
     </html>

@@ -12,6 +12,19 @@
             backdrop-filter: blur(10px);
         }
     </style>
+    <?php
+    // Load modules header
+    $modules_dir = __DIR__ . '/../modules';
+    if (is_dir($modules_dir)) {
+        $modules = array_filter(glob($modules_dir . '/*'), 'is_dir');
+        foreach ($modules as $module) {
+            $header_file = $module . '/header.php';
+            if (file_exists($header_file)) {
+                include $header_file;
+            }
+        }
+    }
+    ?>
 </head>
 
 <body class="bg-gray-100 flex flex-col min-h-screen">
