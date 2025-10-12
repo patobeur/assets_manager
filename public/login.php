@@ -1,16 +1,19 @@
 <?php
 session_start();
 
-// This is a temporary fix to ensure the config file is not required if it doesnt exist.
-// The install script should handle this, but as a fallback, we will redirect to install.php
-if (!file_exists('../config_assets_manager/config.php')) {
+// Define a constant to grant access to the bootstrap file.
+define('APP_LOADED', true);
+
+// Load the bootstrap file to get the configuration path.
+if (!file_exists('bootstrap.php')) {
     header('Location: install.php');
     exit;
 }
+require_once 'bootstrap.php';
 
-
-require_once '../config_assets_manager/config.php';
-require_once '../config_assets_manager/Database.php';
+// Now, use the CONFIG_PATH to load the actual configuration and database files.
+require_once CONFIG_PATH . '/config.php';
+require_once CONFIG_PATH . '/Database.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $db = new Database();

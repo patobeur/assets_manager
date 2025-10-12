@@ -3,10 +3,30 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-if (file_exists('../config_assets_manager/config.php')) {
+if (file_exists('bootstrap.php')) {
     header('Location: index.php');
     exit;
 }
+
+// --- Auto-detection of the configuration path ---
+function find_config_path($max_levels = 5) {
+    $current_dir = __DIR__;
+    for ($i = 0; $i < $max_levels; $i++) {
+        $target_dir = $current_dir . '/config_assets_manager';
+        if (is_dir($target_dir)) {
+            return realpath($target_dir);
+        }
+        $current_dir = dirname($current_dir);
+    }
+    return false;
+}
+
+$config_path = find_config_path();
+
+if ($config_path === false) {
+    die("Erreur critique : Le dossier 'config_assets_manager' est introuvable. Assurez-vous qu'il a été correctement placé sur le serveur, généralement au même niveau ou un niveau au-dessus du dossier 'public_html'.");
+}
+// --- End of auto-detection ---
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Sanitize and validate input, removing backticks to prevent SQL injection in CREATE DATABASE.
@@ -121,15 +141,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         die("Erreur lors de la création de l'utilisateur administrateur : " . $e->getMessage());
     }
 
-    // Create the config file only if all previous steps were successful
+    $config_path_from_form = rtrim($_POST['config_path'], '/\\');
+
+    // Security check: ensure the path from the form is the same as the one we detected.
+    if ($config_path_from_form !== $config_path) {
+        die("Erreur de sécurité : Le chemin de configuration détecté ne correspond pas à celui envoyé par le formulaire.");
+    }
+
+    // Create the main config file in the specified path
     $config_content = "<?php\n\n";
     $config_content .= "define('DB_HOST', '" . addslashes($db_host) . "');\n";
     $config_content .= "define('DB_NAME', '" . addslashes($db_name) . "');\n";
     $config_content .= "define('DB_USER', '" . addslashes($db_user) . "');\n";
     $config_content .= "define('DB_PASSWORD', '" . addslashes($db_password) . "');\n";
 
-    if (file_put_contents('../config_assets_manager/config.php', $config_content) === false) {
-        die("Erreur : Impossible de créer le fichier de configuration. Veuillez vérifier les autorisations du dossier.");
+    if (file_put_contents($config_path . '/config.php', $config_content) === false) {
+        die("Erreur : Impossible de créer le fichier de configuration dans le dossier spécifié. Veuillez vérifier les autorisations. Chemin : " . htmlspecialchars($config_path));
+    }
+
+    // Create the bootstrap file in the public directory
+    $bootstrap_content = "<?php\n\n";
+    $bootstrap_content .= "// Prevent direct script access.\n";
+    $bootstrap_content .= "if (!defined('APP_LOADED')) {\n";
+    $bootstrap_content .= "    die('Accès non autorisé.');\n";
+    $bootstrap_content .= "}\n\n";
+    $bootstrap_content .= "// This file is generated automatically by the installer.\n";
+    $bootstrap_content .= "// It contains the absolute path to the configuration directory.\n";
+    $bootstrap_content .= "define('CONFIG_PATH', '" . addslashes($config_path) . "');\n";
+
+    if (file_put_contents('bootstrap.php', $bootstrap_content) === false) {
+        // Attempt to clean up the main config file if bootstrap fails
+        unlink($config_path . '/config.php');
+        die("Erreur : Impossible de créer le fichier d'amorçage (bootstrap.php). Veuillez vérifier les autorisations du dossier 'public'.");
     }
 
     // Redirect to the login page
@@ -171,6 +214,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div class="mb-6">
                     <label for="db_password" class="block text-gray-700 text-sm font-bold mb-2">Mot de passe</label>
                     <input type="password" id="db_password" name="db_password" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline">
+                </div>
+
+                <hr class="my-6">
+
+                <h2 class="text-2xl font-bold mb-6">Chemin de configuration</h2>
+                <div class="mb-4 bg-gray-100 p-4 rounded">
+                    <p class="text-sm text-gray-700">Le dossier de configuration a été détecté à l'emplacement suivant. Aucune action n'est requise de votre part.</p>
+                    <p class="text-sm font-mono bg-white p-2 mt-2 rounded"><strong><?php echo htmlspecialchars($config_path); ?></strong></p>
+                    <input type="hidden" name="config_path" value="<?php echo htmlspecialchars($config_path); ?>">
                 </div>
 
                 <hr class="my-6">

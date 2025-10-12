@@ -1,21 +1,24 @@
 <?php
 session_start();
 
-// Check if the config file exists
-if (!file_exists('../config_assets_manager/config.php')) {
+// Define a constant to grant access to the bootstrap file.
+define('APP_LOADED', true);
+
+// Load the bootstrap file to get the configuration path.
+if (!file_exists('bootstrap.php')) {
+    // If bootstrap exists, but not install.php, redirect to a maintenance page.
     if (!file_exists('install.php')) {
-        // Redirect to the maintenance page
         header('Location: maintenance.php');
         exit;
-    } else {
-        // Redirect to the installation page
-        header('Location: install.php');
-        exit;
     }
+    // Otherwise, redirect to the installation page.
+    header('Location: install.php');
     exit;
 }
+require_once 'bootstrap.php';
 
-require_once '../config_assets_manager/config.php';
+// Now, use the CONFIG_PATH to load the actual configuration and database files.
+require_once CONFIG_PATH . '/config.php';
 
 // Check if the user is logged in
 if (!isset($_SESSION['user_id'])) {
@@ -23,7 +26,7 @@ if (!isset($_SESSION['user_id'])) {
     exit;
 }
 
-require_once '../config_assets_manager/Database.php';
+require_once CONFIG_PATH . '/Database.php';
 
 $db = new Database();
 $pdo = $db->getConnection();
@@ -294,7 +297,7 @@ if (($_SERVER['REQUEST_METHOD'] === 'POST' && ($action === 'create' || $action =
 }
 
 // If we reach here, it's a normal page view, so we include the header.
-require_once '../config_assets_manager/templates/header.php';
+require_once CONFIG_PATH . '/templates/header.php';
 
 // Display success/error messages
 if (isset($_SESSION['success_message'])) {
@@ -316,7 +319,7 @@ if (isset($_SESSION['error_message'])) {
 // The rest of the page logic for displaying HTML
 switch ($page) {
     case 'dashboard':
-        require_once '../config_assets_manager/templates/dashboard.php';
+        require_once CONFIG_PATH . '/templates/dashboard.php';
         break;
 
     case 'student':
@@ -349,7 +352,7 @@ switch ($page) {
                 $stmt->execute([$student_id]);
                 $loans = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-                require_once '../config_assets_manager/templates/student_details.php';
+                require_once CONFIG_PATH . '/templates/student_details.php';
             } else {
                 echo "Étudiant non trouvé.";
             }
@@ -382,7 +385,7 @@ switch ($page) {
                 $stmt->execute([$material_id]);
                 $loans = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-                require_once '../config_assets_manager/templates/material_details.php';
+                require_once CONFIG_PATH . '/templates/material_details.php';
             } else {
                 echo "Matériel non trouvé.";
             }
@@ -393,7 +396,7 @@ switch ($page) {
     case 'students':
         switch ($action) {
             case 'list':
-                require_once '../config_assets_manager/templates/students.php';
+                require_once CONFIG_PATH . '/templates/students.php';
                 break;
             case 'create':
             case 'edit':
@@ -404,24 +407,24 @@ switch ($page) {
                 $sections_stmt = $pdo->query("SELECT * FROM am_sections ORDER BY title");
                 $sections = $sections_stmt->fetchAll(PDO::FETCH_ASSOC);
 
-                require_once '../config_assets_manager/templates/student_form.php';
+                require_once CONFIG_PATH . '/templates/student_form.php';
                 break;
             default:
-                require_once '../config_assets_manager/templates/students.php';
+                require_once CONFIG_PATH . '/templates/students.php';
                 break;
         }
         break;
     case 'materials':
         switch ($action) {
             case 'list':
-                require_once '../config_assets_manager/templates/materials.php';
+                require_once CONFIG_PATH . '/templates/materials.php';
                 break;
             case 'create':
             case 'edit':
-                require_once '../config_assets_manager/templates/material_form.php';
+                require_once CONFIG_PATH . '/templates/material_form.php';
                 break;
             default:
-                require_once '../config_assets_manager/templates/materials.php';
+                require_once CONFIG_PATH . '/templates/materials.php';
                 break;
         }
         break;
@@ -433,14 +436,14 @@ switch ($page) {
 
         switch ($action) {
             case 'list':
-                require_once '../config_assets_manager/templates/agents.php';
+                require_once CONFIG_PATH . '/templates/agents.php';
                 break;
             case 'create':
             case 'edit':
-                require_once '../config_assets_manager/templates/agent_form.php';
+                require_once CONFIG_PATH . '/templates/agent_form.php';
                 break;
             default:
-                require_once '../config_assets_manager/templates/agents.php';
+                require_once CONFIG_PATH . '/templates/agents.php';
                 break;
         }
         break;
@@ -511,7 +514,7 @@ switch ($page) {
                 $error = "Invalid student or material barcode, or material is not available.";
             }
         }
-        require_once '../config_assets_manager/templates/loans.php';
+        require_once CONFIG_PATH . '/templates/loans.php';
         break;
     case 'returns':
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -582,10 +585,10 @@ switch ($page) {
                 $error = "Code-barres du matériel non valide.";
             }
         }
-        require_once '../config_assets_manager/templates/returns.php';
+        require_once CONFIG_PATH . '/templates/returns.php';
         break;
     case 'history':
-        require_once '../config_assets_manager/templates/history.php';
+        require_once CONFIG_PATH . '/templates/history.php';
         break;
     case 'hydration':
         if ($_SESSION['user_role'] !== 'admin') {
@@ -593,7 +596,7 @@ switch ($page) {
             exit;
         }
 
-        require_once '../config_assets_manager/hydration.php';
+        require_once CONFIG_PATH . '/hydration.php';
         $hydration = new Hydration($pdo);
         $action = $_GET['action'] ?? null;
 
@@ -618,11 +621,11 @@ switch ($page) {
             }
         }
 
-        require_once '../config_assets_manager/templates/hydration.php';
+        require_once CONFIG_PATH . '/templates/hydration.php';
         break;
     default:
-        require_once '../config_assets_manager/templates/dashboard.php';
+        require_once CONFIG_PATH . '/templates/dashboard.php';
         break;
 }
 
-require_once '../config_assets_manager/templates/footer.php';
+require_once CONFIG_PATH . '/templates/footer.php';
