@@ -8,6 +8,7 @@
         opacity: 0.7;
         transition: opacity 0.3s;
     }
+
     .github-icon-link:hover {
         opacity: 1;
     }
