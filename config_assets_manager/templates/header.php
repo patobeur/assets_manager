@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestionnaire d'actifs scolaires</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="alternate icon" type="image/png" href="/assets/assets_manager_logo_64.png">
+    <link rel="alternate icon" type="image/png" href="assets/assets_manager_logo_64.png">
     <style>
         .navbar {
             backdrop-filter: blur(10px);
@@ -18,7 +18,7 @@
     <nav class="navbar bg-white bg-opacity-75 p-4 fixed w-full top-0 z-10 shadow-md">
         <div class="container mx-auto flex justify-between items-center">
             <a href="?page=dashboard" class="text-xl font-bold text-gray-800 flex items-center">
-                <img src="/assets/proflambda_logo_64.png" alt="Logo" class="h-8 mr-2">
+                <img src="assets/assets_manager_logo_64.png" alt="Logo" class="h-8 mr-2">
                 Gestionnaire d'actifs scolaires
             </a>
             <div class="hidden md:flex items-center space-x-4">
