@@ -1,6 +1,6 @@
 <div class="container mx-auto px-4 py-8">
     <a href="index.php?page=materials" class="text-blue-500 hover:underline mb-6 inline-block">&larr; Retour à la liste des matériels</a>
-    
+
     <div class="bg-white shadow-md rounded-lg p-6 mb-8">
         <h1 class="text-3xl font-bold mb-4">Fiche du matériel</h1>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -11,6 +11,9 @@
             <div>
                 <p class="text-gray-600"><strong>Statut:</strong> <?php echo htmlspecialchars($material['status']); ?></p>
                 <p class="text-gray-600"><strong>Code-barres:</strong> <?php echo htmlspecialchars($material['barcode']); ?></p>
+                <?php if (!empty($material['barcode'])): ?>
+                    <img src="barcode/generator.php?data=<?php echo urlencode($material['barcode']); ?>" alt="Code-barres du matériel" class="mt-2">
+                <?php endif; ?>
             </div>
         </div>
     </div>
