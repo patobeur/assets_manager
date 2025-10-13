@@ -1,5 +1,6 @@
 <?php
-session_start();
+// Initialize the language system first, as it may start the session
+require_once 'language_init.php';
 
 // Define a constant to grant access to the bootstrap file.
 define('APP_LOADED', true);
@@ -42,28 +43,28 @@ require_once CONFIG_PATH . '/templates/header.php';
 ?>
 
 <div class="container mx-auto mt-10">
-    <h1 class="text-3xl font-bold text-center">Connexion</h1>
+    <h1 class="text-3xl font-bold text-center"><?php echo t('login', 'Connexion'); ?></h1>
 
     <div class="max-w-md mx-auto mt-10 bg-white p-8 border border-gray-300 rounded">
         <?php if (isset($error)): ?>
             <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
-                <span class="block sm:inline">Identifiants invalides</span>
+                <span class="block sm:inline"><?php echo t('invalid_credentials', 'Identifiants invalides'); ?></span>
             </div>
         <?php endif; ?>
 
         <form action="login.php" method="post" class="mt-6">
             <div class="mb-4">
-                <label for="email" class="block text-gray-700 text-sm font-bold mb-2">Email</label>
+                <label for="email" class="block text-gray-700 text-sm font-bold mb-2"><?php echo t('email', 'Email'); ?></label>
                 <input type="email" id="email" name="email" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
             </div>
             <div class="mb-6">
-                <label for="password" class="block text-gray-700 text-sm font-bold mb-2">Mot de passe</label>
+                <label for="password" class="block text-gray-700 text-sm font-bold mb-2"><?php echo t('password', 'Mot de passe'); ?></label>
                 <input type="password" id="password" name="password" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline" required>
             </div>
 
             <div class="flex items-center justify-between">
                 <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
-                    Connexion
+                    <?php echo t('login', 'Connexion'); ?>
                 </button>
             </div>
         </form>

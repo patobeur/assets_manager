@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="<?php echo Language::getInstance()->getLang(); ?>">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestionnaire d'actifs scolaires</title>
+    <title><?php echo t('school_asset_manager', 'Gestionnaire d\'actifs scolaires'); ?></title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="alternate icon" type="image/png" href="assets/assets_manager_logo_64.png">
     <style>
@@ -34,31 +34,31 @@
         <div class="container mx-auto flex justify-between items-center">
             <a href="?page=dashboard" class="text-xl font-bold text-gray-800 flex items-center">
                 <img src="assets/assets_manager_logo_64.png" alt="Logo" class="h-8 mr-2">
-                Gestionnaire d'actifs scolaires
+                <?php echo t('school_asset_manager', 'Gestionnaire d\'actifs scolaires'); ?>
             </a>
             <div class="hidden md:flex items-center space-x-4">
-                <a href="?page=dashboard" class="text-gray-600 hover:text-gray-900">Tableau de bord</a>
+                <a href="?page=dashboard" class="text-gray-600 hover:text-gray-900"><?php echo t('dashboard', 'Tableau de bord'); ?></a>
 
                 <!-- Dropdown for Gestion -->
                 <div class="relative" id="gestion-dropdown-menu">
                     <button id="gestion-dropdown-button" class="text-gray-600 hover:text-gray-900 focus:outline-none">
-                        Gestion
+                        <?php echo t('management', 'Gestion'); ?>
                     </button>
                     <div id="gestion-dropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-20">
-                        <a href="?page=students" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Étudiants</a>
-                        <a href="?page=materials" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Matériels</a>
-                        <a href="?page=history" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Historique</a>
+                        <a href="?page=students" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"><?php echo t('students', 'Étudiants'); ?></a>
+                        <a href="?page=materials" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"><?php echo t('materials', 'Matériels'); ?></a>
+                        <a href="?page=history" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"><?php echo t('history', 'Historique'); ?></a>
                     </div>
                 </div>
 
                 <!-- Dropdown for Actions -->
                 <div class="relative" id="actions-dropdown-menu">
                     <button id="actions-dropdown-button" class="text-gray-600 hover:text-gray-900 focus:outline-none">
-                        Actions
+                        <?php echo t('actions', 'Actions'); ?>
                     </button>
                     <div id="actions-dropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-20">
-                        <a href="?page=loans" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Emprunt</a>
-                        <a href="?page=returns" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Retour</a>
+                        <a href="?page=loans" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"><?php echo t('loan', 'Emprunt'); ?></a>
+                        <a href="?page=returns" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"><?php echo t('return', 'Retour'); ?></a>
                     </div>
                 </div>
 
@@ -66,24 +66,30 @@
                     <!-- Dropdown for Admin -->
                     <div class="relative" id="admin-dropdown-menu">
                         <button id="admin-dropdown-button" class="text-gray-600 hover:text-gray-900 focus:outline-none">
-                            Admin
+                            <?php echo t('admin', 'Admin'); ?>
                         </button>
                         <div id="admin-dropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-20">
-                            <a href="?page=agents" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Agents</a>
-                            <a href="?page=hydration" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Hydratation</a>
+                            <a href="?page=agents" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"><?php echo t('agents', 'Agents'); ?></a>
+                            <a href="?page=hydration" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"><?php echo t('hydration', 'Hydratation'); ?></a>
                         </div>
                     </div>
                 <?php endif; ?>
 
 
                 <?php if (isset($_SESSION['user_id'])): ?>
+                    <!-- Language Switcher -->
+                    <div class="text-gray-600">
+                        <a href="?lang=fr" class="<?php echo Language::getInstance()->getLang() === 'fr' ? 'font-bold' : ''; ?>">FR</a>
+                        <span>|</span>
+                        <a href="?lang=en" class="<?php echo Language::getInstance()->getLang() === 'en' ? 'font-bold' : ''; ?>">EN</a>
+                    </div>
                     <!-- Dropdown for Profil -->
                     <div class="relative" id="profil-dropdown-menu">
                         <button id="profil-dropdown-button" class="text-gray-600 hover:text-gray-900 focus:outline-none">
                             <?php echo htmlspecialchars($_SESSION['user_first_name']); ?>
                         </button>
                         <div id="profil-dropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-20">
-                            <a href="logout.php" class="block px-4 py-2 text-sm text-orange-500 hover:bg-gray-100">Déconnexion</a>
+                            <a href="logout.php" class="block px-4 py-2 text-sm text-orange-500 hover:bg-gray-100"><?php echo t('logout', 'Déconnexion'); ?></a>
                         </div>
                     </div>
                 <?php endif; ?>

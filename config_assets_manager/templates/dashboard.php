@@ -11,41 +11,41 @@ if ($_SESSION['user_role'] === 'admin' || $_SESSION['user_role'] === 'agent') {
 }
 ?>
 
-<h1 class="text-3xl font-bold text-gray-800">Tableau de bord</h1>
+<h1 class="text-3xl font-bold text-gray-800"><?php echo t('dashboard', 'Tableau de bord'); ?></h1>
 
 <div class="mt-6">
-    <p class="text-lg text-gray-600">Content de vous revoir, <span class="font-semibold"><?php echo htmlspecialchars($user['first_name']); ?></span>!</p>
+    <p class="text-lg text-gray-600"><?php echo str_replace('{user_name}', '<span class="font-semibold">' . htmlspecialchars($user['first_name']) . '</span>', t('welcome_back', 'Content de vous revoir, {user_name}!')); ?></p>
 </div>
 
 <?php if ($_SESSION['user_role'] === 'admin' || $_SESSION['user_role'] === 'agent'): ?>
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-6">
         <div class="bg-white p-6 rounded-lg shadow-md">
             <h2 class="text-2xl font-bold text-gray-800"><?php echo $student_count; ?></h2>
-            <p class="text-gray-600">Étudiants</p>
+            <p class="text-gray-600"><?php echo t('students', 'Étudiants'); ?></p>
         </div>
         <div class="bg-white p-6 rounded-lg shadow-md">
             <h2 class="text-2xl font-bold text-gray-800"><?php echo $material_count; ?></h2>
-            <p class="text-gray-600">Matériels</p>
+            <p class="text-gray-600"><?php echo t('materials', 'Matériels'); ?></p>
         </div>
         <div class="bg-white p-6 rounded-lg shadow-md">
             <h2 class="text-2xl font-bold text-gray-800"><?php echo $agent_count; ?></h2>
-            <p class="text-gray-600">Agents</p>
+            <p class="text-gray-600"><?php echo t('agents', 'Agents'); ?></p>
         </div>
         <div class="bg-blue-100 p-6 rounded-lg shadow-md">
             <h2 class="text-2xl font-bold text-gray-800"><?php echo $loaned_count; ?></h2>
-            <p class="text-gray-600">Matériels empruntés</p>
+            <p class="text-gray-600"><?php echo t('loaned_materials', 'Matériels empruntés'); ?></p>
         </div>
     </div>
 <?php endif; ?>
 
 <div class="mt-10">
-    <h2 class="text-2xl font-bold text-gray-800 mb-4">Actions rapides</h2>
+    <h2 class="text-2xl font-bold text-gray-800 mb-4"><?php echo t('quick_actions', 'Actions rapides'); ?></h2>
     <div class="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4">
         <a href="?page=loans" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg text-center">
-            Emprunter du matériel
+            <?php echo t('loan_material', 'Emprunter du matériel'); ?>
         </a>
         <a href="?page=returns" class="bg-green-500 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg text-center">
-            Retourner du matériel
+            <?php echo t('return_material', 'Retourner du matériel'); ?>
         </a>
     </div>
 </div>
@@ -66,15 +66,15 @@ if ($_SESSION['user_role'] === 'admin' || $_SESSION['user_role'] === 'agent') {
 
 <?php if (($_SESSION['user_role'] === 'admin' || $_SESSION['user_role'] === 'agent') && !empty($current_loans)): ?>
     <div class="mt-10">
-        <h2 class="text-2xl font-bold text-gray-800 mb-4">Matériels actuellement empruntés</h2>
+        <h2 class="text-2xl font-bold text-gray-800 mb-4"><?php echo t('currently_loaned_materials', 'Matériels actuellement empruntés'); ?></h2>
         <div class="bg-white p-6 rounded-lg shadow-md">
             <table class="w-full">
                 <thead>
                     <tr class="border-b">
-                        <th class="text-left py-2">Étudiant</th>
-                        <th class="text-left py-2">Matériel</th>
-                        <th class="text-left py-2">Date d'emprunt</th>
-                        <th class="text-left py-2">Temps écoulé</th>
+                        <th class="text-left py-2"><?php echo t('student', 'Étudiant'); ?></th>
+                        <th class="text-left py-2"><?php echo t('material', 'Matériel'); ?></th>
+                        <th class="text-left py-2"><?php echo t('loan_date', 'Date d\'emprunt'); ?></th>
+                        <th class="text-left py-2"><?php echo t('elapsed_time', 'Temps écoulé'); ?></th>
                     </tr>
                 </thead>
                 <tbody>

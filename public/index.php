@@ -1,6 +1,9 @@
 <?php
 session_start();
 
+// Initialize the language system
+require_once 'language_init.php';
+
 // Define a constant to grant access to the bootstrap file.
 define('APP_LOADED', true);
 
@@ -80,17 +83,17 @@ if ($action === 'import' && $_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
 
                 $pdo->commit();
-                $_SESSION['success_message'] = "Importation réussie.";
+                $_SESSION['success_message'] = t('import_success');
             } catch (Exception $e) {
                 $pdo->rollBack();
-                $_SESSION['error_message'] = "Erreur lors de l'importation : " . $e->getMessage();
+                $_SESSION['error_message'] = str_replace('{error_message}', $e->getMessage(), t('import_error'));
             }
             fclose($handle);
         } else {
-            $_SESSION['error_message'] = "Erreur lors de l'ouverture du fichier CSV.";
+            $_SESSION['error_message'] = t('csv_open_error');
         }
     } else {
-        $_SESSION['error_message'] = "Aucun fichier n'a été téléversé ou une erreur s'est produite.";
+        $_SESSION['error_message'] = t('no_file_uploaded');
     }
     header('Location: ?page=' . $page);
     exit;
@@ -125,7 +128,7 @@ if ($action === 'export') {
 
         case 'agents':
             if ($_SESSION['user_role'] !== 'admin') {
-                die('Accès non autorisé.');
+                die(t('unauthorized_access', 'Accès non autorisé.'));
             }
             $stmt = $pdo->query("SELECT id, first_name, last_name, email, role FROM am_users WHERE role = 'agent' ORDER BY last_name, first_name");
             $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -182,11 +185,11 @@ if (($_SERVER['REQUEST_METHOD'] === 'POST' && ($action === 'create' || $action =
                 $stmt = $pdo->prepare("SELECT COUNT(*) FROM am_loans WHERE student_id = ? AND return_date IS NULL");
                 $stmt->execute([$id]);
                 if ($stmt->fetchColumn() > 0) {
-                    $_SESSION['error_message'] = "Impossible de supprimer l'étudiant car il a des prêts en cours.";
+                    $_SESSION['error_message'] = t('student_delete_error_loans');
                 } else {
                     $stmt = $pdo->prepare("DELETE FROM am_students WHERE id = ?");
                     $stmt->execute([$id]);
-                    $_SESSION['success_message'] = "Étudiant supprimé avec succès.";
+                    $_SESSION['success_message'] = t('student_deleted');
                 }
             } else { // POST request for create or edit
                 $first_name = $_POST['first_name'];
@@ -197,7 +200,7 @@ if (($_SERVER['REQUEST_METHOD'] === 'POST' && ($action === 'create' || $action =
                 $section_id = !empty($_POST['section_id']) ? intval($_POST['section_id']) : null;
 
                 if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                    $_SESSION['error_message'] = "Adresse email de l'étudiant invalide.";
+                    $_SESSION['error_message'] = t('invalid_student_email');
                     header('Location: ?page=students&action=' . $action . (isset($_POST['id']) ? '&id=' . $_POST['id'] : ''));
                     exit;
                 }
@@ -205,12 +208,12 @@ if (($_SERVER['REQUEST_METHOD'] === 'POST' && ($action === 'create' || $action =
                 if ($action === 'create') {
                     $stmt = $pdo->prepare("INSERT INTO am_students (first_name, last_name, email, barcode, promo_id, section_id) VALUES (?, ?, ?, ?, ?, ?)");
                     $stmt->execute([$first_name, $last_name, $email, $barcode, $promo_id, $section_id]);
-                    $_SESSION['success_message'] = "Étudiant créé avec succès.";
+                    $_SESSION['success_message'] = t('student_created');
                 } elseif ($action === 'edit') {
                     $id = intval($_POST['id']);
                     $stmt = $pdo->prepare("UPDATE am_students SET first_name = ?, last_name = ?, email = ?, barcode = ?, promo_id = ?, section_id = ? WHERE id = ?");
                     $stmt->execute([$first_name, $last_name, $email, $barcode, $promo_id, $section_id, $id]);
-                    $_SESSION['success_message'] = "Étudiant mis à jour avec succès.";
+                    $_SESSION['success_message'] = t('student_updated');
                 }
             }
             header('Location: ?page=students');
@@ -225,11 +228,11 @@ if (($_SERVER['REQUEST_METHOD'] === 'POST' && ($action === 'create' || $action =
                 $status = $stmt->fetchColumn();
 
                 if ($status !== 'available') {
-                    $_SESSION['error_message'] = "Impossible de supprimer le matériel car il n'est pas disponible (statut : " . htmlspecialchars($status) . ").";
+                    $_SESSION['error_message'] = str_replace('{status}', htmlspecialchars($status), t('material_delete_error_status'));
                 } else {
                     $stmt = $pdo->prepare("DELETE FROM am_materials WHERE id = ?");
                     $stmt->execute([$id]);
-                    $_SESSION['success_message'] = "Matériel supprimé avec succès.";
+                    $_SESSION['success_message'] = t('material_deleted');
                 }
             } else { // POST request for create or edit
                 $name = $_POST['name'];
@@ -240,12 +243,12 @@ if (($_SERVER['REQUEST_METHOD'] === 'POST' && ($action === 'create' || $action =
                 if ($action === 'create') {
                     $stmt = $pdo->prepare("INSERT INTO am_materials (name, description, status, barcode) VALUES (?, ?, ?, ?)");
                     $stmt->execute([$name, $description, $status, $barcode]);
-                    $_SESSION['success_message'] = "Matériel créé avec succès.";
+                    $_SESSION['success_message'] = t('material_created');
                 } elseif ($action === 'edit') {
                     $id = intval($_POST['id']);
                     $stmt = $pdo->prepare("UPDATE am_materials SET name = ?, description = ?, status = ?, barcode = ? WHERE id = ?");
                     $stmt->execute([$name, $description, $status, $barcode, $id]);
-                    $_SESSION['success_message'] = "Matériel mis à jour avec succès.";
+                    $_SESSION['success_message'] = t('material_updated');
                 }
             }
             header('Location: ?page=materials');
@@ -261,14 +264,14 @@ if (($_SERVER['REQUEST_METHOD'] === 'POST' && ($action === 'create' || $action =
                 $id = intval($_GET['id']);
                 $stmt = $pdo->prepare("DELETE FROM am_users WHERE id = ?");
                 $stmt->execute([$id]);
-                $_SESSION['success_message'] = "Agent supprimé avec succès.";
+                $_SESSION['success_message'] = t('agent_deleted');
             } else { // POST request for create or edit
                 $first_name = $_POST['first_name'];
                 $last_name = $_POST['last_name'];
                 $email = filter_var($_POST['email'], FILTER_SANITIZE_EMAIL);
 
                 if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                    $_SESSION['error_message'] = "Adresse email invalide.";
+                    $_SESSION['error_message'] = t('invalid_agent_email');
                     header('Location: ?page=agents&action=' . $action . (isset($_POST['id']) ? '&id=' . $_POST['id'] : ''));
                     exit;
                 }
@@ -277,7 +280,7 @@ if (($_SERVER['REQUEST_METHOD'] === 'POST' && ($action === 'create' || $action =
                     $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
                     $stmt = $pdo->prepare("INSERT INTO am_users (first_name, last_name, email, password, role) VALUES (?, ?, ?, ?, 'agent')");
                     $stmt->execute([$first_name, $last_name, $email, $password]);
-                    $_SESSION['success_message'] = "Agent créé avec succès.";
+                    $_SESSION['success_message'] = t('agent_created');
                 } elseif ($action === 'edit') {
                     $id = intval($_POST['id']);
                     if (!empty($_POST['password'])) {
@@ -288,7 +291,7 @@ if (($_SERVER['REQUEST_METHOD'] === 'POST' && ($action === 'create' || $action =
                         $stmt = $pdo->prepare("UPDATE am_users SET first_name = ?, last_name = ?, email = ? WHERE id = ?");
                         $stmt->execute([$first_name, $last_name, $email, $id]);
                     }
-                    $_SESSION['success_message'] = "Agent mis à jour avec succès.";
+                    $_SESSION['success_message'] = t('agent_updated');
                 }
             }
             header('Location: ?page=agents');
@@ -302,7 +305,7 @@ require_once CONFIG_PATH . '/templates/header.php';
 // Display success/error messages
 if (isset($_SESSION['success_message'])) {
     echo '<div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">';
-    echo '<strong class="font-bold">Succès !</strong>';
+    echo '<strong class="font-bold">' . t('success', 'Succès !') . '</strong>';
     echo '<span class="block sm:inline">' . htmlspecialchars($_SESSION['success_message'], ENT_QUOTES, 'UTF-8') . '</span>';
     echo '</div>';
     unset($_SESSION['success_message']);
@@ -310,7 +313,7 @@ if (isset($_SESSION['success_message'])) {
 
 if (isset($_SESSION['error_message'])) {
     echo '<div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">';
-    echo '<strong class="font-bold">Erreur !</strong>';
+    echo '<strong class="font-bold">' . t('error', 'Erreur !') . '</strong>';
     echo '<span class="block sm:inline">' . htmlspecialchars($_SESSION['error_message'], ENT_QUOTES, 'UTF-8') . '</span>';
     echo '</div>';
     unset($_SESSION['error_message']);
