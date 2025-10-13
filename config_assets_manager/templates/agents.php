@@ -11,13 +11,13 @@ $stmt = $pdo->query("SELECT * FROM am_users WHERE role = 'agent'");
 $agents = $stmt->fetchAll();
 ?>
 
-<div class="flex justify-between items-center mb-6">
+<div class="flex flex-col md:flex-row md:justify-between md:items-center mb-6">
     <h1 class="text-3xl font-bold">Agents</h1>
-    <div class="flex space-x-4">
-        <a href="?page=agents&action=export" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+    <div class="flex space-x-2 mt-4 md:mt-0">
+        <a href="?page=agents&action=export" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-3 rounded text-sm">
             Exporter en CSV
         </a>
-        <a href="?page=agents&action=create" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+        <a href="?page=agents&action=create" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-3 rounded text-sm">
             Ajouter un agent
         </a>
     </div>
