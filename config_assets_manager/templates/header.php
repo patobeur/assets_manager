@@ -70,6 +70,8 @@
                         </button>
                         <div id="admin-dropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-20">
                             <a href="?page=agents" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"><?php echo t('agents', 'Agents'); ?></a>
+                            <a href="?page=promos" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"><?php echo t('promos', 'Promos'); ?></a>
+                            <a href="?page=sections" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"><?php echo t('sections', 'Sections'); ?></a>
                             <a href="?page=hydration" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"><?php echo t('hydration', 'Hydratation'); ?></a>
                         </div>
                     </div>
@@ -118,6 +120,8 @@
             <?php if ($_SESSION['user_role'] === 'admin'): ?>
                 <div class="py-2 px-4 text-sm text-gray-500">Admin</div>
                 <a href="?page=agents" class="block py-2 pl-8 pr-4 text-sm text-gray-600 hover:bg-gray-200">Agents</a>
+                <a href="?page=promos" class="block py-2 pl-8 pr-4 text-sm text-gray-600 hover:bg-gray-200">Promos</a>
+                <a href="?page=sections" class="block py-2 pl-8 pr-4 text-sm text-gray-600 hover:bg-gray-200">Sections</a>
                 <a href="?page=hydration" class="block py-2 pl-8 pr-4 text-sm text-gray-600 hover:bg-gray-200">Hydratation</a>
             <?php endif; ?>
 

@@ -296,6 +296,62 @@ if (($_SERVER['REQUEST_METHOD'] === 'POST' && ($action === 'create' || $action =
             }
             header('Location: ?page=agents');
             exit;
+
+        case 'promos':
+            if ($_SESSION['user_role'] !== 'admin') {
+                header('Location: ?page=dashboard');
+                exit;
+            }
+
+            if ($action === 'delete') {
+                $id = intval($_GET['id']);
+                $stmt = $pdo->prepare("DELETE FROM am_promos WHERE id = ?");
+                $stmt->execute([$id]);
+                $_SESSION['success_message'] = t('promo_deleted');
+            } else { // POST request for create or edit
+                $title = $_POST['title'];
+
+                if ($action === 'create') {
+                    $stmt = $pdo->prepare("INSERT INTO am_promos (title) VALUES (?)");
+                    $stmt->execute([$title]);
+                    $_SESSION['success_message'] = t('promo_created');
+                } elseif ($action === 'edit') {
+                    $id = intval($_POST['id']);
+                    $stmt = $pdo->prepare("UPDATE am_promos SET title = ? WHERE id = ?");
+                    $stmt->execute([$title, $id]);
+                    $_SESSION['success_message'] = t('promo_updated');
+                }
+            }
+            header('Location: ?page=promos');
+            exit;
+
+        case 'sections':
+            if ($_SESSION['user_role'] !== 'admin') {
+                header('Location: ?page=dashboard');
+                exit;
+            }
+
+            if ($action === 'delete') {
+                $id = intval($_GET['id']);
+                $stmt = $pdo->prepare("DELETE FROM am_sections WHERE id = ?");
+                $stmt->execute([$id]);
+                $_SESSION['success_message'] = t('section_deleted');
+            } else { // POST request for create or edit
+                $title = $_POST['title'];
+
+                if ($action === 'create') {
+                    $stmt = $pdo->prepare("INSERT INTO am_sections (title) VALUES (?)");
+                    $stmt->execute([$title]);
+                    $_SESSION['success_message'] = t('section_created');
+                } elseif ($action === 'edit') {
+                    $id = intval($_POST['id']);
+                    $stmt = $pdo->prepare("UPDATE am_sections SET title = ? WHERE id = ?");
+                    $stmt->execute([$title, $id]);
+                    $_SESSION['success_message'] = t('section_updated');
+                }
+            }
+            header('Location: ?page=sections');
+            exit;
     }
 }
 
@@ -449,6 +505,44 @@ switch ($page) {
                 require_once CONFIG_PATH . '/templates/agents.php';
                 break;
         }
+            break;
+        case 'promos':
+            if ($_SESSION['user_role'] !== 'admin') {
+                header('Location: ?page=dashboard');
+                exit;
+            }
+
+            switch ($action) {
+                case 'list':
+                    require_once CONFIG_PATH . '/templates/promos.php';
+                    break;
+                case 'create':
+                case 'edit':
+                    require_once CONFIG_PATH . '/templates/promo_form.php';
+                    break;
+                default:
+                    require_once CONFIG_PATH . '/templates/promos.php';
+                    break;
+            }
+            break;
+        case 'sections':
+            if ($_SESSION['user_role'] !== 'admin') {
+                header('Location: ?page=dashboard');
+                exit;
+            }
+
+            switch ($action) {
+                case 'list':
+                    require_once CONFIG_PATH . '/templates/sections.php';
+                    break;
+                case 'create':
+                case 'edit':
+                    require_once CONFIG_PATH . '/templates/section_form.php';
+                    break;
+                default:
+                    require_once CONFIG_PATH . '/templates/sections.php';
+                    break;
+            }
         break;
     case 'loans':
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
