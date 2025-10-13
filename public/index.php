@@ -357,10 +357,10 @@ switch ($page) {
 
                 require_once CONFIG_PATH . '/templates/student_details.php';
             } else {
-                echo "Étudiant non trouvé.";
+                echo t('student_not_found');
             }
         } else {
-            echo "ID de l'étudiant non fourni.";
+            echo t('student_id_not_provided');
         }
         break;
 
@@ -390,10 +390,10 @@ switch ($page) {
 
                 require_once CONFIG_PATH . '/templates/material_details.php';
             } else {
-                echo "Matériel non trouvé.";
+                echo t('material_not_found');
             }
         } else {
-            echo "ID du matériel non fourni.";
+            echo t('material_id_not_provided');
         }
         break;
     case 'students':
@@ -490,7 +490,11 @@ switch ($page) {
                 $stmt->execute([$loan_id]);
                 $loan_info = $stmt->fetch();
 
-                $success = "Le matériel \"{$material_info['name']}\" a été emprunté par {$student_info['first_name']} {$student_info['last_name']} le " . date('d/m/Y à H:i', strtotime($loan_info['loan_date'])) . ".";
+                $success = t('loan_success_message', [
+                    'material_name' => $material_info['name'],
+                    'student_name' => $student_info['first_name'] . ' ' . $student_info['last_name'],
+                    'loan_date' => date(t('date_format_long'), strtotime($loan_info['loan_date']))
+                ]);
 
                 // Get student's other loaned am_materials
                 $stmt = $pdo->prepare("
@@ -514,7 +518,7 @@ switch ($page) {
                 $stmt->execute([$student['id']]);
                 $loan_history = $stmt->fetchAll(PDO::FETCH_ASSOC);
             } else {
-                $error = "Invalid student or material barcode, or material is not available.";
+                $error = t('loan_error');
             }
         }
         require_once CONFIG_PATH . '/templates/loans.php';
@@ -543,7 +547,7 @@ switch ($page) {
                     $stmt = $pdo->prepare("UPDATE am_materials SET status = 'available' WHERE id = ?");
                     $stmt->execute([$material['id']]);
 
-                    $success = "Le matériel a été retourné avec succès !";
+                    $success = t('return_success_message');
 
                     // Get student info
                     $stmt = $pdo->prepare("SELECT first_name, last_name FROM am_students WHERE id = ?");
@@ -582,10 +586,10 @@ switch ($page) {
                     $stmt->execute([$loan['student_id']]);
                     $loan_history = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 } else {
-                    $error = "Aucun emprunt actif trouvé pour ce matériel.";
+                    $error = t('return_error_no_active_loan');
                 }
             } else {
-                $error = "Code-barres du matériel non valide.";
+                $error = t('return_error_invalid_barcode');
             }
         }
         require_once CONFIG_PATH . '/templates/returns.php';
@@ -610,17 +614,17 @@ switch ($page) {
 
         if ($action === 'populate') {
             if ($isHydrated) {
-                $error = "Les données de démonstration existent déjà.";
+                $error = t('hydration_already_exists');
             } else {
                 $hydration->populateTables();
-                $success = "Les données de démonstration ont été ajoutées.";
+                $success = t('hydration_populated');
             }
         } elseif ($action === 'clear') {
             if (!$isHydrated) {
-                $error = "Il n'y a pas de données de démonstration à supprimer.";
+                $error = t('hydration_no_data_to_clear');
             } else {
                 $hydration->clearTables();
-                $success = "Les données de démonstration ont été supprimées.";
+                $success = t('hydration_cleared');
             }
         }
 

@@ -12,15 +12,27 @@ if (file_exists('bootstrap.php')) {
 }
 
 // --- Auto-detection of the configuration path ---
-function find_config_path($max_levels = 5) {
+function find_config_path() {
+    // Start searching from the parent directory of the current script's directory.
+    // This is more robust, especially for the built-in PHP server.
+    $base_dir = dirname(__DIR__);
+    $target_dir = $base_dir . '/config_assets_manager';
+
+    if (is_dir($target_dir)) {
+        // Replace backslashes with forward slashes for cross-platform compatibility.
+        return str_replace('\\', '/', realpath($target_dir));
+    }
+
+    // Fallback for other server configurations: search up the directory tree.
     $current_dir = __DIR__;
-    for ($i = 0; $i < $max_levels; $i++) {
+    for ($i = 0; $i < 5; $i++) {
         $target_dir = $current_dir . '/config_assets_manager';
         if (is_dir($target_dir)) {
-            return realpath($target_dir);
+            return str_replace('\\', '/', realpath($target_dir));
         }
         $current_dir = dirname($current_dir);
     }
+
     return false;
 }
 

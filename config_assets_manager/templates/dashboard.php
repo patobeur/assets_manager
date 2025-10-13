@@ -85,14 +85,16 @@ if ($_SESSION['user_role'] === 'admin' || $_SESSION['user_role'] === 'agent') {
 
                         $elapsed_time = '';
                         if ($interval->days > 0) {
-                            $elapsed_time .= $interval->days . 'j ';
+                            $elapsed_time .= $interval->days . t('time_unit_days') . ' ';
                         }
-                        $elapsed_time .= $interval->format('%Hh %Im %Ss');
+                        $elapsed_time .= sprintf('%02d', $interval->h) . t('time_unit_hours') . ' ';
+                        $elapsed_time .= sprintf('%02d', $interval->i) . t('time_unit_minutes') . ' ';
+                        $elapsed_time .= sprintf('%02d', $interval->s) . t('time_unit_seconds');
                     ?>
                         <tr class="border-b">
                             <td class="py-2"><?php echo htmlspecialchars($loan['student_first_name'] . ' ' . $loan['student_last_name']); ?></td>
                             <td class="py-2"><?php echo htmlspecialchars($loan['material_name']); ?></td>
-                            <td class="py-2"><?php echo date('d/m/Y H:i', strtotime($loan['loan_date'])); ?></td>
+                            <td class="py-2"><?php echo date(t('date_format_long'), strtotime($loan['loan_date'])); ?></td>
                             <td class="py-2 font-mono"><?php echo $elapsed_time; ?></td>
                         </tr>
                     <?php endforeach; ?>

@@ -1,3 +1,5 @@
 config_assets_manager/config.php
 php_server.log
 vendor/
+public/bootstrap.php
+public/bootstrap.php
