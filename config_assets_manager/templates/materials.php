@@ -3,17 +3,17 @@ $stmt = $pdo->query("SELECT * FROM am_materials");
 $materials = $stmt->fetchAll();
 ?>
 
-<div class="flex flex-col md:flex-row md:justify-between md:items-center mb-6">
+<div class="flex justify-between items-center mb-6">
     <h1 class="text-3xl font-bold">Matériels</h1>
-    <div class="flex space-x-2 mt-4 md:mt-0">
-        <a href="?page=materials&action=export" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-3 rounded text-sm">
+    <div class="flex space-x-4">
+        <a href="?page=materials&action=export" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
             Exporter en CSV
         </a>
         <?php if ($_SESSION['user_role'] === 'admin'): ?>
-            <button id="import-btn-materials" class="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-3 rounded text-sm">
+            <button id="import-btn-materials" class="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded">
                 Importer CSV
             </button>
-            <a href="?page=materials&action=create" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-3 rounded text-sm">
+            <a href="?page=materials&action=create" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
                 Ajouter du matériel
             </a>
         <?php endif; ?>
