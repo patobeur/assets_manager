@@ -23,8 +23,16 @@ class Language {
         }
     }
 
-    public function get($key, $default = '') {
-        return $this->translations[$key] ?? $default;
+    public function get($key, $args = [], $default = '') {
+        $value = $this->translations[$key] ?? $default;
+
+        if (!empty($args) && is_array($args)) {
+            foreach ($args as $arg_key => $arg_val) {
+                $value = str_replace('{' . $arg_key . '}', $arg_val, $value);
+            }
+        }
+
+        return $value;
     }
 
     public function getLang() {
@@ -39,6 +47,11 @@ class Language {
     }
 }
 
-function t($key, $default = '') {
-    return Language::getInstance()->get($key, $default);
+function t($key, $args = [], $default = '') {
+    // If the second argument is a string, it's the default value (for backward compatibility)
+    if (is_string($args)) {
+        $default = $args;
+        $args = [];
+    }
+    return Language::getInstance()->get($key, $args, $default);
 }
