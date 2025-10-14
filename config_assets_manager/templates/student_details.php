@@ -15,7 +15,7 @@
 
                 <p class="text-gray-600"><strong>Code-barres:</strong> <?php echo htmlspecialchars($student['barcode']); ?></p>
                 <?php if (!empty($student['barcode'])): ?>
-                    <img src="barcode/generator.php?data=<?php echo urlencode($student['barcode']); ?>" alt="Code-barres de l'étudiant" class="mt-2">
+                    <img src="generator.php?data=<?php echo urlencode($student['barcode']); ?>" alt="Code-barres de l'étudiant" class="mt-2">
                 <?php endif; ?>
             </div>
             <div>
