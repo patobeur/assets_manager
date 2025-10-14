@@ -139,7 +139,13 @@ $students = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     </td>
                     <td class="py-3 px-6 text-left"><?php echo htmlspecialchars($student['promo_name'] ?? 'N/A'); ?></td>
                     <td class="py-3 px-6 text-left"><?php echo htmlspecialchars($student['section_name'] ?? 'N/A'); ?></td>
-                    <td class="py-3 px-6 text-left"><?php echo htmlspecialchars($student['barcode']); ?></td>
+                    <td class="py-3 px-6 text-left">
+                        <?php if (!empty($student['barcode'])): ?>
+                            <img src="barcode/generator.php?data=<?php echo urlencode($student['barcode']); ?>" alt="Code-barres de l'étudiant" class="mt-2">
+                        <?php endif; ?>
+
+                        <?php echo htmlspecialchars($student['barcode']); ?>
+                    </td>
                     <?php if ($_SESSION['user_role'] === 'admin'): ?>
                         <td class="py-3 px-6 text-center">
                             <div class="flex item-center justify-center">
