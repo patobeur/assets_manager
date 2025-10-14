@@ -17,7 +17,7 @@ class Language {
     }
 
     private function loadTranslations() {
-        $langFile = __DIR__ . '/../languages/' . $this->lang . '.json';
+        $langFile = __DIR__ . '/' . $this->lang . '.json';
         if (file_exists($langFile)) {
             $this->translations = json_decode(file_get_contents($langFile), true);
         }

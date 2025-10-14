@@ -5,7 +5,7 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 // Define the path to the Language class
-require_once __DIR__ . '/../config_assets_manager/Language.php';
+require_once __DIR__ . '/languages/Language.php';
 
 // Supported languages
 $supported_langs = ['fr', 'en'];
