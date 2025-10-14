@@ -1,16 +1,47 @@
 # assets_manager
 
-**assets_manager** est une application web conçue pour gérer les prêts de matériel au sein d'une école ou d'une organisation. Elle offre une interface conviviale aux administrateurs et aux agents pour suivre le matériel, gérer les informations sur les étudiants et enregistrer les prêts. L'application est développée en PHP et utilise une base de données MySQL pour stocker les données.
+**assets_manager** est une application web conçue pour gérer les prêts de matériel au sein d'une école ou d'une organisation. Elle offre une interface conviviale aux administrateurs et aux agents pour suivre le matériel, gérer les informations sur les prêts de matériels. L'application est développée en PHP et utilise une base de données MySQL pour stocker les données.
 
 ## Fonctionnalités
 
--  **Gestion des utilisateurs**: Créez, modifiez et supprimez des utilisateurs avec différents rôles (administrateur ou agent).
--  **Gestion des étudiants**: Gérez les informations des étudiants, y compris leur prénom, leur nom et un code-barres unique.
--  **Gestion du matériel**: Suivez tous les matériaux disponibles, leurs descriptions et leur statut (disponible, prêté ou en maintenance).
--  **Gestion des prêts**: Enregistrez les prêts, y compris l'étudiant qui a emprunté le matériel, la date du prêt et la date de retour.
--  **Hydratation des données**: Une fonctionnalité permettant aux administrateurs de peupler la base de données avec des données de démonstration et de la nettoyer lorsqu'elle n'est plus nécessaire.
--  **Import et Export CSV**: Importez et exportez facilement des listes d'étudiants et de matériel.
--  **Interface conviviale**: Une interface simple et intuitive créée avec Tailwind CSS.
+L'application offre une gamme complète d'outils pour une gestion simple et efficace du matériel.
+
+### Gestion des Entités
+
+Le système permet une gestion complète (CRUD : Créer, Lire, Mettre à jour, Supprimer) des différentes entités de l'application :
+
+-  **Utilisateurs** : Création, modification et suppression des comptes utilisateurs, avec attribution des rôles `administrateur` ou `agent`.
+-  **Étudiants** : Gestion des profils étudiants, incluant leurs informations personnelles (nom, prénom, email) et leur appartenance à une promotion et une section.
+-  **Matériels** : Suivi du parc de matériel, avec nom, description, statut (`disponible`, `prêté`, `en maintenance`) et code-barres unique.
+-  **Promotions et Sections** : Organisation des étudiants par promotions (ex: "2025-2027") et sections (ex: "BTS SIO"), entièrement configurables.
+
+### Processus de Prêt et Retour
+
+-  **Interface Simplifiée** : Des pages dédiées pour enregistrer les prêts et les retours en scannant simplement le code-barres de l'étudiant et du matériel.
+-  **Mise à jour Automatique** : Le statut du matériel est automatiquement mis à jour à `prêté` lors d'un emprunt et à `disponible` lors d'un retour.
+-  **Confirmation Visuelle** : Après chaque opération, un résumé s'affiche, confirmant l'action et montrant les détails du prêt ou du retour, ainsi que l'historique récent de l'étudiant.
+
+### Suivi et Historique
+
+-  **Tableau de Bord** : Affiche en temps réel les prêts en cours, avec une mise en évidence visuelle des prêts de longue durée.
+-  **Historique Global** : Une vue complète de tous les prêts (passés et en cours), avec des informations détaillées sur l'étudiant, le matériel, les dates et les agents ayant traité les opérations.
+-  **Pages de Détails** : Chaque étudiant et chaque matériel dispose de sa propre page de détails, affichant ses informations complètes ainsi que son historique de prêts personnel.
+
+### Import et Export de Données
+
+-  **Import CSV** : Importez en masse des listes d'étudiants et de matériel. Le système associe automatiquement les étudiants à leur promotion et section en se basant sur leur nom, simplifiant la préparation des données.
+-  **Export CSV** : Exportez facilement les listes complètes des étudiants, du matériel, des agents et même l'historique complet des prêts pour une analyse externe ou des archives.
+-  **Fichiers d'Exemple** : Des modèles de fichiers CSV sont fournis pour garantir un formatage correct des données à importer.
+
+### Fonctionnalités Administratives
+
+-  **Hydratation des Données** : Une fonctionnalité réservée aux administrateurs pour peupler la base de données avec un jeu de données de démonstration (étudiants, matériels, prêts) et pour la nettoyer en un clic. Idéal pour les démonstrations ou les tests.
+-  **Gestion des Rôles** : Seuls les administrateurs peuvent créer, modifier ou supprimer d'autres utilisateurs, ainsi que gérer les promotions et les sections.
+
+### Internationalisation
+
+-  **Support Multilingue** : L'interface est disponible en français et en anglais. Le système de traduction est conçu pour être facilement extensible à d'autres langues via de simples fichiers de configuration (JSON).
+-  **Sélecteur de Langue** : Un sélecteur de langue discret (`FR | EN`) est présent dans le menu principal pour permettre aux utilisateurs de changer de langue à tout moment, tout en conservant le contexte de la page actuelle.
 
 ### Import de Données via CSV
 
