@@ -12,6 +12,21 @@
 			backdrop-filter: blur(10px);
 		}
 
+		#mobile-menu {
+			max-height: calc(100vh - 80px);
+			/* Adjust 80px to match your navbar height */
+			overflow-y: auto;
+			position: absolute;
+			top: 100%;
+			left: 0;
+			right: 0;
+		}
+
+		.last-menu-item .relative>div[id$="-dropdown"] {
+			right: 100%;
+			left: auto;
+		}
+
 		@media print {
 
 			body,
@@ -46,7 +61,6 @@
 			break-inside: avoid;
 		}
 	</style>
-
 	<?php
 	// Load modules header
 	$modules_dir = __DIR__ . '/../modules';
@@ -96,46 +110,46 @@
 						</div>
 					</div>
 
-					<?php if ($_SESSION['user_role'] === 'admin'): ?>
-						<!-- Dropdown for Admin -->
-						<div class="relative" id="admin-dropdown-menu">
-							<button id="admin-dropdown-button" class="text-gray-600 hover:text-gray-900 focus:outline-none">
-								<?php echo t('admin', 'Admin'); ?>
-							</button>
-							<div id="admin-dropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-20">
-								<a href="?page=agents" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"><?php echo t('agents', 'Agents'); ?></a>
-								<a href="?page=promos" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"><?php echo t('promos', 'Promos'); ?></a>
-								<a href="?page=sections" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"><?php echo t('sections', 'Sections'); ?></a>
-								<a href="?page=hydration" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"><?php echo t('hydration', 'Hydratation'); ?></a>
-								<a href="?page=barecode" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"><?php echo t('barcode_page_title', 'Étiquettes de codes-barres') ?></a>
-
-							</div>
-						</div>
-					<?php endif; ?>
-
-
 					<?php if (isset($_SESSION['user_id'])): ?>
-						<!-- Language Switcher -->
-						<div class="text-gray-600">
-							<?php
-							// Prepare language switcher URLs
-							$queryParams = $_GET;
-							$queryParams['lang'] = 'fr';
-							$fr_url = '?' . http_build_query($queryParams);
-							$queryParams['lang'] = 'en';
-							$en_url = '?' . http_build_query($queryParams);
-							?>
-							<a href="<?php echo htmlspecialchars($fr_url); ?>" class="<?php echo Language::getInstance()->getLang() === 'fr' ? 'font-bold' : ''; ?>">FR</a>
-							<span>|</span>
-							<a href="<?php echo htmlspecialchars($en_url); ?>" class="<?php echo Language::getInstance()->getLang() === 'en' ? 'font-bold' : ''; ?>">EN</a>
-
-						</div>
 						<!-- Dropdown for Profil -->
-						<div class="relative" id="profil-dropdown-menu">
+						<div class="relative last-menu-item" id="profil-dropdown-menu">
 							<button id="profil-dropdown-button" class="text-gray-600 hover:text-gray-900 focus:outline-none">
 								<?php echo htmlspecialchars($_SESSION['user_first_name']); ?>
 							</button>
 							<div id="profil-dropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-20">
+								<?php if ($_SESSION['user_role'] === 'admin'): ?>
+									<div class="relative" id="admin-submenu">
+										<button id="admin-submenu-button" class="w-full text-left block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+											<?php echo t('admin', 'Admin'); ?>
+										</button>
+										<div id="admin-submenu-dropdown" class="hidden absolute top-0 mt-0 w-48 bg-white rounded-md shadow-lg py-1 z-30" style="right: 100%;">
+											<a href="?page=agents" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"><?php echo t('agents', 'Agents'); ?></a>
+											<a href="?page=promos" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"><?php echo t('promos', 'Promos'); ?></a>
+											<a href="?page=sections" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"><?php echo t('sections', 'Sections'); ?></a>
+											<a href="?page=hydration" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"><?php echo t('hydration', 'Hydratation'); ?></a>
+											<a href="?page=barecode" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"><?php echo t('barcode_page_title', 'Étiquettes de codes-barres') ?></a>
+										</div>
+									</div>
+									<div class="border-t border-gray-200 my-1"></div>
+								<?php endif; ?>
+								<div class="relative" id="language-submenu">
+									<button id="language-submenu-button" class="w-full text-left block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+										<?php echo t('language', 'Langue'); ?>
+									</button>
+									<div id="language-submenu-dropdown" class="hidden absolute top-0 mt-0 w-48 bg-white rounded-md shadow-lg py-1 z-40" style="right: 100%;">
+										<?php
+										// Prepare language switcher URLs
+										$queryParams = $_GET;
+										$queryParams['lang'] = 'fr';
+										$fr_url = '?' . http_build_query($queryParams);
+										$queryParams['lang'] = 'en';
+										$en_url = '?' . http_build_query($queryParams);
+										?>
+										<a href="<?php echo htmlspecialchars($fr_url); ?>" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 <?php echo Language::getInstance()->getLang() === 'fr' ? 'font-bold' : ''; ?>">Français</a>
+										<a href="<?php echo htmlspecialchars($en_url); ?>" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 <?php echo Language::getInstance()->getLang() === 'en' ? 'font-bold' : ''; ?>">English</a>
+									</div>
+								</div>
+								<div class="border-t border-gray-200 my-1"></div>
 								<a href="logout.php" class="block px-4 py-2 text-sm text-orange-500 hover:bg-gray-100"><?php echo t('logout', 'Déconnexion'); ?></a>
 							</div>
 						</div>
@@ -150,7 +164,7 @@
 				</div>
 			</div>
 			<!-- Mobile Menu -->
-			<div id="mobile-menu" class="hidden md:hidden">
+			<div id="mobile-menu" class="hidden md:hidden bg-white">
 				<a href="?page=dashboard" class="block py-2 px-4 text-sm text-gray-600 hover:bg-gray-200">Tableau de bord</a>
 
 				<div class="py-2 px-4 text-sm text-gray-500"><?php echo t('management', 'Gestion'); ?></div>
@@ -162,68 +176,109 @@
 				<a href="?page=loans" class="block py-2 pl-8 pr-4 text-sm text-gray-600 hover:bg-gray-200"><?php echo t('loan', 'Emprunt'); ?></a>
 				<a href="?page=returns" class="block py-2 pl-8 pr-4 text-sm text-gray-600 hover:bg-gray-200"><?php echo t('return', 'Retour'); ?></a>
 
-				<?php if ($_SESSION['user_role'] === 'admin'): ?>
-					<div class="py-2 px-4 text-sm text-gray-500">Admin</div>
-					<a href="?page=agents" class="block py-2 pl-8 pr-4 text-sm text-gray-600 hover:bg-gray-200"><?php echo t('agents', 'Agents'); ?></a>
-					<a href="?page=promos" class="block py-2 pl-8 pr-4 text-sm text-gray-600 hover:bg-gray-200"><?php echo t('promos', 'Promos'); ?></a>
-					<a href="?page=sections" class="block py-2 pl-8 pr-4 text-sm text-gray-600 hover:bg-gray-200"><?php echo t('sections', 'Sections'); ?></a>
-					<a href="?page=hydration" class="block py-2 pl-8 pr-4 text-sm text-gray-600 hover:bg-gray-200"><?php echo t('hydration', 'Hydratation'); ?></a>
-					<a href="?page=barecode" class="block py-2 pl-8 pr-4 text-sm text-gray-600 hover:bg-gray-200"><?php echo t('barcode_page_title', 'Étiquettes de codes-barres') ?></a>
-
-				<?php endif; ?>
 
 				<?php if (isset($_SESSION['user_id'])): ?>
+					<div class="border-t border-gray-200 my-1"></div>
 					<div class="py-2 px-4 text-sm text-gray-500"><?php echo htmlspecialchars($_SESSION['user_first_name']); ?></div>
+
+					<?php if ($_SESSION['user_role'] === 'admin'): ?>
+						<button id="mobile-admin-submenu-button" class="w-full text-left block py-2 pl-8 pr-4 text-sm text-gray-600 hover:bg-gray-200">
+							<?php echo t('admin', 'Admin'); ?>
+						</button>
+						<div id="mobile-admin-submenu" class="hidden pl-4">
+							<a href="?page=agents" class="block py-2 pl-12 pr-4 text-sm text-gray-600 hover:bg-gray-200"><?php echo t('agents', 'Agents'); ?></a>
+							<a href="?page=promos" class="block py-2 pl-12 pr-4 text-sm text-gray-600 hover:bg-gray-200"><?php echo t('promos', 'Promos'); ?></a>
+							<a href="?page=sections" class="block py-2 pl-12 pr-4 text-sm text-gray-600 hover:bg-gray-200"><?php echo t('sections', 'Sections'); ?></a>
+							<a href="?page=hydration" class="block py-2 pl-12 pr-4 text-sm text-gray-600 hover:bg-gray-200"><?php echo t('hydration', 'Hydratation'); ?></a>
+							<a href="?page=barecode" class="block py-2 pl-12 pr-4 text-sm text-gray-600 hover:bg-gray-200"><?php echo t('barcode_page_title', 'Étiquettes de codes-barres') ?></a>
+						</div>
+					<?php endif; ?>
+
+					<button id="mobile-language-submenu-button" class="w-full text-left block py-2 pl-8 pr-4 text-sm text-gray-600 hover:bg-gray-200">
+						<?php echo t('language', 'Langue'); ?>
+					</button>
+					<div id="mobile-language-submenu" class="hidden pl-4">
+						<?php
+						// Prepare language switcher URLs
+						$queryParams = $_GET;
+						$queryParams['lang'] = 'fr';
+						$fr_url = '?' . http_build_query($queryParams);
+						$queryParams['lang'] = 'en';
+						$en_url = '?' . http_build_query($queryParams);
+						?>
+						<a href="<?php echo htmlspecialchars($fr_url); ?>" class="block py-2 pl-12 pr-4 text-sm text-gray-600 hover:bg-gray-200 <?php echo Language::getInstance()->getLang() === 'fr' ? 'font-bold' : ''; ?>">Français</a>
+						<a href="<?php echo htmlspecialchars($en_url); ?>" class="block py-2 pl-12 pr-4 text-sm text-gray-600 hover:bg-gray-200 <?php echo Language::getInstance()->getLang() === 'en' ? 'font-bold' : ''; ?>">English</a>
+					</div>
+
 					<a href="logout.php" class="block py-2 pl-8 pr-4 text-sm text-red-500 hover:bg-gray-200"><?php echo t('logout', 'Déconnexion'); ?></a>
 				<?php endif; ?>
 			</div>
 		</nav>
 		<script>
-			// Mobile menu toggle
-			const mobileMenuButton = document.getElementById('mobile-menu-button');
-			const mobileMenu = document.getElementById('mobile-menu');
-			mobileMenuButton.addEventListener('click', () => {
-				mobileMenu.classList.toggle('hidden');
-			});
+			document.addEventListener('DOMContentLoaded', function() {
+				const mainDropdownButtons = [
+					'gestion-dropdown-button',
+					'actions-dropdown-button',
+					'profil-dropdown-button',
+				];
+				const subMenuButtons = [
+					'admin-submenu-button',
+					'language-submenu-button',
+				];
+				const mobileMenuButtons = [
+					'mobile-menu-button',
+					'mobile-admin-submenu-button',
+					'mobile-language-submenu-button',
+				];
 
-			// Dropdown toggle function
-			function setupDropdown(buttonId, dropdownId) {
-				const button = document.getElementById(buttonId);
-				const dropdown = document.getElementById(dropdownId);
-				if (button) {
-					button.addEventListener('click', (event) => {
-						event.stopPropagation();
-						// Close other dropdowns
-						document.querySelectorAll('.relative > div[id$="-dropdown"]').forEach(d => {
-							if (d.id !== dropdownId) {
-								d.classList.add('hidden');
-							}
-						});
-						dropdown.classList.toggle('hidden');
+				function closeAllMainDropdowns() {
+					mainDropdownButtons.forEach(btnId => {
+						const dropdownId = btnId.replace('-button', '');
+						document.getElementById(dropdownId)?.classList.add('hidden');
 					});
 				}
-			}
 
-			setupDropdown('gestion-dropdown-button', 'gestion-dropdown');
-			setupDropdown('actions-dropdown-button', 'actions-dropdown');
-			setupDropdown('admin-dropdown-button', 'admin-dropdown');
-			setupDropdown('profil-dropdown-button', 'profil-dropdown');
+				function closeAllSubMenus() {
+					subMenuButtons.forEach(btnId => {
+						const dropdownId = btnId.replace('-button', '-dropdown');
+						document.getElementById(dropdownId)?.classList.add('hidden');
+					});
+				}
 
+				mainDropdownButtons.forEach(btnId => {
+					document.getElementById(btnId)?.addEventListener('click', (e) => {
+						e.stopPropagation();
+						const dropdownId = btnId.replace('-button', '');
+						const dropdown = document.getElementById(dropdownId);
+						const isHidden = dropdown.classList.contains('hidden');
+						closeAllMainDropdowns();
+						if (isHidden) dropdown.classList.remove('hidden');
+					});
+				});
 
-			// Close dropdowns when clicking outside
-			document.addEventListener('click', (event) => {
-				if (!document.getElementById('admin-dropdown-menu').contains(event.target)) {
-					document.getElementById('admin-dropdown').classList.add('hidden');
-				}
-				if (!document.getElementById('gestion-dropdown-menu').contains(event.target)) {
-					document.getElementById('gestion-dropdown').classList.add('hidden');
-				}
-				if (!document.getElementById('actions-dropdown-menu').contains(event.target)) {
-					document.getElementById('actions-dropdown').classList.add('hidden');
-				}
-				if (!document.getElementById('profil-dropdown-menu').contains(event.target)) {
-					document.getElementById('profil-dropdown').classList.add('hidden');
-				}
+				subMenuButtons.forEach(btnId => {
+					document.getElementById(btnId)?.addEventListener('click', (e) => {
+						e.stopPropagation();
+						const dropdownId = btnId.replace('-button', '-dropdown');
+						const dropdown = document.getElementById(dropdownId);
+						const isHidden = dropdown.classList.contains('hidden');
+						closeAllSubMenus();
+						if (isHidden) dropdown.classList.remove('hidden');
+					});
+				});
+
+				mobileMenuButtons.forEach(btnId => {
+					document.getElementById(btnId)?.addEventListener('click', (e) => {
+						e.stopPropagation();
+						const dropdownId = btnId.replace('-button', '');
+						const dropdown = document.getElementById(dropdownId) || document.getElementById(dropdownId + '-submenu');
+						dropdown?.classList.toggle('hidden');
+					});
+				});
+
+				document.addEventListener('click', () => {
+					closeAllMainDropdowns();
+				});
 			});
 		</script>
 		<main class="flex-grow container mx-auto mt-24 p-4">
