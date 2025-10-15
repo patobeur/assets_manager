@@ -121,7 +121,11 @@ if ($action === 'export') {
 			break;
 
 		case 'materials':
-			$stmt = $pdo->query("SELECT name, description, status, barcode, material_categories_id FROM am_materials ORDER BY name");
+			$stmt = $pdo->query("
+                SELECT m.name, m.description, m.status, m.barcode, m.material_categories_id
+                FROM am_materials m
+                ORDER BY m.name
+            ");
 			$items = $stmt->fetchAll(PDO::FETCH_ASSOC);
 			$filename = 'materiels.csv';
 			$headers = ['Nom', 'Description', 'Statut', 'Code-barres', 'Catégorie'];
@@ -163,12 +167,28 @@ if ($action === 'export') {
 	if (!empty($items)) {
 		header('Content-Type: text/csv; charset=utf-8');
 		header('Content-Disposition: attachment; filename="' . $filename . '"');
-
 		$output = fopen('php://output', 'w');
+
+		// Handle headers
 		fputcsv($output, $headers);
 
-		foreach ($items as $item) {
-			fputcsv($output, $item);
+		// Handle rows
+		if ($page === 'materials') {
+			foreach ($items as $item) {
+				// Manually build the CSV line to ensure order and avoid quotes
+				$line = [
+					$item['name'],
+					$item['description'],
+					$item['status'],
+					$item['barcode'],
+					$item['category_title']
+				];
+				echo implode(',', $line) . "\n";
+			}
+		} else {
+			foreach ($items as $item) {
+				fputcsv($output, $item);
+			}
 		}
 
 		fclose($output);
