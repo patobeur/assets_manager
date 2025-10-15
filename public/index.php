@@ -93,17 +93,34 @@ if ($action === 'import' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 
 					$material_stmt = $pdo->prepare("INSERT INTO am_materials (name, description, status, barcode, material_categories_id) VALUES (?, ?, ?, ?, ?)");
 
-					// Clean all data
-					$name = clean_string($data[0]);
-					$description = clean_string($data[1]);
-					$status = clean_string($data[2]);
-					$barcode = clean_string($data[3]);
-					$category_id_from_csv = filter_var(clean_string($data[4]), FILTER_VALIDATE_INT);
+					// Define the status mapping from French/other to English ENUM
+					$status_map = [
+						'disponible' => 'available',
+						'emprunté' => 'loaned',
+						'en maintenance' => 'maintenance',
+						// Add English values as well to be safe
+						'available' => 'available',
+						'loaned' => 'loaned',
+						'maintenance' => 'maintenance',
+					];
 
-					// Check if the provided category ID is valid. If not, default to 1.
-					$final_category_id = in_array($category_id_from_csv, $valid_category_ids) ? $category_id_from_csv : 1;
+					while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
 
-					$material_stmt->execute([$name, $description, $status, $barcode, $final_category_id]);
+						// Clean all data
+						$name = clean_string($data[0]);
+						$description = clean_string($data[1]);
+						$status_from_csv = strtolower(clean_string($data[2])); // Standardize to lowercase
+						$barcode = clean_string($data[3]);
+						$category_id_from_csv = filter_var(clean_string($data[4]), FILTER_VALIDATE_INT);
+
+						// Map status to the correct ENUM value, default to 'available' if not found
+						$status = $status_map[$status_from_csv] ?? 'available';
+
+						// Check if the provided category ID is valid. If not, default to 1.
+						$final_category_id = in_array($category_id_from_csv, $valid_category_ids) ? $category_id_from_csv : 1;
+
+						$material_stmt->execute([$name, $description, $status, $barcode, $final_category_id]);
+					}
 				}
 
 				$pdo->commit();
