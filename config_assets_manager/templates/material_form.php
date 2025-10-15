@@ -2,10 +2,10 @@
 $material = [
     'id' => '',
     'name' => '',
-    'status' => 'available',
     'barcode' => '',
     'description' => '',
     'material_categories_id' => '',
+    'material_status_id' => 1, // Default to 'available'
 ];
 $is_edit = false;
 
@@ -18,6 +18,10 @@ if (isset($_GET['id'])) {
 
 $categories_stmt = $pdo->query("SELECT * FROM am_materials_categories ORDER BY title");
 $categories = $categories_stmt->fetchAll();
+
+$statuses_stmt = $pdo->query("SELECT * FROM am_materials_status ORDER BY title");
+$statuses = $statuses_stmt->fetchAll();
+
 ?>
 
 <h1 class="text-3xl font-bold mb-6"><?php echo $is_edit ? 'Modifier le matériel' : 'Ajouter du matériel'; ?></h1>
@@ -45,11 +49,14 @@ $categories = $categories_stmt->fetchAll();
             </select>
         </div>
         <div class="mb-4">
-            <label for="status" class="block text-gray-700 text-sm font-bold mb-2">Statut</label>
-            <select id="status" name="status" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-                <option value="available" <?php echo $material['status'] === 'available' ? 'selected' : ''; ?>>Disponible</option>
-                <option value="loaned" <?php echo $material['status'] === 'loaned' ? 'selected' : ''; ?>>Emprunté</option>
-                <option value="maintenance" <?php echo $material['status'] === 'maintenance' ? 'selected' : ''; ?>>En maintenance</option>
+            <label for="material_status_id" class="block text-gray-700 text-sm font-bold mb-2">Statut</label>
+            <select id="material_status_id" name="material_status_id" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+                <option value="">Sélectionner un statut</option>
+                <?php foreach ($statuses as $status): ?>
+                    <option value="<?php echo $status['id']; ?>" <?php echo ($material['material_status_id'] == $status['id']) ? 'selected' : ''; ?>>
+                        <?php echo htmlspecialchars($status['title']); ?>
+                    </option>
+                <?php endforeach; ?>
             </select>
         </div>
         <div class="mb-6">

@@ -131,10 +131,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         id INT(11) AUTO_INCREMENT PRIMARY KEY,
         name VARCHAR(255) NOT NULL,
         description TEXT,
-        status ENUM('available', 'loaned', 'maintenance') NOT NULL DEFAULT 'available',
         barcode VARCHAR(255) NOT NULL UNIQUE,
         material_categories_id INT(11) NOT NULL,
-        material_status_id INT(11) NOT NULL,
+        material_status_id INT(11) NOT NULL DEFAULT 1,
         FOREIGN KEY (material_categories_id) REFERENCES am_materials_categories(id) ON DELETE CASCADE,
         FOREIGN KEY (material_status_id) REFERENCES am_materials_status(id) ON DELETE CASCADE
     );

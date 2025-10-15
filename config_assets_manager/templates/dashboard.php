@@ -7,7 +7,12 @@ if ($_SESSION['user_role'] === 'admin' || $_SESSION['user_role'] === 'agent') {
     $student_count = $pdo->query("SELECT count(*) FROM am_students")->fetchColumn();
     $material_count = $pdo->query("SELECT count(*) FROM am_materials")->fetchColumn();
     $agent_count = $pdo->query("SELECT count(*) FROM am_users WHERE role = 'agent'")->fetchColumn();
-    $loaned_count = $pdo->query("SELECT count(*) FROM am_materials WHERE status = 'loaned'")->fetchColumn();
+    $loaned_count = $pdo->query("
+        SELECT count(*)
+        FROM am_materials m
+        JOIN am_materials_status ms ON m.material_status_id = ms.id
+        WHERE ms.title = 'loaned'
+    ")->fetchColumn();
 }
 ?>
 

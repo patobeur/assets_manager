@@ -91,18 +91,18 @@ if ($action === 'import' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 					$valid_category_ids_stmt = $pdo->query("SELECT id FROM am_materials_categories");
 					$valid_category_ids = $valid_category_ids_stmt->fetchAll(PDO::FETCH_COLUMN, 0);
 
-					$material_stmt = $pdo->prepare("INSERT INTO am_materials (name, description, status, barcode, material_categories_id) VALUES (?, ?, ?, ?, ?)");
+					// Fetch all material statuses into an associative array for mapping.
+					$statuses_stmt = $pdo->query("SELECT title, id FROM am_materials_status");
+					$db_statuses = $statuses_stmt->fetchAll(PDO::FETCH_KEY_PAIR);
 
-					// Define the status mapping from French/other to English ENUM
-					$status_map = [
-						'disponible' => 'available',
-						'emprunté' => 'loaned',
-						'en maintenance' => 'maintenance',
-						// Add English values as well to be safe
-						'available' => 'available',
-						'loaned' => 'loaned',
-						'maintenance' => 'maintenance',
-					];
+					// Create a comprehensive map for all possible CSV values.
+					$status_map = array_change_key_case($db_statuses, CASE_LOWER); // 'available' => 1, etc.
+					$status_map['disponible'] = $status_map['available'] ?? 1;
+					$status_map['emprunté'] = $status_map['loaned'] ?? 2;
+					$status_map['en maintenance'] = $status_map['maintenance'] ?? 3;
+
+
+					$material_stmt = $pdo->prepare("INSERT INTO am_materials (name, description, barcode, material_categories_id, material_status_id) VALUES (?, ?, ?, ?, ?)");
 
 					while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
 
@@ -113,13 +113,13 @@ if ($action === 'import' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 						$barcode = clean_string($data[3]);
 						$category_id_from_csv = filter_var(clean_string($data[4]), FILTER_VALIDATE_INT);
 
-						// Map status to the correct ENUM value, default to 'available' if not found
-						$status = $status_map[$status_from_csv] ?? 'available';
+						// Map status to ID, default to 1 ('available') if not found
+						$status_id = $status_map[$status_from_csv] ?? 1;
 
 						// Check if the provided category ID is valid. If not, default to 1.
 						$final_category_id = in_array($category_id_from_csv, $valid_category_ids) ? $category_id_from_csv : 1;
 
-						$material_stmt->execute([$name, $description, $status, $barcode, $final_category_id]);
+						$material_stmt->execute([$name, $description, $barcode, $final_category_id, $status_id]);
 					}
 				}
 
@@ -162,13 +162,15 @@ if ($action === 'export') {
 
 		case 'materials':
 			$stmt = $pdo->query("
-                SELECT m.name, m.description, m.status, m.barcode, m.material_categories_id
+                SELECT m.name, m.description, ms.title as status, m.barcode, mc.title as category_name
                 FROM am_materials m
+                JOIN am_materials_status ms ON m.material_status_id = ms.id
+                JOIN am_materials_categories mc ON m.material_categories_id = mc.id
                 ORDER BY m.name
             ");
 			$items = $stmt->fetchAll(PDO::FETCH_ASSOC);
 			$filename = 'materiels.csv';
-			$headers = ['Nom', 'Description', 'Statut', 'Code-barres', 'Catégorie_Id'];
+			$headers = ['Nom', 'Description', 'Statut', 'Code-barres', 'Catégorie'];
 			break;
 
 		case 'agents':
@@ -301,13 +303,18 @@ if (($_SERVER['REQUEST_METHOD'] === 'POST' && ($action === 'create' || $action =
 		case 'materials':
 			if ($action === 'delete') {
 				$id = intval($_GET['id']);
-				// Check material status
-				$stmt = $pdo->prepare("SELECT status FROM am_materials WHERE id = ?");
+				// Check material status by joining with the status table
+				$stmt = $pdo->prepare("
+                    SELECT ms.title
+                    FROM am_materials m
+                    JOIN am_materials_status ms ON m.material_status_id = ms.id
+                    WHERE m.id = ?
+                ");
 				$stmt->execute([$id]);
-				$status = $stmt->fetchColumn();
+				$status_title = $stmt->fetchColumn();
 
-				if ($status !== 'available') {
-					$_SESSION['error_message'] = str_replace('{status}', htmlspecialchars($status), t('material_delete_error_status'));
+				if ($status_title !== 'available') {
+					$_SESSION['error_message'] = str_replace('{status}', htmlspecialchars($status_title), t('material_delete_error_status'));
 				} else {
 					$stmt = $pdo->prepare("DELETE FROM am_materials WHERE id = ?");
 					$stmt->execute([$id]);
@@ -316,18 +323,18 @@ if (($_SERVER['REQUEST_METHOD'] === 'POST' && ($action === 'create' || $action =
 			} else { // POST request for create or edit
 				$name = $_POST['name'];
 				$description = $_POST['description'];
-				$status = $_POST['status'];
 				$barcode = $_POST['barcode'];
 				$material_categories_id = $_POST['material_categories_id'];
+				$material_status_id = $_POST['material_status_id']; // New field
 
 				if ($action === 'create') {
-					$stmt = $pdo->prepare("INSERT INTO am_materials (name, description, status, barcode, material_categories_id) VALUES (?, ?, ?, ?, ?)");
-					$stmt->execute([$name, $description, $status, $barcode, $material_categories_id]);
+					$stmt = $pdo->prepare("INSERT INTO am_materials (name, description, barcode, material_categories_id, material_status_id) VALUES (?, ?, ?, ?, ?)");
+					$stmt->execute([$name, $description, $barcode, $material_categories_id, $material_status_id]);
 					$_SESSION['success_message'] = t('material_created');
 				} elseif ($action === 'edit') {
 					$id = intval($_POST['id']);
-					$stmt = $pdo->prepare("UPDATE am_materials SET name = ?, description = ?, status = ?, barcode = ?, material_categories_id = ? WHERE id = ?");
-					$stmt->execute([$name, $description, $status, $barcode, $material_categories_id, $id]);
+					$stmt = $pdo->prepare("UPDATE am_materials SET name = ?, description = ?, barcode = ?, material_categories_id = ?, material_status_id = ? WHERE id = ?");
+					$stmt->execute([$name, $description, $barcode, $material_categories_id, $material_status_id, $id]);
 					$_SESSION['success_message'] = t('material_updated');
 				}
 			}
@@ -634,20 +641,31 @@ switch ($page) {
 			$stmt->execute([$student_barcode]);
 			$student = $stmt->fetch();
 
-			// Get material id
-			$stmt = $pdo->prepare("SELECT id, status FROM am_materials WHERE barcode = ?");
+			// Get material id and status title
+			$stmt = $pdo->prepare("
+                SELECT m.id, ms.title as status_title
+                FROM am_materials m
+                JOIN am_materials_status ms ON m.material_status_id = ms.id
+                WHERE m.barcode = ?
+            ");
 			$stmt->execute([$material_barcode]);
 			$material = $stmt->fetch();
 
-			if ($student && $material && $material['status'] === 'available') {
+			if ($student && $material && $material['status_title'] === 'available') {
+				// Get the ID for 'loaned' status
+				$stmt_status = $pdo->prepare("SELECT id FROM am_materials_status WHERE title = 'loaned'");
+				$stmt_status->execute();
+				$loaned_status_id = $stmt_status->fetchColumn();
+
+
 				// Create loan
 				$stmt = $pdo->prepare("INSERT INTO am_loans (student_id, material_id, loan_date, loan_user_id) VALUES (?, ?, NOW(), ?)");
 				$stmt->execute([$student['id'], $material['id'], $_SESSION['user_id']]);
 				$loan_id = $pdo->lastInsertId();
 
 				// Update material status
-				$stmt = $pdo->prepare("UPDATE am_materials SET status = 'loaned' WHERE id = ?");
-				$stmt->execute([$material['id']]);
+				$stmt = $pdo->prepare("UPDATE am_materials SET material_status_id = ? WHERE id = ?");
+				$stmt->execute([$loaned_status_id, $material['id']]);
 
 				// Get student info
 				$stmt = $pdo->prepare("SELECT first_name, last_name FROM am_students WHERE id = ?");
@@ -713,13 +731,18 @@ switch ($page) {
 				$loan = $stmt->fetch();
 
 				if ($loan) {
+					// Get the ID for 'available' status
+					$stmt_status = $pdo->prepare("SELECT id FROM am_materials_status WHERE title = 'available'");
+					$stmt_status->execute();
+					$available_status_id = $stmt_status->fetchColumn();
+
 					// Update loan
 					$stmt = $pdo->prepare("UPDATE am_loans SET return_date = NOW(), return_user_id = ? WHERE id = ?");
 					$stmt->execute([$_SESSION['user_id'], $loan['id']]);
 
 					// Update material status
-					$stmt = $pdo->prepare("UPDATE am_materials SET status = 'available' WHERE id = ?");
-					$stmt->execute([$material['id']]);
+					$stmt = $pdo->prepare("UPDATE am_materials SET material_status_id = ? WHERE id = ?");
+					$stmt->execute([$available_status_id, $material['id']]);
 
 					$success = t('return_success_message');
 
