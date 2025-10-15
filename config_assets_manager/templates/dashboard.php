@@ -1,47 +1,125 @@
 <?php
-$stmt = $pdo->prepare("SELECT first_name FROM am_users WHERE id = ?");
-$stmt->execute([$_SESSION['user_id']]);
-$user = $stmt->fetch();
+// All data fetching is now done in index.php before this template is included.
+// This file is purely for presentation.
 
-if ($_SESSION['user_role'] === 'admin' || $_SESSION['user_role'] === 'agent') {
-    $student_count = $pdo->query("SELECT count(*) FROM am_students")->fetchColumn();
-    $material_count = $pdo->query("SELECT count(*) FROM am_materials")->fetchColumn();
-    $agent_count = $pdo->query("SELECT count(*) FROM am_users WHERE role = 'agent'")->fetchColumn();
-    $loaned_count = $pdo->query("
-        SELECT count(*)
-        FROM am_materials m
-        JOIN am_materials_status ms ON m.material_status_id = ms.id
-        WHERE ms.title = 'loaned'
-    ")->fetchColumn();
+// --- Helper function to format duration ---
+function format_duration($total_seconds)
+{
+    if ($total_seconds < 1) {
+        return "0 " . t('time_unit_seconds');
+    }
+    $days = floor($total_seconds / 86400);
+    $hours = floor(($total_seconds % 86400) / 3600);
+    $minutes = floor(($total_seconds % 3600) / 60);
+    $seconds = $total_seconds % 60;
+
+    $parts = [];
+    if ($days > 0) $parts[] = $days . t('time_unit_days');
+    if ($hours > 0) $parts[] = $hours . t('time_unit_hours');
+    if ($minutes > 0) $parts[] = $minutes . t('time_unit_minutes');
+    if ($seconds > 0 || empty($parts)) $parts[] = $seconds . t('time_unit_seconds');
+
+    return implode(' ', $parts);
 }
 ?>
 
-<h1 class="text-3xl font-bold text-gray-800"><?php echo t('dashboard', 'Tableau de bord'); ?></h1>
+<h1 class="text-3xl font-bold text-gray-800 mb-6"><?php echo t('dashboard', 'Tableau de bord'); ?></h1>
 
-<div class="mt-6">
-    <p class="text-lg text-gray-600"><?php echo str_replace('{user_name}', '<span class="font-semibold">' . htmlspecialchars($user['first_name']) . '</span>', t('welcome_back', 'Content de vous revoir, {user_name}!')); ?></p>
+<p class="text-lg text-gray-600 mb-8"><?php echo str_replace('{user_name}', '<span class="font-semibold">' . htmlspecialchars($user['first_name']) . '</span>', t('welcome_back', 'Content de vous revoir, {user_name}!')); ?></p>
+
+<!-- Main Stats Cards -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+    <div class="bg-white p-6 rounded-lg shadow-md">
+        <h2 class="text-3xl font-bold text-gray-800"><?php echo $student_count; ?></h2>
+        <p class="text-gray-600 mt-1"><?php echo t('students', 'Étudiants'); ?></p>
+    </div>
+    <div class="bg-white p-6 rounded-lg shadow-md">
+        <h2 class="text-3xl font-bold text-gray-800"><?php echo $material_count; ?></h2>
+        <p class="text-gray-600 mt-1"><?php echo t('materials', 'Matériels'); ?></p>
+    </div>
+    <div class="bg-blue-100 p-6 rounded-lg shadow-md">
+        <h2 class="text-3xl font-bold text-gray-800"><?php echo $loaned_count; ?></h2>
+        <p class="text-gray-600 mt-1"><?php echo t('loaned_materials', 'Matériels empruntés'); ?></p>
+    </div>
 </div>
 
-<?php if ($_SESSION['user_role'] === 'admin' || $_SESSION['user_role'] === 'agent'): ?>
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-6">
-        <div class="bg-white p-6 rounded-lg shadow-md">
-            <h2 class="text-2xl font-bold text-gray-800"><?php echo $student_count; ?></h2>
-            <p class="text-gray-600"><?php echo t('students', 'Étudiants'); ?></p>
+<!-- Detailed Stats Grid -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+
+    <!-- Left Column -->
+    <div>
+        <!-- Sections and Promos -->
+        <div class="bg-white p-6 rounded-lg shadow-md mb-8">
+            <h3 class="text-xl font-bold text-gray-800 mb-4"><?php echo t('school_structure', 'Structure de l\'école'); ?></h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <p class="text-gray-600"><?php echo t('sections'); ?></p>
+                    <p class="text-2xl font-bold"><?php echo "{$used_sections} / {$total_sections}"; ?></p>
+                    <p class="text-sm text-gray-500"><?php echo t('sections_in_use', 'utilisées'); ?></p>
+                </div>
+                <div>
+                    <p class="text-gray-600"><?php echo t('promos'); ?></p>
+                    <p class="text-2xl font-bold"><?php echo "{$used_promos} / {$total_promos}"; ?></p>
+                    <p class="text-sm text-gray-500"><?php echo t('promos_in_use', 'utilisées'); ?></p>
+                </div>
+            </div>
         </div>
+
+        <!-- Most Popular Materials -->
         <div class="bg-white p-6 rounded-lg shadow-md">
-            <h2 class="text-2xl font-bold text-gray-800"><?php echo $material_count; ?></h2>
-            <p class="text-gray-600"><?php echo t('materials', 'Matériels'); ?></p>
-        </div>
-        <div class="bg-white p-6 rounded-lg shadow-md">
-            <h2 class="text-2xl font-bold text-gray-800"><?php echo $agent_count; ?></h2>
-            <p class="text-gray-600"><?php echo t('agents', 'Agents'); ?></p>
-        </div>
-        <div class="bg-blue-100 p-6 rounded-lg shadow-md">
-            <h2 class="text-2xl font-bold text-gray-800"><?php echo $loaned_count; ?></h2>
-            <p class="text-gray-600"><?php echo t('loaned_materials', 'Matériels empruntés'); ?></p>
+            <h3 class="text-xl font-bold text-gray-800 mb-4"><?php echo t('most_popular_materials', 'Matériels les plus populaires'); ?></h3>
+            <?php if (!empty($most_loaned_materials)): ?>
+                <ol class="list-decimal list-inside space-y-2">
+                    <?php foreach ($most_loaned_materials as $material): ?>
+                        <li>
+                            <span class="font-semibold"><?php echo htmlspecialchars($material['name']); ?></span>
+                            - <span class="text-gray-600"><?php echo str_replace('{count}', $material['loan_count'], t('loaned_n_times', 'Emprunté {count} fois')); ?></span>
+                        </li>
+                    <?php endforeach; ?>
+                </ol>
+            <?php else: ?>
+                <p class="text-gray-500"><?php echo t('no_loan_data_yet', 'Aucune donnée d\'emprunt.'); ?></p>
+            <?php endif; ?>
         </div>
     </div>
-<?php endif; ?>
+
+    <!-- Right Column -->
+    <div>
+        <!-- Top 5 Students by Loans -->
+        <div class="bg-white p-6 rounded-lg shadow-md mb-8">
+            <h3 class="text-xl font-bold text-gray-800 mb-4"><?php echo t('top_5_students_by_loans', 'Top 5 des étudiants (par nombre d\'emprunts)'); ?></h3>
+            <?php if (!empty($top_students_by_loans)): ?>
+                <ol class="list-decimal list-inside space-y-2">
+                    <?php foreach ($top_students_by_loans as $student): ?>
+                        <li>
+                            <span class="font-semibold"><?php echo htmlspecialchars($student['first_name'] . ' ' . $student['last_name']); ?></span>
+                            - <span class="text-gray-600"><?php echo str_replace('{count}', $student['loan_count'], t('n_loans', '{count} emprunts')); ?></span>
+                        </li>
+                    <?php endforeach; ?>
+                </ol>
+            <?php else: ?>
+                <p class="text-gray-500"><?php echo t('no_loan_data_yet'); ?></p>
+            <?php endif; ?>
+        </div>
+
+        <!-- Top 5 Students by Duration -->
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <h3 class="text-xl font-bold text-gray-800 mb-4"><?php echo t('top_5_students_by_duration', 'Top 5 des étudiants (par durée d\'emprunt)'); ?></h3>
+            <?php if (!empty($top_students_by_duration)): ?>
+                <ol class="list-decimal list-inside space-y-2">
+                    <?php foreach ($top_students_by_duration as $student): ?>
+                        <li>
+                            <span class="font-semibold"><?php echo htmlspecialchars($student['first_name'] . ' ' . $student['last_name']); ?></span>
+                            - <span class="text-gray-600"><?php echo format_duration($student['total_duration_seconds']); ?></span>
+                        </li>
+                    <?php endforeach; ?>
+                </ol>
+            <?php else: ?>
+                <p class="text-gray-500"><?php echo t('no_loan_data_yet'); ?></p>
+            <?php endif; ?>
+        </div>
+    </div>
+</div>
 
 <div class="mt-10">
     <h2 class="text-2xl font-bold text-gray-800 mb-4"><?php echo t('quick_actions', 'Actions rapides'); ?></h2>
