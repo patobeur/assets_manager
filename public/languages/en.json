@@ -136,5 +136,7 @@
 	"title": "Title",
 	"update": "Update",
 	"create": "Create",
-	"cancel": "Cancel"
+	"cancel": "Cancel",
+	"student_status_updated": "Student status updated successfully.",
+	"student_delete_error_active": "Cannot delete an active student. Please deactivate them first."
 }

@@ -135,5 +135,7 @@
 	"title": "Titre",
 	"update": "Mettre à jour",
 	"create": "Créer",
-	"cancel": "Annuler"
+	"cancel": "Annuler",
+	"student_status_updated": "Statut de l'étudiant mis à jour avec succès.",
+	"student_delete_error_active": "Impossible de supprimer un étudiant actif. Veuillez d'abord le désactiver."
 }

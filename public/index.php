@@ -175,11 +175,24 @@ if ($action === 'export') {
 	}
 }
 
-// Handle POST actions (create, edit) and GET actions (delete) before any HTML is output
-if (($_SERVER['REQUEST_METHOD'] === 'POST' && ($action === 'create' || $action === 'edit')) || $action === 'delete') {
+// Handle POST actions (create, edit) and GET actions (delete, toggle_status) before any HTML is output
+if (($_SERVER['REQUEST_METHOD'] === 'POST' && ($action === 'create' || $action === 'edit')) || in_array($action, ['delete', 'toggle_status'])) {
 	switch ($page) {
 		case 'students':
-			if ($action === 'delete') {
+			if ($action === 'toggle_status') {
+				$id = intval($_GET['id']);
+				// First, check the current status
+				$stmt = $pdo->prepare("SELECT status FROM am_students WHERE id = ?");
+				$stmt->execute([$id]);
+				$current_status = $stmt->fetchColumn();
+
+				// Toggle the status
+				$new_status = $current_status == 1 ? 0 : 1;
+				$stmt = $pdo->prepare("UPDATE am_students SET status = ? WHERE id = ?");
+				$stmt->execute([$new_status, $id]);
+				$_SESSION['success_message'] = t('student_status_updated');
+
+			} elseif ($action === 'delete') {
 				$id = intval($_GET['id']);
 				// Check for active loans
 				$stmt = $pdo->prepare("SELECT COUNT(*) FROM am_loans WHERE student_id = ? AND return_date IS NULL");
@@ -187,9 +200,14 @@ if (($_SERVER['REQUEST_METHOD'] === 'POST' && ($action === 'create' || $action =
 				if ($stmt->fetchColumn() > 0) {
 					$_SESSION['error_message'] = t('student_delete_error_loans');
 				} else {
-					$stmt = $pdo->prepare("DELETE FROM am_students WHERE id = ?");
+					// Only delete if status is 0 (inactive)
+					$stmt = $pdo->prepare("DELETE FROM am_students WHERE id = ? AND status = 0");
 					$stmt->execute([$id]);
-					$_SESSION['success_message'] = t('student_deleted');
+					if ($stmt->rowCount() > 0) {
+						$_SESSION['success_message'] = t('student_deleted');
+					} else {
+						$_SESSION['error_message'] = t('student_delete_error_active');
+					}
 				}
 			} else { // POST request for create or edit
 				$first_name = $_POST['first_name'];
@@ -198,6 +216,7 @@ if (($_SERVER['REQUEST_METHOD'] === 'POST' && ($action === 'create' || $action =
 				$barcode = $_POST['barcode'];
 				$promo_id = !empty($_POST['promo_id']) ? intval($_POST['promo_id']) : null;
 				$section_id = !empty($_POST['section_id']) ? intval($_POST['section_id']) : null;
+				$status = isset($_POST['status']) ? 1 : 0;
 
 				if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
 					$_SESSION['error_message'] = t('invalid_student_email');
@@ -206,13 +225,13 @@ if (($_SERVER['REQUEST_METHOD'] === 'POST' && ($action === 'create' || $action =
 				}
 
 				if ($action === 'create') {
-					$stmt = $pdo->prepare("INSERT INTO am_students (first_name, last_name, email, barcode, promo_id, section_id) VALUES (?, ?, ?, ?, ?, ?)");
-					$stmt->execute([$first_name, $last_name, $email, $barcode, $promo_id, $section_id]);
+					$stmt = $pdo->prepare("INSERT INTO am_students (first_name, last_name, email, barcode, promo_id, section_id, status) VALUES (?, ?, ?, ?, ?, ?, ?)");
+					$stmt->execute([$first_name, $last_name, $email, $barcode, $promo_id, $section_id, $status]);
 					$_SESSION['success_message'] = t('student_created');
 				} elseif ($action === 'edit') {
 					$id = intval($_POST['id']);
-					$stmt = $pdo->prepare("UPDATE am_students SET first_name = ?, last_name = ?, email = ?, barcode = ?, promo_id = ?, section_id = ? WHERE id = ?");
-					$stmt->execute([$first_name, $last_name, $email, $barcode, $promo_id, $section_id, $id]);
+					$stmt = $pdo->prepare("UPDATE am_students SET first_name = ?, last_name = ?, email = ?, barcode = ?, promo_id = ?, section_id = ?, status = ? WHERE id = ?");
+					$stmt->execute([$first_name, $last_name, $email, $barcode, $promo_id, $section_id, $status, $id]);
 					$_SESSION['success_message'] = t('student_updated');
 				}
 			}

@@ -60,6 +60,13 @@
 		.break-inside-avoid {
 			break-inside: avoid;
 		}
+        .toggle-checkbox:checked {
+            right: 0;
+            border-color: #48bb78;
+        }
+        .toggle-checkbox:checked + .toggle-label {
+            background-color: #48bb78;
+        }
 	</style>
 	<?php
 	// Load modules header

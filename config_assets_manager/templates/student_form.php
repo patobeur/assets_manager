@@ -7,6 +7,7 @@ $student = [
     'email' => '',
     'promo_id' => null,
     'section_id' => null,
+    'status' => 1,
 ];
 $is_edit = false;
 
@@ -60,6 +61,15 @@ if (isset($_GET['id'])) {
         <div class="mb-6">
             <label for="barcode" class="block text-gray-700 text-sm font-bold mb-2">Code-barres</label>
             <input type="text" id="barcode" name="barcode" value="<?php echo htmlspecialchars($student['barcode']); ?>" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline" required>
+        </div>
+
+        <div class="mb-4">
+            <label for="status" class="block text-gray-700 text-sm font-bold mb-2">Statut</label>
+            <div class="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in">
+                <input type="checkbox" name="status" id="status" value="1" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer" <?php echo (isset($student['status']) && $student['status'] == 1) ? 'checked' : ''; ?>>
+                <label for="status" class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer"></label>
+            </div>
+            <span class="text-gray-700 text-sm">Actif</span>
         </div>
 
         <div class="flex items-center justify-between">
