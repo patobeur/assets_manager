@@ -1,3 +1,3 @@
-Prénom,Nom,Email,Promo,Section,Code-barres
-Anne,Émone,anne.enome@example.com,25-27,BTS COM,HYDRATION-U-01
-Thomas,Photota,thomas.photota@example.com,00-00,Bachelor RC,HYDRATION-U-02
+Prénom,Nom,Email,Promo,Section,Code-barres,Status
+Anne,Émone,anne.enome@example.com,25-27,BTS COM,HYDRATION-U-01,1
+Thomas,Photota,thomas.photota@example.com,00-00,Bachelor RC,HYDRATION-U-02,1

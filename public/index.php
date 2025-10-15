@@ -53,16 +53,17 @@ if ($action === 'import' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 					$promo_stmt = $pdo->prepare("SELECT id FROM am_promos WHERE title = ?");
 					$section_stmt = $pdo->prepare("SELECT id FROM am_sections WHERE title = ?");
 
-					$student_stmt = $pdo->prepare("INSERT INTO am_students (first_name, last_name, email, barcode, promo_id, section_id) VALUES (?, ?, ?, ?, ?, ?)");
+					$student_stmt = $pdo->prepare("INSERT INTO am_students (first_name, last_name, email, barcode, promo_id, section_id, status) VALUES (?, ?, ?, ?, ?, ?, ?)");
 
 					while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
-						// CSV columns: first_name, last_name, email, promo_name, section_name, barcode
+						// CSV columns: first_name, last_name, email, promo_name, section_name, barcode, categorie
 						$first_name = $data[0];
 						$last_name = $data[1];
 						$email = $data[2];
 						$promo_name = $data[3];
 						$section_name = $data[4];
 						$barcode = $data[5];
+						$status = $data[6];
 
 						// Get promo ID
 						$promo_stmt->execute([$promo_name]);
@@ -72,13 +73,13 @@ if ($action === 'import' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 						$section_stmt->execute([$section_name]);
 						$section_id = $section_stmt->fetchColumn() ?: null;
 
-						$student_stmt->execute([$first_name, $last_name, $email, $barcode, $promo_id, $section_id]);
+						$student_stmt->execute([$first_name, $last_name, $email, $barcode, $promo_id, $section_id, $status]);
 					}
 				} elseif ($page === 'materials') {
-					$stmt = $pdo->prepare("INSERT INTO am_materials (name, description, status, barcode) VALUES (?, ?, ?, ?)");
+					$stmt = $pdo->prepare("INSERT INTO am_materials (name, description, status, barcode, material_categories_id) VALUES (?, ?, ?, ?, ?)");
 					while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
-						// Assuming CSV columns are: name, description, status, barcode
-						$stmt->execute([$data[0], $data[1], $data[2], $data[3]]);
+						// Assuming CSV columns are: name, description, status, barcode, material_categories_id
+						$stmt->execute([$data[0], $data[1], $data[2], $data[3], $data[4]]);
 					}
 				}
 
@@ -108,7 +109,7 @@ if ($action === 'export') {
 	switch ($page) {
 		case 'students':
 			$stmt = $pdo->query("
-				SELECT s.id, s.first_name, s.last_name, s.email, p.title as promo_name, sec.title as section_name, s.barcode
+				SELECT s.id, s.first_name, s.last_name, s.email, p.title as promo_name, sec.title as section_name, s.barcode, s.status
 				FROM am_students s
 				LEFT JOIN am_promos p ON s.promo_id = p.id
 				LEFT JOIN am_sections sec ON s.section_id = sec.id
@@ -116,11 +117,11 @@ if ($action === 'export') {
 			");
 			$items = $stmt->fetchAll(PDO::FETCH_ASSOC);
 			$filename = 'etudiants.csv';
-			$headers = ['ID', 'Prénom', 'Nom', 'Email', 'Promo', 'Section', 'Code-barres'];
+			$headers = ['ID', 'Prénom', 'Nom', 'Email', 'Promo', 'Section', 'Code-barres', 'Status'];
 			break;
 
 		case 'materials':
-			$stmt = $pdo->query("SELECT m.id, m.name, m.description, m.status, m.barcode, c.title as category_title FROM am_materials m LEFT JOIN am_materials_categories c ON m.material_categories_id = c.id ORDER BY m.name");
+			$stmt = $pdo->query("SELECT m.id, m.name, m.description, m.status, m.barcode, m.material_categories_id FROM am_materials m ORDER BY m.name");
 			$items = $stmt->fetchAll(PDO::FETCH_ASSOC);
 			$filename = 'materiels.csv';
 			$headers = ['ID', 'Nom', 'Description', 'Statut', 'Code-barres', 'Catégorie'];
@@ -191,7 +192,6 @@ if (($_SERVER['REQUEST_METHOD'] === 'POST' && ($action === 'create' || $action =
 				$stmt = $pdo->prepare("UPDATE am_students SET status = ? WHERE id = ?");
 				$stmt->execute([$new_status, $id]);
 				$_SESSION['success_message'] = t('student_status_updated');
-
 			} elseif ($action === 'delete') {
 				$id = intval($_GET['id']);
 				// Check for active loans

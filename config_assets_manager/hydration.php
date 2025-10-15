@@ -16,25 +16,25 @@ class Hydration
         try {
             // Data for students
             $students = [
-                ['Aiden', 'Walker', 'HYDRATION-S-001', 'aiden.walker@patobeur.pat', 1, 1],
-                ['Isabella', 'Moreno', 'HYDRATION-S-002', 'isabella.moreno@patobeur.pat', 1, 1],
-                ['Luca', 'Bianchi', 'HYDRATION-S-003', 'luca.bianchi@patobeur.pat', 1, 1],
-                ['Nora', 'Andersson', 'HYDRATION-S-004', 'nora.andersson@patobeur.pat', 1, 1],
-                ['Mateo', 'Silva', 'HYDRATION-S-005', 'mateo.silva@patobeur.pat', 1, 1],
-                ['Elena', 'Kuznetsova', 'HYDRATION-S-006', 'elena.kuznetsova@patobeur.pat', 1, 1],
-                ['Kai', 'Tanaka', 'HYDRATION-S-007', 'kai.tanaka@patobeur.pat', 1, 1],
-                ['Sofia', 'Garcia', 'HYDRATION-S-008', 'sofia.garcia@patobeur.pat', 1, 1],
-                ['Noah', 'Johnson', 'HYDRATION-S-009', 'noah.johnson@patobeur.pat', 1, 1],
-                ['Mila', 'Novak', 'HYDRATION-S-010', 'mila.novak@patobeur.pat', 1, 1],
-                ['Ethan', 'Carter', 'HYDRATION-S-011', 'ethan.carter@patobeur.pat', 1, 1],
-                ['Aria', 'Romero', 'HYDRATION-S-012', 'aria.romero@patobeur.pat', 1, 1],
-                ['Leo', 'Petrov', 'HYDRATION-S-013', 'leo.petrov@patobeur.pat', 1, 1],
-                ['Amara', 'Singh', 'HYDRATION-S-014', 'amara.singh@patobeur.pat', 1, 1],
-                ['Ravi', 'Patel', 'HYDRATION-S-015', 'ravi.patel@patobeur.pat', 1, 1],
+                ['Aiden', 'Walker', 'HYDRATION-S-001', 'aiden.walker@patobeur.pat', 1, 1, 1],
+                ['Isabella', 'Moreno', 'HYDRATION-S-002', 'isabella.moreno@patobeur.pat', 1, 1, 1],
+                ['Luca', 'Bianchi', 'HYDRATION-S-003', 'luca.bianchi@patobeur.pat', 1, 1, 1],
+                ['Nora', 'Andersson', 'HYDRATION-S-004', 'nora.andersson@patobeur.pat', 1, 1, 1],
+                ['Mateo', 'Silva', 'HYDRATION-S-005', 'mateo.silva@patobeur.pat', 1, 1, 1],
+                ['Elena', 'Kuznetsova', 'HYDRATION-S-006', 'elena.kuznetsova@patobeur.pat', 1, 1, 1],
+                ['Kai', 'Tanaka', 'HYDRATION-S-007', 'kai.tanaka@patobeur.pat', 1, 1, 1],
+                ['Sofia', 'Garcia', 'HYDRATION-S-008', 'sofia.garcia@patobeur.pat', 1, 1, 0],
+                ['Noah', 'Johnson', 'HYDRATION-S-009', 'noah.johnson@patobeur.pat', 1, 1, 1],
+                ['Mila', 'Novak', 'HYDRATION-S-010', 'mila.novak@patobeur.pat', 1, 1, 1],
+                ['Ethan', 'Carter', 'HYDRATION-S-011', 'ethan.carter@patobeur.pat', 1, 1, 1],
+                ['Aria', 'Romero', 'HYDRATION-S-012', 'aria.romero@patobeur.pat', 1, 1, 1],
+                ['Leo', 'Petrov', 'HYDRATION-S-013', 'leo.petrov@patobeur.pat', 1, 1, 1],
+                ['Amara', 'Singh', 'HYDRATION-S-014', 'amara.singh@patobeur.pat', 1, 1, 1],
+                ['Ravi', 'Patel', 'HYDRATION-S-015', 'ravi.patel@patobeur.pat', 1, 1, 1],
             ];
 
             $student_ids = [];
-            $stmt = $this->pdo->prepare("INSERT INTO am_students (first_name, last_name, barcode, email, section_id, promo_id) VALUES (?, ?, ?, ?, ?, ?)");
+            $stmt = $this->pdo->prepare("INSERT INTO am_students (first_name, last_name, barcode, email, section_id, promo_id, status) VALUES (?, ?, ?, ?, ?, ?, ?)");
             foreach ($students as $student) {
                 $stmt->execute($student);
                 $student_ids[] = $this->pdo->lastInsertId();
