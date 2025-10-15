@@ -1,5 +1,5 @@
 <?php
-$stmt = $pdo->query("SELECT * FROM am_materials");
+$stmt = $pdo->query("SELECT m.*, c.title AS category_title FROM am_materials m LEFT JOIN am_materials_categories c ON m.material_categories_id = c.id");
 $materials = $stmt->fetchAll();
 ?>
 
@@ -108,6 +108,7 @@ $materials = $stmt->fetchAll();
             <tr class="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
                 <th class="py-3 px-6 text-left">Nom</th>
                 <th class="py-3 px-6 text-left">Description</th>
+                <th class="py-3 px-6 text-left">Catégorie</th>
                 <th class="py-3 px-6 text-left">Statut</th>
                 <th class="py-3 px-6 text-left">Code-barres</th>
                 <?php if ($_SESSION['user_role'] === 'admin'): ?>
@@ -124,6 +125,7 @@ $materials = $stmt->fetchAll();
                         </a>
                     </td>
                     <td class="py-3 px-6 text-left"><?php echo htmlspecialchars($material['description']); ?></td>
+                    <td class="py-3 px-6 text-left"><?php echo htmlspecialchars($material['category_title']); ?></td>
                     <td class="py-3 px-6 text-left"><?php echo htmlspecialchars($material['status']); ?></td>
                     <td class="py-3 px-6 text-left"><?php echo htmlspecialchars($material['barcode']); ?></td>
                     <?php if ($_SESSION['user_role'] === 'admin'): ?>

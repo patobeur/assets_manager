@@ -1,4 +1,5 @@
 <?php
+session_start();
 // Initialize the language system first, as it may start the session
 require_once 'language_init.php';
 

@@ -120,10 +120,10 @@ if ($action === 'export') {
 			break;
 
 		case 'materials':
-			$stmt = $pdo->query("SELECT id, name, description, status, barcode FROM am_materials ORDER BY name");
+			$stmt = $pdo->query("SELECT m.id, m.name, m.description, m.status, m.barcode, c.title as category_title FROM am_materials m LEFT JOIN am_materials_categories c ON m.material_categories_id = c.id ORDER BY m.name");
 			$items = $stmt->fetchAll(PDO::FETCH_ASSOC);
 			$filename = 'materiels.csv';
-			$headers = ['ID', 'Nom', 'Description', 'Statut', 'Code-barres'];
+			$headers = ['ID', 'Nom', 'Description', 'Statut', 'Code-barres', 'Catégorie'];
 			break;
 
 		case 'agents':
@@ -239,15 +239,16 @@ if (($_SERVER['REQUEST_METHOD'] === 'POST' && ($action === 'create' || $action =
 				$description = $_POST['description'];
 				$status = $_POST['status'];
 				$barcode = $_POST['barcode'];
+				$material_categories_id = $_POST['material_categories_id'];
 
 				if ($action === 'create') {
-					$stmt = $pdo->prepare("INSERT INTO am_materials (name, description, status, barcode) VALUES (?, ?, ?, ?)");
-					$stmt->execute([$name, $description, $status, $barcode]);
+					$stmt = $pdo->prepare("INSERT INTO am_materials (name, description, status, barcode, material_categories_id) VALUES (?, ?, ?, ?, ?)");
+					$stmt->execute([$name, $description, $status, $barcode, $material_categories_id]);
 					$_SESSION['success_message'] = t('material_created');
 				} elseif ($action === 'edit') {
 					$id = intval($_POST['id']);
-					$stmt = $pdo->prepare("UPDATE am_materials SET name = ?, description = ?, status = ?, barcode = ? WHERE id = ?");
-					$stmt->execute([$name, $description, $status, $barcode, $id]);
+					$stmt = $pdo->prepare("UPDATE am_materials SET name = ?, description = ?, status = ?, barcode = ?, material_categories_id = ? WHERE id = ?");
+					$stmt->execute([$name, $description, $status, $barcode, $material_categories_id, $id]);
 					$_SESSION['success_message'] = t('material_updated');
 				}
 			}

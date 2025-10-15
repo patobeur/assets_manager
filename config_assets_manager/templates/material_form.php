@@ -5,6 +5,7 @@ $material = [
     'status' => 'available',
     'barcode' => '',
     'description' => '',
+    'material_categories_id' => '',
 ];
 $is_edit = false;
 
@@ -14,6 +15,9 @@ if (isset($_GET['id'])) {
     $stmt->execute([$_GET['id']]);
     $material = $stmt->fetch();
 }
+
+$categories_stmt = $pdo->query("SELECT * FROM am_materials_categories ORDER BY title");
+$categories = $categories_stmt->fetchAll();
 ?>
 
 <h1 class="text-3xl font-bold mb-6"><?php echo $is_edit ? 'Modifier le matériel' : 'Ajouter du matériel'; ?></h1>
@@ -28,6 +32,17 @@ if (isset($_GET['id'])) {
         <div class="mb-4">
             <label for="description" class="block text-gray-700 text-sm font-bold mb-2">Description</label>
             <textarea id="description" name="description" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"><?php echo htmlspecialchars($material['description']); ?></textarea>
+        </div>
+        <div class="mb-4">
+            <label for="material_categories_id" class="block text-gray-700 text-sm font-bold mb-2">Catégorie</label>
+            <select id="material_categories_id" name="material_categories_id" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+                <option value="">Sélectionner une catégorie</option>
+                <?php foreach ($categories as $category): ?>
+                    <option value="<?php echo $category['id']; ?>" <?php echo ($material['material_categories_id'] == $category['id']) ? 'selected' : ''; ?>>
+                        <?php echo htmlspecialchars($category['title']); ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
         </div>
         <div class="mb-4">
             <label for="status" class="block text-gray-700 text-sm font-bold mb-2">Statut</label>
