@@ -109,22 +109,22 @@ if ($action === 'export') {
 	switch ($page) {
 		case 'students':
 			$stmt = $pdo->query("
-				SELECT s.id, s.first_name, s.last_name, s.email, p.title as promo_name, sec.title as section_name, s.barcode, s.status
-				FROM am_students s
-				LEFT JOIN am_promos p ON s.promo_id = p.id
-				LEFT JOIN am_sections sec ON s.section_id = sec.id
-				ORDER BY s.last_name, s.first_name
-			");
+                SELECT s.first_name, s.last_name, s.email, p.title as promo_name, sec.title as section_name, s.barcode, s.status
+                FROM am_students s
+                LEFT JOIN am_promos p ON s.promo_id = p.id
+                LEFT JOIN am_sections sec ON s.section_id = sec.id
+                ORDER BY s.last_name, s.first_name
+            ");
 			$items = $stmt->fetchAll(PDO::FETCH_ASSOC);
 			$filename = 'etudiants.csv';
-			$headers = ['ID', 'Prénom', 'Nom', 'Email', 'Promo', 'Section', 'Code-barres', 'Status'];
+			$headers = ['Prénom', 'Nom', 'Email', 'Promo', 'Section', 'Code-barres', 'Status'];
 			break;
 
 		case 'materials':
-			$stmt = $pdo->query("SELECT m.id, m.name, m.description, m.status, m.barcode, m.material_categories_id FROM am_materials m ORDER BY m.name");
+			$stmt = $pdo->query("SELECT name, description, status, barcode, material_categories_id FROM am_materials ORDER BY name");
 			$items = $stmt->fetchAll(PDO::FETCH_ASSOC);
 			$filename = 'materiels.csv';
-			$headers = ['ID', 'Nom', 'Description', 'Statut', 'Code-barres', 'Catégorie'];
+			$headers = ['Nom', 'Description', 'Statut', 'Code-barres', 'Catégorie'];
 			break;
 
 		case 'agents':
