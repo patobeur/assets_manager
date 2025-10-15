@@ -11,8 +11,8 @@ L'application offre une gamme complète d'outils pour une gestion simple et effi
 Le système permet une gestion complète (CRUD : Créer, Lire, Mettre à jour, Supprimer) des différentes entités de l'application :
 
 -  **Utilisateurs** : Création, modification et suppression des comptes utilisateurs, avec attribution des rôles `administrateur` ou `agent`.
--  **Étudiants** : Gestion des profils étudiants, incluant leurs informations personnelles (nom, prénom, email) et leur appartenance à une promotion et une section.
--  **Matériels** : Suivi du parc de matériel, avec nom, description, statut (`disponible`, `prêté`, `en maintenance`) et code-barres unique.
+-  **Étudiants** : Gestion des profils étudiants, incluant les informations nom, prénom, email ainsi que la promo et la section.
+-  **Matériels** : Suivi du parc de matériel, avec nom, description, catégorie, statut (`disponible`, `prêté`, `en maintenance`) et code-barres unique.
 -  **Promotions et Sections** : Organisation des étudiants par promotions (ex: "2025-2027") et sections (ex: "BTS SIO"), entièrement configurables.
 
 ### Processus de Prêt et Retour
@@ -57,12 +57,14 @@ L'application permet d'importer des listes d'étudiants et de matériel en utili
    4. `Promo` (le nom de la promotion, ex: "25-27")
    5. `Section` (le nom de la section, ex: "BTS COM")
    6. `Code-barres`
+   7. `Status`
 
 -  **Format pour le matériel :**
    1. `Nom`
    2. `Description`
    3. `Statut` (doit être `available`, `loaned`, ou `maintenance`)
    4. `Code-barres`
+   5. `Catégories`
 
 Des fichiers d'exemple sont disponibles au téléchargement directement depuis l'interface d'importation pour vous aider à préparer vos données.
 
