@@ -43,6 +43,11 @@ if ($action === 'import' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 		$csvFile = $_FILES['csv_file']['tmp_name'];
 
 		if (($handle = fopen($csvFile, "r")) !== FALSE) {
+			// BOM detection and removal
+			$bom = "\xef\xbb\xbf";
+			if (fgets($handle, 4) !== $bom) {
+				rewind($handle);
+			}
 			$pdo->beginTransaction();
 			try {
 				// Skip header row
@@ -76,11 +81,29 @@ if ($action === 'import' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 						$student_stmt->execute([$first_name, $last_name, $email, $barcode, $promo_id, $section_id, $status]);
 					}
 				} elseif ($page === 'materials') {
-					$stmt = $pdo->prepare("INSERT INTO am_materials (name, description, status, barcode, material_categories_id) VALUES (?, ?, ?, ?, ?)");
-					while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
-						// Assuming CSV columns are: name, description, status, barcode, material_categories_id
-						$stmt->execute([$data[0], $data[1], $data[2], $data[3], $data[4]]);
+					// Helper function to clean strings
+					function clean_string($str)
+					{
+						// Remove non-printable characters and trim whitespace
+						return trim(preg_replace('/[[:^print:]]/', '', $str));
 					}
+					// Fetch all valid category IDs into an array for efficient lookup.
+					$valid_category_ids_stmt = $pdo->query("SELECT id FROM am_materials_categories");
+					$valid_category_ids = $valid_category_ids_stmt->fetchAll(PDO::FETCH_COLUMN, 0);
+
+					$material_stmt = $pdo->prepare("INSERT INTO am_materials (name, description, status, barcode, material_categories_id) VALUES (?, ?, ?, ?, ?)");
+
+					// Clean all data
+					$name = clean_string($data[0]);
+					$description = clean_string($data[1]);
+					$status = clean_string($data[2]);
+					$barcode = clean_string($data[3]);
+					$category_id_from_csv = filter_var(clean_string($data[4]), FILTER_VALIDATE_INT);
+
+					// Check if the provided category ID is valid. If not, default to 1.
+					$final_category_id = in_array($category_id_from_csv, $valid_category_ids) ? $category_id_from_csv : 1;
+
+					$material_stmt->execute([$name, $description, $status, $barcode, $final_category_id]);
 				}
 
 				$pdo->commit();
@@ -117,7 +140,7 @@ if ($action === 'export') {
             ");
 			$items = $stmt->fetchAll(PDO::FETCH_ASSOC);
 			$filename = 'etudiants.csv';
-			$headers = ['Prénom', 'Nom', 'Email', 'Promo', 'Section', 'Code-barres', 'Status'];
+			$headers = ['Prénom', 'Nom', 'Email', 'Promo', 'Section', 'Code-barres', 'Status_Id'];
 			break;
 
 		case 'materials':
@@ -128,7 +151,7 @@ if ($action === 'export') {
             ");
 			$items = $stmt->fetchAll(PDO::FETCH_ASSOC);
 			$filename = 'materiels.csv';
-			$headers = ['Nom', 'Description', 'Statut', 'Code-barres', 'Catégorie'];
+			$headers = ['Nom', 'Description', 'Statut', 'Code-barres', 'Catégorie_Id'];
 			break;
 
 		case 'agents':
@@ -181,7 +204,7 @@ if ($action === 'export') {
 					$item['description'],
 					$item['status'],
 					$item['barcode'],
-					$item['category_title']
+					$item['material_categories_id']
 				];
 				echo implode(',', $line) . "\n";
 			}

@@ -117,6 +117,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         id INT(11) AUTO_INCREMENT PRIMARY KEY,
         title VARCHAR(255) NOT NULL
     );
+    CREATE TABLE IF NOT EXISTS am_materials_status (
+        id INT(11) AUTO_INCREMENT PRIMARY KEY,
+        title VARCHAR(255) NOT NULL
+    );
 
     CREATE TABLE IF NOT EXISTS am_options (
         id INT(11) AUTO_INCREMENT PRIMARY KEY,
@@ -130,7 +134,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         status ENUM('available', 'loaned', 'maintenance') NOT NULL DEFAULT 'available',
         barcode VARCHAR(255) NOT NULL UNIQUE,
         material_categories_id INT(11) NOT NULL,
-        FOREIGN KEY (material_categories_id) REFERENCES am_materials_categories(id) ON DELETE CASCADE
+        material_status_id INT(11) NOT NULL,
+        FOREIGN KEY (material_categories_id) REFERENCES am_materials_categories(id) ON DELETE CASCADE,
+        FOREIGN KEY (material_categories_id) REFERENCES am_materials_status(id) ON DELETE CASCADE
     );
 
     CREATE TABLE IF NOT EXISTS am_loans (
@@ -158,6 +164,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
         $pdo->exec("INSERT INTO am_promos (title) VALUES ('00-00'), ('25-27');");
         $pdo->exec("INSERT INTO am_sections (title) VALUES ('Bachelor RC'), ('BTS COM');");
+        $pdo->exec("INSERT INTO am_materials_status (title) VALUES ('Available'), ('Loaned', ('Maintenance');");
         $pdo->exec("INSERT INTO am_materials_categories (title) VALUES ('Ordinateur Portable'), ('Matériels informatique'), ('Matériels de bureau');");
     } catch (PDOException $e) {
         die(str_replace('{error_message}', $e->getMessage(), t('default_data_error')));
