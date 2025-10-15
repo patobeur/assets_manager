@@ -136,7 +136,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         material_categories_id INT(11) NOT NULL,
         material_status_id INT(11) NOT NULL,
         FOREIGN KEY (material_categories_id) REFERENCES am_materials_categories(id) ON DELETE CASCADE,
-        FOREIGN KEY (material_categories_id) REFERENCES am_materials_status(id) ON DELETE CASCADE
+        FOREIGN KEY (material_status_id) REFERENCES am_materials_status(id) ON DELETE CASCADE
     );
 
     CREATE TABLE IF NOT EXISTS am_loans (
