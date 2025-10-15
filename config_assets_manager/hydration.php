@@ -42,25 +42,25 @@ class Hydration
 
             // Data for materials
             $materials = [
-                ['Ordinateur Portable Dell', 'Modèle Latitude 7420', 'available', 'HYDRATION-M-001'],
-                ['Microscope Optique', 'Grossissement 1000x', 'available', 'HYDRATION-M-002'],
-                ['Livre "Le Petit Prince"', 'Antoine de Saint-Exupéry', 'available', 'HYDRATION-M-003'],
-                ['Calculatrice TI-83', 'Texas Instruments', 'available', 'HYDRATION-M-004'],
-                ['Tablette iPad Air', 'Apple, 256GB', 'available', 'HYDRATION-M-005'],
-                ['Kit de Chimie', '50 pièces', 'available', 'HYDRATION-M-006'],
-                ['Appareil Photo Canon', 'EOS Rebel T7', 'available', 'HYDRATION-M-007'],
-                ['Ballon de Basket', 'Taille 7', 'available', 'HYDRATION-M-008'],
-                ['Guitare Acoustique', 'Yamaha F310', 'available', 'HYDRATION-M-009'],
-                ['VidéoProjecteur Epson', 'HD 1080p', 'available', 'HYDRATION-M-010'],
-                ['Oscilloscope Numérique', 'Tektronix', 'available', 'HYDRATION-M-011'],
-                ['Mannequin de Secourisme', 'RCP', 'available', 'HYDRATION-M-012'],
-                ['Dictionnaire Larousse', 'Édition 2023', 'available', 'HYDRATION-M-013'],
-                ['Globe Terrestre', '30cm diamètre', 'available', 'HYDRATION-M-014'],
-                ['Ensemble de Pinceaux', 'Peinture à l\'huile', 'available', 'HYDRATION-M-015'],
+                ['Ordinateur Portable Dell', 'Modèle Latitude 7420', 'available', 'HYDRATION-M-001', 1],
+                ['Microscope Optique', 'Grossissement 1000x', 'available', 'HYDRATION-M-002', 1],
+                ['Livre "Le Petit Prince"', 'Antoine de Saint-Exupéry', 'available', 'HYDRATION-M-003', 1],
+                ['Calculatrice TI-83', 'Texas Instruments', 'available', 'HYDRATION-M-004', 1],
+                ['Tablette iPad Air', 'Apple, 256GB', 'available', 'HYDRATION-M-005', 1],
+                ['Kit de Chimie', '50 pièces', 'available', 'HYDRATION-M-006', 1],
+                ['Appareil Photo Canon', 'EOS Rebel T7', 'available', 'HYDRATION-M-007', 1],
+                ['Ballon de Basket', 'Taille 7', 'available', 'HYDRATION-M-008', 1],
+                ['Guitare Acoustique', 'Yamaha F310', 'available', 'HYDRATION-M-009', 1],
+                ['VidéoProjecteur Epson', 'HD 1080p', 'available', 'HYDRATION-M-010', 1],
+                ['Oscilloscope Numérique', 'Tektronix', 'available', 'HYDRATION-M-011', 1],
+                ['Mannequin de Secourisme', 'RCP', 'available', 'HYDRATION-M-012', 1],
+                ['Dictionnaire Larousse', 'Édition 2023', 'available', 'HYDRATION-M-013', 1],
+                ['Globe Terrestre', '30cm diamètre', 'available', 'HYDRATION-M-014', 1],
+                ['Ensemble de Pinceaux', 'Peinture à l\'huile', 'available', 'HYDRATION-M-015', 1]
             ];
 
             $material_ids = [];
-            $stmt = $this->pdo->prepare("INSERT INTO am_materials (name, description, status, barcode) VALUES (?, ?, ?, ?)");
+            $stmt = $this->pdo->prepare("INSERT INTO am_materials (name, description, status, barcode, material_categories_id) VALUES (?, ?, ?, ?, ?)");
             foreach ($materials as $material) {
                 $stmt->execute($material);
                 $material_ids[] = $this->pdo->lastInsertId();
