@@ -164,7 +164,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
         $pdo->exec("INSERT INTO am_promos (title) VALUES ('00-00'), ('25-27');");
         $pdo->exec("INSERT INTO am_sections (title) VALUES ('Bachelor RC'), ('BTS COM');");
-        $pdo->exec("INSERT INTO am_materials_status (title) VALUES ('Available'), ('Loaned', ('Maintenance');");
+        $pdo->exec("INSERT INTO am_materials_status (title) VALUES ('available'), ('loaned'), ('maintenance');");
         $pdo->exec("INSERT INTO am_materials_categories (title) VALUES ('Ordinateur Portable'), ('Matériels informatique'), ('Matériels de bureau');");
     } catch (PDOException $e) {
         die(str_replace('{error_message}', $e->getMessage(), t('default_data_error')));
