@@ -86,7 +86,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         last_name VARCHAR(255) NOT NULL,
         email VARCHAR(255) NOT NULL UNIQUE,
         password VARCHAR(255) NOT NULL,
-        role ENUM('agent', 'admin') NOT NULL
+        role ENUM('agent', 'admin', 'adminsys') NOT NULL
     );
 
     CREATE TABLE IF NOT EXISTS am_promos (
