@@ -141,5 +141,6 @@
 	"cookie_consent_title": "Cookie Management",
 	"cookie_consent_text": "This site uses essential cookies to ensure its proper functioning. They are only used for managing the login session and do not collect any personal information.",
 	"cookie_consent_info": "This cookie acts like a temporary pass. It allows the site to remember that you are logged in as you browse from page to page. Without it, the site would forget you on each new page, which would end your session.",
-	"cookie_consent_accept": "I understand and accept the use of essential cookies"
+	"cookie_consent_accept": "I understand and accept the use of essential cookies",
+	"language": "Languages"
 }

@@ -93,103 +93,108 @@
 					<img src="assets/assets_manager_logo_64.png" alt="Logo" class="h-8 mr-2">
 					<?php echo t('school_asset_manager', 'Gestionnaire d\'actifs scolaires'); ?>
 				</a>
-				<div class="hidden md:flex items-center space-x-4">
-					<a href="?page=dashboard" class="text-gray-600 hover:text-gray-900"><?php echo t('dashboard', 'Tableau de bord'); ?></a>
 
-					<!-- Dropdown for Gestion -->
-					<div class="relative" id="gestion-dropdown-menu">
-						<button id="gestion-dropdown-button" class="text-gray-600 hover:text-gray-900 focus:outline-none">
-							<?php echo t('management', 'Gestion'); ?>
-						</button>
-						<div id="gestion-dropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-20">
-							<a href="?page=students" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"><?php echo t('students', 'Étudiants'); ?></a>
-							<a href="?page=materials" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"><?php echo t('materials', 'Matériels'); ?></a>
-							<a href="?page=history" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"><?php echo t('history', 'Historique'); ?></a>
-						</div>
-					</div>
+				<?php if (isset($_SESSION['user_id'])): ?>
+					<div class="hidden md:flex items-center space-x-4">
+						<a href="?page=dashboard" class="text-gray-600 hover:text-gray-900"><?php echo t('dashboard', 'Tableau de bord'); ?></a>
 
-					<!-- Dropdown for Actions -->
-					<div class="relative" id="actions-dropdown-menu">
-						<button id="actions-dropdown-button" class="text-gray-600 hover:text-gray-900 focus:outline-none">
-							<?php echo t('actions', 'Actions'); ?>
-						</button>
-						<div id="actions-dropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-20">
-							<a href="?page=loans" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"><?php echo t('loan', 'Emprunt'); ?></a>
-							<a href="?page=returns" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"><?php echo t('return', 'Retour'); ?></a>
-						</div>
-					</div>
-
-					<?php if (isset($_SESSION['user_id'])): ?>
-						<!-- Dropdown for Profil -->
-						<div class="relative last-menu-item" id="profil-dropdown-menu">
-							<button id="profil-dropdown-button" class="text-gray-600 hover:text-gray-900 focus:outline-none">
-								<?php echo htmlspecialchars($_SESSION['user_first_name']); ?>
+						<!-- Dropdown for Gestion -->
+						<div class="relative" id="gestion-dropdown-menu">
+							<button id="gestion-dropdown-button" class="text-gray-600 hover:text-gray-900 focus:outline-none">
+								<?php echo t('management', 'Gestion'); ?>
 							</button>
-							<div id="profil-dropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-20">
-								<?php if ($_SESSION['user_role'] === 'admin'): ?>
-									<div class="relative" id="admin-submenu">
-										<button id="admin-submenu-button" class="w-full text-left block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-											<?php echo t('admin', 'Admin'); ?>
+							<div id="gestion-dropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-20">
+								<a href="?page=students" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"><?php echo t('students', 'Étudiants'); ?></a>
+								<a href="?page=materials" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"><?php echo t('materials', 'Matériels'); ?></a>
+								<a href="?page=history" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"><?php echo t('history', 'Historique'); ?></a>
+							</div>
+						</div>
+
+						<!-- Dropdown for Actions -->
+						<div class="relative" id="actions-dropdown-menu">
+							<button id="actions-dropdown-button" class="text-gray-600 hover:text-gray-900 focus:outline-none">
+								<?php echo t('actions', 'Actions'); ?>
+							</button>
+							<div id="actions-dropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-20">
+								<a href="?page=loans" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"><?php echo t('loan', 'Emprunt'); ?></a>
+								<a href="?page=returns" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"><?php echo t('return', 'Retour'); ?></a>
+							</div>
+						</div>
+
+						<?php if (isset($_SESSION['user_id'])): ?>
+							<!-- Dropdown for Profil -->
+							<div class="relative last-menu-item" id="profil-dropdown-menu">
+								<button id="profil-dropdown-button" class="text-gray-600 hover:text-gray-900 focus:outline-none">
+									<?php echo htmlspecialchars($_SESSION['user_first_name']); ?>
+								</button>
+								<div id="profil-dropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-20">
+									<?php if ($_SESSION['user_role'] === 'admin'): ?>
+										<div class="relative" id="admin-submenu">
+											<button id="admin-submenu-button" class="w-full text-left block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+												<?php echo t('admin', 'Admin'); ?>
+											</button>
+											<div id="admin-submenu-dropdown" class="hidden absolute top-0 mt-0 w-48 bg-white rounded-md shadow-lg py-1 z-30" style="right: 100%;">
+												<a href="?page=agents" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"><?php echo t('agents', 'Agents'); ?></a>
+												<a href="?page=promos" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"><?php echo t('promos', 'Promos'); ?></a>
+												<a href="?page=sections" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"><?php echo t('sections', 'Sections'); ?></a>
+												<a href="?page=hydration" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"><?php echo t('hydration', 'Hydratation'); ?></a>
+												<a href="?page=barecode" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"><?php echo t('barcode_page_title', 'Étiquettes de codes-barres') ?></a>
+											</div>
+										</div>
+										<div class="border-t border-gray-200 my-1"></div>
+									<?php endif; ?>
+									<div class="relative" id="language-submenu">
+										<button id="language-submenu-button" class="w-full text-left block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+											<?php echo t('language', 'Langue'); ?>
 										</button>
-										<div id="admin-submenu-dropdown" class="hidden absolute top-0 mt-0 w-48 bg-white rounded-md shadow-lg py-1 z-30" style="right: 100%;">
-											<a href="?page=agents" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"><?php echo t('agents', 'Agents'); ?></a>
-											<a href="?page=promos" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"><?php echo t('promos', 'Promos'); ?></a>
-											<a href="?page=sections" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"><?php echo t('sections', 'Sections'); ?></a>
-											<a href="?page=hydration" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"><?php echo t('hydration', 'Hydratation'); ?></a>
-											<a href="?page=barecode" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"><?php echo t('barcode_page_title', 'Étiquettes de codes-barres') ?></a>
+										<div id="language-submenu-dropdown" class="hidden absolute top-0 mt-0 w-48 bg-white rounded-md shadow-lg py-1 z-40" style="right: 100%;">
+											<?php
+											// Prepare language switcher URLs
+											$queryParams = $_GET;
+											$queryParams['lang'] = 'fr';
+											$fr_url = '?' . http_build_query($queryParams);
+											$queryParams['lang'] = 'en';
+											$en_url = '?' . http_build_query($queryParams);
+											$queryParams['lang'] = 'es';
+											$es_url = '?' . http_build_query($queryParams);
+											?>
+											<a href="<?php echo htmlspecialchars($fr_url); ?>" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 <?php echo Language::getInstance()->getLang() === 'fr' ? 'font-bold' : ''; ?>">Français</a>
+											<a href="<?php echo htmlspecialchars($en_url); ?>" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 <?php echo Language::getInstance()->getLang() === 'en' ? 'font-bold' : ''; ?>">English</a>
+											<a href="<?php echo htmlspecialchars($es_url); ?>" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 <?php echo Language::getInstance()->getLang() === 'es' ? 'font-bold' : ''; ?>">Español</a>
 										</div>
 									</div>
 									<div class="border-t border-gray-200 my-1"></div>
-								<?php endif; ?>
-								<div class="relative" id="language-submenu">
-									<button id="language-submenu-button" class="w-full text-left block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-										<?php echo t('language', 'Langue'); ?>
-									</button>
-									<div id="language-submenu-dropdown" class="hidden absolute top-0 mt-0 w-48 bg-white rounded-md shadow-lg py-1 z-40" style="right: 100%;">
-										<?php
-										// Prepare language switcher URLs
-										$queryParams = $_GET;
-										$queryParams['lang'] = 'fr';
-										$fr_url = '?' . http_build_query($queryParams);
-										$queryParams['lang'] = 'en';
-										$en_url = '?' . http_build_query($queryParams);
-										$queryParams['lang'] = 'es';
-										$es_url = '?' . http_build_query($queryParams);
-										?>
-										<a href="<?php echo htmlspecialchars($fr_url); ?>" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 <?php echo Language::getInstance()->getLang() === 'fr' ? 'font-bold' : ''; ?>">Français</a>
-										<a href="<?php echo htmlspecialchars($en_url); ?>" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 <?php echo Language::getInstance()->getLang() === 'en' ? 'font-bold' : ''; ?>">English</a>
-										<a href="<?php echo htmlspecialchars($es_url); ?>" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 <?php echo Language::getInstance()->getLang() === 'es' ? 'font-bold' : ''; ?>">Español</a>
-									</div>
+									<a href="logout.php" class="block px-4 py-2 text-sm text-orange-500 hover:bg-gray-100"><?php echo t('logout', 'Déconnexion'); ?></a>
 								</div>
-								<div class="border-t border-gray-200 my-1"></div>
-								<a href="logout.php" class="block px-4 py-2 text-sm text-orange-500 hover:bg-gray-100"><?php echo t('logout', 'Déconnexion'); ?></a>
 							</div>
-						</div>
-					<?php endif; ?>
-				</div>
-				<div class="md:hidden">
-					<button id="mobile-menu-button" class="text-gray-800 focus:outline-none">
-						<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
-						</svg>
-					</button>
-				</div>
+						<?php endif; ?>
+					</div>
+
+					<div class="md:hidden">
+						<button id="mobile-menu-button" class="text-gray-800 focus:outline-none">
+							<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+							</svg>
+						</button>
+					</div>
+				<?php endif; ?>
 			</div>
+
 			<!-- Mobile Menu -->
 			<div id="mobile-menu" class="hidden md:hidden bg-white">
+
 				<a href="?page=dashboard" class="block py-2 px-4 text-sm text-gray-600 hover:bg-gray-200">Tableau de bord</a>
-
-				<div class="py-2 px-4 text-sm text-gray-500"><?php echo t('management', 'Gestion'); ?></div>
-				<a href="?page=students" class="block py-2 pl-8 pr-4 text-sm text-gray-600 hover:bg-gray-200"><?php echo t('students', 'Étudiants'); ?></a>
-				<a href="?page=materials" class="block py-2 pl-8 pr-4 text-sm text-gray-600 hover:bg-gray-200"><?php echo t('materials', 'Matériels'); ?></a>
-				<a href="?page=history" class="block py-2 pl-8 pr-4 text-sm text-gray-600 hover:bg-gray-200"><?php echo t('history', 'Historique'); ?></a>
-
-				<div class="py-2 px-4 text-sm text-gray-500"><?php echo t('actions', 'Actions'); ?></div>
-				<a href="?page=loans" class="block py-2 pl-8 pr-4 text-sm text-gray-600 hover:bg-gray-200"><?php echo t('loan', 'Emprunt'); ?></a>
-				<a href="?page=returns" class="block py-2 pl-8 pr-4 text-sm text-gray-600 hover:bg-gray-200"><?php echo t('return', 'Retour'); ?></a>
-
-
 				<?php if (isset($_SESSION['user_id'])): ?>
+					<div class="py-2 px-4 text-sm text-gray-500"><?php echo t('management', 'Gestion'); ?></div>
+					<a href="?page=students" class="block py-2 pl-8 pr-4 text-sm text-gray-600 hover:bg-gray-200"><?php echo t('students', 'Étudiants'); ?></a>
+					<a href="?page=materials" class="block py-2 pl-8 pr-4 text-sm text-gray-600 hover:bg-gray-200"><?php echo t('materials', 'Matériels'); ?></a>
+					<a href="?page=history" class="block py-2 pl-8 pr-4 text-sm text-gray-600 hover:bg-gray-200"><?php echo t('history', 'Historique'); ?></a>
+
+					<div class="py-2 px-4 text-sm text-gray-500"><?php echo t('actions', 'Actions'); ?></div>
+					<a href="?page=loans" class="block py-2 pl-8 pr-4 text-sm text-gray-600 hover:bg-gray-200"><?php echo t('loan', 'Emprunt'); ?></a>
+					<a href="?page=returns" class="block py-2 pl-8 pr-4 text-sm text-gray-600 hover:bg-gray-200"><?php echo t('return', 'Retour'); ?></a>
+
+
 					<div class="border-t border-gray-200 my-1"></div>
 					<div class="py-2 px-4 text-sm text-gray-500"><?php echo htmlspecialchars($_SESSION['user_first_name']); ?></div>
 
@@ -205,28 +210,33 @@
 							<a href="?page=barecode" class="block py-2 pl-12 pr-4 text-sm text-gray-600 hover:bg-gray-200"><?php echo t('barcode_page_title', 'Étiquettes de codes-barres') ?></a>
 						</div>
 					<?php endif; ?>
+				<?php endif; ?>
 
-					<button id="mobile-language-submenu-button" class="w-full text-left block py-2 pl-8 pr-4 text-sm text-gray-600 hover:bg-gray-200">
-						<?php echo t('language', 'Langue'); ?>
-					</button>
-					<div id="mobile-language-submenu" class="hidden pl-4">
-						<?php
-						// Prepare language switcher URLs
-						$queryParams = $_GET;
-						$queryParams['lang'] = 'fr';
-						$fr_url = '?' . http_build_query($queryParams);
-						$queryParams['lang'] = 'en';
-						$en_url = '?' . http_build_query($queryParams);
-						$queryParams['lang'] = 'es';
-						$es_url = '?' . http_build_query($queryParams);
-						?>
-						<a href="<?php echo htmlspecialchars($fr_url); ?>" class="block py-2 pl-12 pr-4 text-sm text-gray-600 hover:bg-gray-200 <?php echo Language::getInstance()->getLang() === 'fr' ? 'font-bold' : ''; ?>">Français</a>
-						<a href="<?php echo htmlspecialchars($en_url); ?>" class="block py-2 pl-12 pr-4 text-sm text-gray-600 hover:bg-gray-200 <?php echo Language::getInstance()->getLang() === 'en' ? 'font-bold' : ''; ?>">English</a>
-						<a href="<?php echo htmlspecialchars($es_url); ?>" class="block py-2 pl-12 pr-4 text-sm text-gray-600 hover:bg-gray-200 <?php echo Language::getInstance()->getLang() === 'es' ? 'font-bold' : ''; ?>">Español</a>
-					</div>
 
+
+				<button id="mobile-language-submenu-button" class="w-full text-left block py-2 pl-8 pr-4 text-sm text-gray-600 hover:bg-gray-200">
+					<?php echo t('language', 'Langue'); ?>
+				</button>
+				<div id="mobile-language-submenu" class="hidden pl-4">
+					<?php
+					// Prepare language switcher URLs
+					$queryParams = $_GET;
+					$queryParams['lang'] = 'fr';
+					$fr_url = '?' . http_build_query($queryParams);
+					$queryParams['lang'] = 'en';
+					$en_url = '?' . http_build_query($queryParams);
+					$queryParams['lang'] = 'es';
+					$es_url = '?' . http_build_query($queryParams);
+					?>
+					<a href="<?php echo htmlspecialchars($fr_url); ?>" class="block py-2 pl-12 pr-4 text-sm text-gray-600 hover:bg-gray-200 <?php echo Language::getInstance()->getLang() === 'fr' ? 'font-bold' : ''; ?>">Français</a>
+					<a href="<?php echo htmlspecialchars($en_url); ?>" class="block py-2 pl-12 pr-4 text-sm text-gray-600 hover:bg-gray-200 <?php echo Language::getInstance()->getLang() === 'en' ? 'font-bold' : ''; ?>">English</a>
+					<a href="<?php echo htmlspecialchars($es_url); ?>" class="block py-2 pl-12 pr-4 text-sm text-gray-600 hover:bg-gray-200 <?php echo Language::getInstance()->getLang() === 'es' ? 'font-bold' : ''; ?>">Español</a>
+				</div>
+
+				<?php if (isset($_SESSION['user_id'])): ?>
 					<a href="logout.php" class="block py-2 pl-8 pr-4 text-sm text-red-500 hover:bg-gray-200"><?php echo t('logout', 'Déconnexion'); ?></a>
 				<?php endif; ?>
+
 			</div>
 		</nav>
 		<script>

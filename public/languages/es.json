@@ -141,5 +141,6 @@
 	"cookie_consent_title": "Gestión de cookies",
 	"cookie_consent_text": "Este sitio utiliza cookies esenciales para garantizar su correcto funcionamiento. Solo se utilizan para gestionar la sesión de inicio de sesión y no recopilan ninguna información personal.",
 	"cookie_consent_info": "Esta cookie actúa como un \"pase temporal\". Permite que el sitio recuerde que ha iniciado sesión mientras navega de una página a otra. Sin ella, el sitio lo olvidaría en cada nueva página, lo que finalizaría su sesión.",
-	"cookie_consent_accept": "Entiendo y acepto el uso de cookies esenciales"
+	"cookie_consent_accept": "Entiendo y acepto el uso de cookies esenciales",
+	"language": "Languages"
 }
