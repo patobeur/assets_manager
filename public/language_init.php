@@ -8,7 +8,7 @@ if (session_status() === PHP_SESSION_NONE) {
 require_once __DIR__ . '/languages/Language.php';
 
 // Supported languages
-$supported_langs = ['fr', 'en'];
+$supported_langs = ['fr', 'en', 'es'];
 $default_lang = 'fr';
 
 // 1. Check for language in URL query
