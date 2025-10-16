@@ -1,13 +1,3 @@
-<?php
-$stmt = $pdo->query("
-    SELECT m.*, c.title AS category_title, s.title AS status_title
-    FROM am_materials m
-    LEFT JOIN am_materials_categories c ON m.material_categories_id = c.id
-    LEFT JOIN am_materials_status s ON m.material_status_id = s.id
-");
-$materials = $stmt->fetchAll();
-?>
-
 <div class="flex justify-between items-center mb-6">
     <h1 class="text-3xl font-bold">Matériels</h1>
     <div class="flex space-x-4">

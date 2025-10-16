@@ -1,8 +1,3 @@
-<?php
-$stmt = $pdo->query("SELECT * FROM am_sections ORDER BY title");
-$sections = $stmt->fetchAll(PDO::FETCH_ASSOC);
-?>
-
 <div class="flex justify-between items-center mb-6">
     <h1 class="text-3xl font-bold"><?php echo t('manage_sections'); ?></h1>
     <a href="?page=sections&action=create" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">

@@ -31,14 +31,26 @@ if (($_SERVER['REQUEST_METHOD'] === 'POST' && ($action === 'create' || $action =
     exit;
 }
 
+// Default action to list if not specified or unknown
+if (!in_array($action, ['list', 'create', 'edit'])) {
+    $action = 'list';
+}
+
+// Fetch data for the views
+$promos = [];
+if ($action === 'list') {
+    $stmt = $pdo->query("SELECT * FROM am_promos ORDER BY title");
+    $promos = $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+
+// Display the appropriate template
 switch ($action) {
-    case 'list':
-        require_once CONFIG_PATH . '/templates/promos.php';
-        break;
     case 'create':
     case 'edit':
         require_once CONFIG_PATH . '/templates/promo_form.php';
         break;
+    case 'list':
     default:
         require_once CONFIG_PATH . '/templates/promos.php';
         break;

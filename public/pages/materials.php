@@ -45,15 +45,30 @@ if (($_SERVER['REQUEST_METHOD'] === 'POST' && ($action === 'create' || $action =
     exit;
 }
 
-// The rest of the page logic for displaying HTML
+// Default action to list if not specified or unknown
+if (!in_array($action, ['list', 'create', 'edit'])) {
+    $action = 'list';
+}
+
+// Fetch data for the views
+$materials = [];
+if ($action === 'list') {
+    $stmt = $pdo->query("
+        SELECT m.*, c.title AS category_title, s.title AS status_title
+        FROM am_materials m
+        LEFT JOIN am_materials_categories c ON m.material_categories_id = c.id
+        LEFT JOIN am_materials_status s ON m.material_status_id = s.id
+    ");
+    $materials = $stmt->fetchAll();
+}
+
+// Display the appropriate template
 switch ($action) {
-    case 'list':
-        require_once CONFIG_PATH . '/templates/materials.php';
-        break;
     case 'create':
     case 'edit':
         require_once CONFIG_PATH . '/templates/material_form.php';
         break;
+    case 'list':
     default:
         require_once CONFIG_PATH . '/templates/materials.php';
         break;

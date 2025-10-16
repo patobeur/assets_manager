@@ -1,16 +1,3 @@
-<?php
-if ($_SESSION['user_role'] !== 'admin') {
-    echo '<div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
-        <strong class="font-bold">Accès refusé !</strong>
-        <span class="block sm:inline">Vous n\'avez pas la permission d\'accéder à cette page.</span>
-    </div>';
-    return;
-}
-
-$stmt = $pdo->query("SELECT * FROM am_users WHERE role = 'agent'");
-$agents = $stmt->fetchAll();
-?>
-
 <div class="flex justify-between items-center mb-6">
     <h1 class="text-3xl font-bold">Agents</h1>
     <div class="flex space-x-4">

@@ -4,27 +4,23 @@ defined('APP_LOADED') or die('Accès non autorisé.');
 
 // Handle POST actions (create, edit) and GET actions (delete, toggle_status) before any HTML is output
 if (($_SERVER['REQUEST_METHOD'] === 'POST' && ($action === 'create' || $action === 'edit')) || in_array($action, ['delete', 'toggle_status'])) {
+    // ... (action handling logic remains the same)
     if ($action === 'toggle_status') {
         $id = intval($_GET['id']);
-        // First, check the current status
         $stmt = $pdo->prepare("SELECT status FROM am_students WHERE id = ?");
         $stmt->execute([$id]);
         $current_status = $stmt->fetchColumn();
-
-        // Toggle the status
         $new_status = $current_status == 1 ? 0 : 1;
         $stmt = $pdo->prepare("UPDATE am_students SET status = ? WHERE id = ?");
         $stmt->execute([$new_status, $id]);
         $_SESSION['success_message'] = t('student_status_updated');
     } elseif ($action === 'delete') {
         $id = intval($_GET['id']);
-        // Check for active loans
         $stmt = $pdo->prepare("SELECT COUNT(*) FROM am_loans WHERE student_id = ? AND return_date IS NULL");
         $stmt->execute([$id]);
         if ($stmt->fetchColumn() > 0) {
             $_SESSION['error_message'] = t('student_delete_error_loans');
         } else {
-            // Only delete if status is 0 (inactive)
             $stmt = $pdo->prepare("DELETE FROM am_students WHERE id = ? AND status = 0");
             $stmt->execute([$id]);
             if ($stmt->rowCount() > 0) {
@@ -63,22 +59,42 @@ if (($_SERVER['REQUEST_METHOD'] === 'POST' && ($action === 'create' || $action =
     exit;
 }
 
-// The rest of the page logic for displaying HTML
+// Default action to list if not specified or unknown
+if (!in_array($action, ['list', 'create', 'edit'])) {
+    $action = 'list';
+}
+
+// Fetch data for the views
+$students = [];
+$promos = [];
+$sections = [];
+
+if ($action === 'list') {
+    $stmt = $pdo->query("
+        SELECT s.*, p.title as promo_name, sec.title as section_name
+        FROM am_students s
+        LEFT JOIN am_promos p ON s.promo_id = p.id
+        LEFT JOIN am_sections sec ON s.section_id = sec.id
+        ORDER BY s.last_name, s.first_name
+    ");
+    $students = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} elseif ($action === 'create' || $action === 'edit') {
+    // Fetch promos and sections for the form
+    $promos_stmt = $pdo->query("SELECT * FROM am_promos ORDER BY title");
+    $promos = $promos_stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    $sections_stmt = $pdo->query("SELECT * FROM am_sections ORDER BY title");
+    $sections = $sections_stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+
+// Display the appropriate template
 switch ($action) {
-    case 'list':
-        require_once CONFIG_PATH . '/templates/students.php';
-        break;
     case 'create':
     case 'edit':
-        // Fetch promos and sections for the form
-        $promos_stmt = $pdo->query("SELECT * FROM am_promos ORDER BY title");
-        $promos = $promos_stmt->fetchAll(PDO::FETCH_ASSOC);
-
-        $sections_stmt = $pdo->query("SELECT * FROM am_sections ORDER BY title");
-        $sections = $sections_stmt->fetchAll(PDO::FETCH_ASSOC);
-
         require_once CONFIG_PATH . '/templates/student_form.php';
         break;
+    case 'list':
     default:
         require_once CONFIG_PATH . '/templates/students.php';
         break;

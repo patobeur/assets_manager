@@ -1,14 +1,3 @@
-<?php
-$stmt = $pdo->query("
-    SELECT s.*, p.title as promo_name, sec.title as section_name
-    FROM am_students s
-    LEFT JOIN am_promos p ON s.promo_id = p.id
-    LEFT JOIN am_sections sec ON s.section_id = sec.id
-    ORDER BY s.last_name, s.first_name
-");
-$students = $stmt->fetchAll(PDO::FETCH_ASSOC);
-?>
-
 <div class="flex justify-between items-center mb-6">
     <h1 class="text-3xl font-bold">Étudiants</h1>
     <div class="flex space-x-4">

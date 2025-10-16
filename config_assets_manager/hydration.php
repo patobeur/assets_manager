@@ -9,7 +9,7 @@ class Hydration
         $this->pdo = $pdo;
     }
 
-    public function populateTables()
+    public function populateTables($user_id)
     {
         $this->pdo->beginTransaction();
 
@@ -67,7 +67,7 @@ class Hydration
             }
 
             // Data for loans
-            $admin_user_id = $_SESSION['user_id'] ?? 1; // Default to 1 if not in session
+            $admin_user_id = $user_id ?? 1; // Default to 1 if not in session
             $loan_stmt = $this->pdo->prepare("INSERT INTO am_loans (student_id, material_id, loan_date, return_date, loan_user_id, return_user_id) VALUES (?, ?, ?, ?, ?, ?)");
             $update_material_status_stmt = $this->pdo->prepare("UPDATE am_materials SET material_status_id = ? WHERE id = ?");
 

@@ -47,15 +47,25 @@ if (($_SERVER['REQUEST_METHOD'] === 'POST' && ($action === 'create' || $action =
     exit;
 }
 
+// Default action to list if not specified or unknown
+if (!in_array($action, ['list', 'create', 'edit'])) {
+    $action = 'list';
+}
 
+// Fetch data for the views
+$agents = [];
+if ($action === 'list') {
+    $stmt = $pdo->query("SELECT * FROM am_users WHERE role = 'agent'");
+    $agents = $stmt->fetchAll();
+}
+
+// Display the appropriate template
 switch ($action) {
-    case 'list':
-        require_once CONFIG_PATH . '/templates/agents.php';
-        break;
     case 'create':
     case 'edit':
         require_once CONFIG_PATH . '/templates/agent_form.php';
         break;
+    case 'list':
     default:
         require_once CONFIG_PATH . '/templates/agents.php';
         break;
