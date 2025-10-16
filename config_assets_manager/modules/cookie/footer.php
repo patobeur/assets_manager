@@ -1,4 +1,4 @@
-<!-- Cookie Consent Banner -->
+<!-- Module: Cookie Consent Banner -->
 <div id="cookie-consent-banner" class="fixed bottom-4 right-4 bg-gray-800 text-white p-4 rounded-lg shadow-lg max-w-sm" style="display: none;">
     <h3 class="font-bold text-lg"><?php echo t('cookie_consent_title'); ?></h3>
     <p class="text-sm mt-2"><?php echo t('cookie_consent_text'); ?></p>
@@ -34,3 +34,4 @@
         });
     });
 </script>
+<!-- End Module: Cookie Consent Banner -->
