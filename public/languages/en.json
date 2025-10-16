@@ -57,7 +57,6 @@
 	"host": "Host",
 	"database_name": "Database Name",
 	"user": "User",
-	"password": "Password",
 	"configuration_path": "Configuration Path",
 	"config_path_detected": "The configuration folder has been detected at the following location. No action is required on your part.",
 	"admin_account": "Administrator Account",
@@ -138,5 +137,9 @@
 	"create": "Create",
 	"cancel": "Cancel",
 	"student_status_updated": "Student status updated successfully.",
-	"student_delete_error_active": "Cannot delete an active student. Please deactivate them first."
+	"student_delete_error_active": "Cannot delete an active student. Please deactivate them first.",
+	"cookie_consent_title": "Cookie Management",
+	"cookie_consent_text": "This site uses essential cookies to ensure its proper functioning. They are only used for managing the login session and do not collect any personal information.",
+	"cookie_consent_info": "This cookie acts like a temporary pass. It allows the site to remember that you are logged in as you browse from page to page. Without it, the site would forget you on each new page, which would end your session.",
+	"cookie_consent_accept": "I understand and accept the use of essential cookies"
 }

@@ -8,8 +8,8 @@ if (session_status() === PHP_SESSION_NONE) {
 require_once __DIR__ . '/languages/Language.php';
 
 // Supported languages
-$supported_langs = ['fr', 'en'];
-$default_lang = 'fr';
+$supported_langs = ['fr', 'en', 'es'];
+$default_lang = $_SERVER['HTTP_ACCEPT_LANGUAGE'] ?? 'fr';
 
 // 1. Check for language in URL query
 $lang_from_url = $_GET['lang'] ?? null;
@@ -43,4 +43,3 @@ $_SESSION['lang'] = $lang;
 
 // Initialize the Language class
 Language::getInstance($lang);
-?>

@@ -137,5 +137,9 @@
 	"create": "Créer",
 	"cancel": "Annuler",
 	"student_status_updated": "Statut de l'étudiant mis à jour avec succès.",
-	"student_delete_error_active": "Impossible de supprimer un étudiant actif. Veuillez d'abord le désactiver."
+	"student_delete_error_active": "Impossible de supprimer un étudiant actif. Veuillez d'abord le désactiver.",
+	"cookie_consent_title": "Gestion des cookies",
+	"cookie_consent_text": "Ce site utilise des cookies essentiels pour assurer son bon fonctionnement. Ils ne sont utilisés que pour la gestion de la session de connexion et ne collectent aucune information personnelle.",
+	"cookie_consent_info": "Ce cookie fonctionne comme un \"laissez-passer\" temporaire. Il permet au site de se souvenir que vous êtes bien connecté(e) pendant que vous naviguez. Sans lui, le site vous oublierait à chaque nouvelle page, ce qui mettrait fin à votre session.",
+	"cookie_consent_accept": "J'ai compris. Fermer ce pop-up !"
 }

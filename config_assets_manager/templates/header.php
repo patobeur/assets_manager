@@ -60,13 +60,15 @@
 		.break-inside-avoid {
 			break-inside: avoid;
 		}
-        .toggle-checkbox:checked {
-            right: 0;
-            border-color: #48bb78;
-        }
-        .toggle-checkbox:checked + .toggle-label {
-            background-color: #48bb78;
-        }
+
+		.toggle-checkbox:checked {
+			right: 0;
+			border-color: #48bb78;
+		}
+
+		.toggle-checkbox:checked+.toggle-label {
+			background-color: #48bb78;
+		}
 	</style>
 	<?php
 	// Load modules header
@@ -151,9 +153,12 @@
 										$fr_url = '?' . http_build_query($queryParams);
 										$queryParams['lang'] = 'en';
 										$en_url = '?' . http_build_query($queryParams);
+										$queryParams['lang'] = 'es';
+										$es_url = '?' . http_build_query($queryParams);
 										?>
 										<a href="<?php echo htmlspecialchars($fr_url); ?>" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 <?php echo Language::getInstance()->getLang() === 'fr' ? 'font-bold' : ''; ?>">Français</a>
 										<a href="<?php echo htmlspecialchars($en_url); ?>" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 <?php echo Language::getInstance()->getLang() === 'en' ? 'font-bold' : ''; ?>">English</a>
+										<a href="<?php echo htmlspecialchars($es_url); ?>" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 <?php echo Language::getInstance()->getLang() === 'es' ? 'font-bold' : ''; ?>">Español</a>
 									</div>
 								</div>
 								<div class="border-t border-gray-200 my-1"></div>
@@ -212,9 +217,12 @@
 						$fr_url = '?' . http_build_query($queryParams);
 						$queryParams['lang'] = 'en';
 						$en_url = '?' . http_build_query($queryParams);
+						$queryParams['lang'] = 'es';
+						$es_url = '?' . http_build_query($queryParams);
 						?>
 						<a href="<?php echo htmlspecialchars($fr_url); ?>" class="block py-2 pl-12 pr-4 text-sm text-gray-600 hover:bg-gray-200 <?php echo Language::getInstance()->getLang() === 'fr' ? 'font-bold' : ''; ?>">Français</a>
 						<a href="<?php echo htmlspecialchars($en_url); ?>" class="block py-2 pl-12 pr-4 text-sm text-gray-600 hover:bg-gray-200 <?php echo Language::getInstance()->getLang() === 'en' ? 'font-bold' : ''; ?>">English</a>
+						<a href="<?php echo htmlspecialchars($es_url); ?>" class="block py-2 pl-12 pr-4 text-sm text-gray-600 hover:bg-gray-200 <?php echo Language::getInstance()->getLang() === 'es' ? 'font-bold' : ''; ?>">Español</a>
 					</div>
 
 					<a href="logout.php" class="block py-2 pl-8 pr-4 text-sm text-red-500 hover:bg-gray-200"><?php echo t('logout', 'Déconnexion'); ?></a>
