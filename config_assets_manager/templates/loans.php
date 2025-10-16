@@ -32,42 +32,42 @@
 </div>
 
 <?php if (isset($student_info)): ?>
-<div class="mt-6">
-    <h2 class="text-2xl font-bold mb-4"><?php echo t('loan_information'); ?></h2>
+    <div class="mt-6">
+        <h2 class="text-2xl font-bold mb-4"><?php echo t('loan_information'); ?></h2>
 
-    <?php if (!empty($other_materials)): ?>
-        <div class="mb-4">
-            <h3 class="text-xl font-bold mb-2"><?php echo t('student_material_possession'); ?></h3>
-            <ul class="list-disc list-inside">
-                <?php foreach ($other_materials as $material): ?>
-                    <li><?php echo htmlspecialchars($material['name']); ?></li>
-                <?php endforeach; ?>
-            </ul>
-        </div>
-    <?php endif; ?>
-
-    <?php if (!empty($loan_history)): ?>
-        <div>
-            <h3 class="text-xl font-bold mb-2"><?php echo t('student_loan_history_5'); ?></h3>
-            <table class="min-w-full bg-white">
-                <thead>
-                    <tr>
-                        <th class="py-2 px-4 border-b"><?php echo t('material'); ?></th>
-                        <th class="py-2 px-4 border-b"><?php echo t('loan_date'); ?></th>
-                        <th class="py-2 px-4 border-b"><?php echo t('return_date'); ?></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach ($loan_history as $loan): ?>
-                        <tr>
-                            <td class="py-2 px-4 border-b"><?php echo htmlspecialchars($loan['name']); ?></td>
-                            <td class="py-2 px-4 border-b"><?php echo date(t('date_format_long'), strtotime($loan['loan_date'])); ?></td>
-                            <td class="py-2 px-4 border-b"><?php echo $loan['return_date'] ? date(t('date_format_long'), strtotime($loan['return_date'])) : t('not_returned'); ?></td>
-                        </tr>
+        <?php if (!empty($other_materials)): ?>
+            <div class="mb-4">
+                <h3 class="text-xl font-bold mb-2"><?php echo t('student_material_possession'); ?></h3>
+                <ul class="list-disc list-inside">
+                    <?php foreach ($other_materials as $material): ?>
+                        <li><?php echo htmlspecialchars($material['name']); ?> - <?php echo t('loaned_on') . ' ' . date(t('date_format_long'), strtotime($material['loan_date'])); ?></li>
                     <?php endforeach; ?>
-                </tbody>
-            </table>
-        </div>
-    <?php endif; ?>
-</div>
+                </ul>
+            </div>
+        <?php endif; ?>
+
+        <?php if (!empty($loan_history)): ?>
+            <div>
+                <h3 class="text-xl font-bold mb-2"><?php echo t('student_loan_history_5'); ?></h3>
+                <table class="min-w-full bg-white">
+                    <thead>
+                        <tr>
+                            <th class="py-2 px-4 border-b"><?php echo t('material'); ?></th>
+                            <th class="py-2 px-4 border-b"><?php echo t('loan_date'); ?></th>
+                            <th class="py-2 px-4 border-b"><?php echo t('return_date'); ?></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($loan_history as $loan): ?>
+                            <tr>
+                                <td class="py-2 px-4 border-b"><?php echo htmlspecialchars($loan['name']); ?></td>
+                                <td class="py-2 px-4 border-b"><?php echo date(t('date_format_long'), strtotime($loan['loan_date'])); ?></td>
+                                <td class="py-2 px-4 border-b"><?php echo $loan['return_date'] ? date(t('date_format_long'), strtotime($loan['return_date'])) : t('not_returned'); ?></td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+        <?php endif; ?>
+    </div>
 <?php endif; ?>

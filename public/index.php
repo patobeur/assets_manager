@@ -764,7 +764,7 @@ switch ($page) {
 
 				// Get student's other loaned am_materials
 				$stmt = $pdo->prepare("
-					SELECT m.name
+					SELECT m.name, l.loan_date
 					FROM am_loans l
 					JOIN am_materials m ON l.material_id = m.id
 					WHERE l.student_id = ? AND l.return_date IS NULL
