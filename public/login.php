@@ -16,6 +16,7 @@ require_once 'bootstrap.php';
 // Now, use the CONFIG_PATH to load the actual configuration and database files.
 require_once CONFIG_PATH . '/config.php';
 require_once CONFIG_PATH . '/Database.php';
+require_once CONFIG_PATH . '/modules/tracking/tracking.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $db = new Database();
@@ -29,6 +30,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $_SESSION['user_id'] = $user['id'];
         $_SESSION['user_role'] = $user['role'];
         $_SESSION['user_first_name'] = $user['first_name'];
+
+        // Track the user login
+        track_user_login($user['id'], $user['email']);
 
         header('Location: index.php');
         exit;
