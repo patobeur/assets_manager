@@ -17,7 +17,7 @@ Currently, this generator is implemented to produce **Code 128** barcodes. The i
 
 exemple : ` !"#$%&'()*+,...~`
 
-````bash
+```bash
 json = [
 {"code":32,"char":" ","name":"Espace"},
 {"code":33,"char":"!","name":"Point d’exclamation"},
@@ -117,4 +117,3 @@ json = [
 {"code":127,"char":"⌂","name":"DEL (non imprimable)"}
 ]
 ```
-````
