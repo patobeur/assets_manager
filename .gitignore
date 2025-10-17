@@ -1,4 +1,3 @@
 config_assets_manager/config.php
 vendor/
 public/bootstrap.php
-config_assets_manager/modules/log
