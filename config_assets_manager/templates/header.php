@@ -14,69 +14,6 @@ if (!defined('APP_LOADED')) {
 	<title><?php echo t('school_asset_manager', 'Gestionnaire d\'actifs scolaires'); ?></title>
 	<link href="css/tailwind.css" rel="stylesheet">
 	<link rel="alternate icon" type="image/png" href="assets/assets_manager_logo_64.png">
-	<style>
-		.navbar {
-			backdrop-filter: blur(10px);
-		}
-
-		#mobile-menu {
-			max-height: calc(100vh - 80px);
-			/* Adjust 80px to match your navbar height */
-			overflow-y: auto;
-			position: absolute;
-			top: 100%;
-			left: 0;
-			right: 0;
-		}
-
-		.last-menu-item .relative>div[id$="-dropdown"] {
-			right: 100%;
-			left: auto;
-		}
-
-		@media print {
-
-			body,
-			main {
-				margin: 0 !important;
-				padding: 0 !important;
-				background-color: white !important;
-			}
-
-			nav,
-			button,
-			.no-print {
-				display: none !important;
-			}
-
-			#barcode-container {
-				display: grid;
-				grid-template-columns: repeat(3, 1fr);
-				gap: 1rem;
-			}
-
-			.barcode-label {
-				page-break-inside: avoid;
-				break-inside: avoid;
-				border: 1px solid #ccc;
-				padding: 0.5rem;
-				border-radius: 0.5rem;
-			}
-		}
-
-		.break-inside-avoid {
-			break-inside: avoid;
-		}
-
-		.toggle-checkbox:checked {
-			right: 0;
-			border-color: #48bb78;
-		}
-
-		.toggle-checkbox:checked+.toggle-label {
-			background-color: #48bb78;
-		}
-	</style>
 	<?php
 	// Load modules header
 	$modules_dir = __DIR__ . '/../modules';
