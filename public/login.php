@@ -1,39 +1,68 @@
 <?php
 session_start();
+
 // Initialize the language system first, as it may start the session
 require_once 'language_init.php';
 
-// Define a constant to grant access to the bootstrap file.
-define('APP_LOADED', true);
+// --- Brute Force Protection ---
+const MAX_LOGIN_ATTEMPTS = 5;
+const LOCKOUT_TIME = 300; // 5 minutes in seconds
 
-// Load the bootstrap file to get the configuration path.
-if (!file_exists('bootstrap.php')) {
-    header('Location: install.php');
-    exit;
-}
-require_once 'bootstrap.php';
+// Check if the user is currently locked out
+if (isset($_SESSION['lockout_time']) && time() < $_SESSION['lockout_time']) {
+    $remaining_time = $_SESSION['lockout_time'] - time();
+    $error = t('login_locked_out', "Trop de tentatives de connexion. Veuillez réessayer dans {minutes} minutes.", ['minutes' => ceil($remaining_time / 60)]);
+} else {
+    // Define a constant to grant access to the bootstrap file.
+    define('APP_LOADED', true);
 
-// Now, use the CONFIG_PATH to load the actual configuration and database files.
-require_once CONFIG_PATH . '/config.php';
-require_once CONFIG_PATH . '/Database.php';
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $db = new Database();
-    $pdo = $db->getConnection();
-
-    $stmt = $pdo->prepare("SELECT * FROM am_users WHERE email = ?");
-    $stmt->execute([$_POST['email']]);
-    $user = $stmt->fetch();
-
-    if ($user && password_verify($_POST['password'], $user['password'])) {
-        $_SESSION['user_id'] = $user['id'];
-        $_SESSION['user_role'] = $user['role'];
-        $_SESSION['user_first_name'] = $user['first_name'];
-
-        header('Location: index.php');
+    // Load the bootstrap file to get the configuration path.
+    if (!file_exists('bootstrap.php')) {
+        header('Location: install.php');
         exit;
-    } else {
-        $error = 'Invalid credentials';
+    }
+    require_once 'bootstrap.php';
+
+    // Now, use the CONFIG_PATH to load the actual configuration and database files.
+    require_once CONFIG_PATH . '/config.php';
+    require_once CONFIG_PATH . '/Database.php';
+
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $db = new Database();
+        $pdo = $db->getConnection();
+
+        $stmt = $pdo->prepare("SELECT * FROM am_users WHERE email = ?");
+        $stmt->execute([$_POST['email']]);
+        $user = $stmt->fetch();
+
+        if ($user && password_verify($_POST['password'], $user['password'])) {
+            // On successful login, clear any attempts and lockout time
+            unset($_SESSION['login_attempts']);
+            unset($_SESSION['lockout_time']);
+
+            $_SESSION['user_id'] = $user['id'];
+            $_SESSION['user_role'] = $user['role'];
+            $_SESSION['user_first_name'] = $user['first_name'];
+
+            header('Location: index.php');
+            exit;
+        } else {
+            // On failed login, increment the attempt counter
+            if (!isset($_SESSION['login_attempts'])) {
+                $_SESSION['login_attempts'] = 0;
+            }
+            $_SESSION['login_attempts']++;
+
+            if ($_SESSION['login_attempts'] >= MAX_LOGIN_ATTEMPTS) {
+                // If attempts exceed the max, set the lockout time
+                $_SESSION['lockout_time'] = time() + LOCKOUT_TIME;
+                unset($_SESSION['login_attempts']); // Reset attempts after lockout
+                $remaining_time = LOCKOUT_TIME;
+                $error = t('login_locked_out', "Trop de tentatives de connexion. Veuillez réessayer dans {minutes} minutes.", ['minutes' => ceil($remaining_time / 60)]);
+            } else {
+                $error = t('invalid_credentials', 'Identifiants invalides');
+            }
+        }
     }
 }
 

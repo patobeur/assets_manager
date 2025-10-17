@@ -1,4 +1,10 @@
 <?php
+// Prevent direct script access.
+if (!defined('APP_LOADED')) {
+    http_response_code(403);
+    die('Accès non autorisé.');
+}
+
 $stmt = $pdo->query("
     SELECT m.*, c.title AS category_title, s.title AS status_title
     FROM am_materials m

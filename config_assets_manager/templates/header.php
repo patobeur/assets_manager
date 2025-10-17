@@ -1,3 +1,10 @@
+<?php
+// Prevent direct script access.
+if (!defined('APP_LOADED')) {
+	http_response_code(403);
+	die('Accès non autorisé.');
+}
+?>
 <!DOCTYPE html>
 <html lang="<?php echo Language::getInstance()->getLang(); ?>">
 

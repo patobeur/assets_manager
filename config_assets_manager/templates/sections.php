@@ -1,4 +1,10 @@
 <?php
+// Prevent direct script access.
+if (!defined('APP_LOADED')) {
+    http_response_code(403);
+    die('Accès non autorisé.');
+}
+
 $stmt = $pdo->query("SELECT * FROM am_sections ORDER BY title");
 $sections = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
@@ -84,29 +90,29 @@ $sections = $stmt->fetchAll(PDO::FETCH_ASSOC);
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-    const deleteModal = document.getElementById('delete-modal');
-    const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
-    const cancelDeleteBtn = document.getElementById('cancel-delete-btn');
-    let sectionIdToDelete = null;
+    document.addEventListener('DOMContentLoaded', function() {
+        const deleteModal = document.getElementById('delete-modal');
+        const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
+        const cancelDeleteBtn = document.getElementById('cancel-delete-btn');
+        let sectionIdToDelete = null;
 
-    document.querySelectorAll('.delete-btn').forEach(button => {
-        button.addEventListener('click', function () {
-            sectionIdToDelete = this.dataset.id;
-            deleteModal.classList.remove('hidden');
+        document.querySelectorAll('.delete-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                sectionIdToDelete = this.dataset.id;
+                deleteModal.classList.remove('hidden');
+            });
+        });
+
+        cancelDeleteBtn.addEventListener('click', function() {
+            deleteModal.classList.add('hidden');
+            sectionIdToDelete = null;
+        });
+
+        confirmDeleteBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            if (sectionIdToDelete) {
+                window.location.href = `?page=sections&action=delete&id=${sectionIdToDelete}`;
+            }
         });
     });
-
-    cancelDeleteBtn.addEventListener('click', function () {
-        deleteModal.classList.add('hidden');
-        sectionIdToDelete = null;
-    });
-
-    confirmDeleteBtn.addEventListener('click', function (e) {
-        e.preventDefault();
-        if (sectionIdToDelete) {
-            window.location.href = `?page=sections&action=delete&id=${sectionIdToDelete}`;
-        }
-    });
-});
 </script>

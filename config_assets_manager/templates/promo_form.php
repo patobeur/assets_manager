@@ -1,12 +1,18 @@
 <?php
+// Prevent direct script access.
+if (!defined('APP_LOADED')) {
+    http_response_code(403);
+    die('Accès non autorisé.');
+}
+?>
 $promo = null;
 $is_edit = $action === 'edit';
 
 if ($is_edit) {
-    $id = intval($_GET['id']);
-    $stmt = $pdo->prepare("SELECT * FROM am_promos WHERE id = ?");
-    $stmt->execute([$id]);
-    $promo = $stmt->fetch(PDO::FETCH_ASSOC);
+$id = intval($_GET['id']);
+$stmt = $pdo->prepare("SELECT * FROM am_promos WHERE id = ?");
+$stmt->execute([$id]);
+$promo = $stmt->fetch(PDO::FETCH_ASSOC);
 }
 ?>
 

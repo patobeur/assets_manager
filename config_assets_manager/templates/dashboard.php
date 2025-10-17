@@ -1,4 +1,10 @@
 <?php
+// Prevent direct script access.
+if (!defined('APP_LOADED')) {
+    http_response_code(403);
+    die('Accès non autorisé.');
+}
+
 // All data fetching is now done in index.php before this template is included.
 // This file is purely for presentation.
 

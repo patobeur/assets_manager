@@ -1,4 +1,10 @@
-<div class="max-w-4xl mx-auto p-6 bg-white shadow-md rounded-lg">
+<?php
+// Prevent direct script access.
+if (!defined('APP_LOADED')) {
+    http_response_code(403);
+    die('Accès non autorisé.');
+}
+?><div class="max-w-4xl mx-auto p-6 bg-white shadow-md rounded-lg">
     <h1 class="text-3xl font-bold text-gray-800 mb-4">Politique de confidentialité</h1>
     <div class="prose max-w-full text-gray-700">
         <p class="mb-4">Dernière mise à jour : 12 octobre 2025</p>
@@ -35,14 +41,14 @@
         <h2 class="text-2xl font-semibold text-gray-800 mt-6 mb-2">3. Utilisation de vos données</h2>
         <p class="mb-4">
             L'application utilise les données collectées à diverses fins :
-            <ul class="list-disc list-inside mb-4">
-                <li>Pour fournir et maintenir notre Service.</li>
-                <li>Pour gérer les comptes utilisateurs et les autorisations.</li>
-                <li>Pour suivre l'inventaire du matériel et l'historique des prêts.</li>
-                <li>Pour vous permettre d'utiliser les fonctionnalités interactives de notre Service lorsque vous choisissez de le faire.</li>
-                <li>Pour fournir un support client.</li>
-                <li>Pour surveiller l'utilisation de notre Service afin de détecter, prévenir et résoudre les problèmes techniques.</li>
-            </ul>
+        <ul class="list-disc list-inside mb-4">
+            <li>Pour fournir et maintenir notre Service.</li>
+            <li>Pour gérer les comptes utilisateurs et les autorisations.</li>
+            <li>Pour suivre l'inventaire du matériel et l'historique des prêts.</li>
+            <li>Pour vous permettre d'utiliser les fonctionnalités interactives de notre Service lorsque vous choisissez de le faire.</li>
+            <li>Pour fournir un support client.</li>
+            <li>Pour surveiller l'utilisation de notre Service afin de détecter, prévenir et résoudre les problèmes techniques.</li>
+        </ul>
         </p>
 
         <h2 class="text-2xl font-semibold text-gray-800 mt-6 mb-2">4. Sécurité des données</h2>

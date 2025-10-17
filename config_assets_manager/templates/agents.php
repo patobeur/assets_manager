@@ -1,4 +1,11 @@
 <?php
+
+// Prevent direct script access.
+if (!defined('APP_LOADED')) {
+    http_response_code(403);
+    die('Accès non autorisé.');
+}
+
 if ($_SESSION['user_role'] !== 'admin') {
     echo '<div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
         <strong class="font-bold">Accès refusé !</strong>

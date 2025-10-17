@@ -1,4 +1,10 @@
-<div class="container mx-auto px-4 py-8">
+<?php
+// Prevent direct script access.
+if (!defined('APP_LOADED')) {
+    http_response_code(403);
+    die('Accès non autorisé.');
+}
+?><div class="container mx-auto px-4 py-8">
     <a href="index.php?page=materials" class="text-blue-500 hover:underline mb-6 inline-block">&larr; Retour à la liste des matériels</a>
 
     <div class="bg-white shadow-md rounded-lg p-6 mb-8">

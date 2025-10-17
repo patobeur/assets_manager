@@ -1,4 +1,10 @@
-<h1 class="text-3xl font-bold mb-6"><?php echo t('return_material'); ?></h1>
+<?php
+// Prevent direct script access.
+if (!defined('APP_LOADED')) {
+    http_response_code(403);
+    die('Accès non autorisé.');
+}
+?><h1 class="text-3xl font-bold mb-6"><?php echo t('return_material'); ?></h1>
 
 
 <?php if (isset($error)): ?>

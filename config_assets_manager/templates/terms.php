@@ -1,4 +1,10 @@
-<div class="max-w-4xl mx-auto p-6 bg-white shadow-md rounded-lg">
+<?php
+// Prevent direct script access.
+if (!defined('APP_LOADED')) {
+    http_response_code(403);
+    die('Accès non autorisé.');
+}
+?><div class="max-w-4xl mx-auto p-6 bg-white shadow-md rounded-lg">
     <h1 class="text-3xl font-bold text-gray-800 mb-4">Conditions d'utilisation</h1>
     <div class="prose max-w-full text-gray-700">
         <p class="mb-4">Dernière mise à jour : 12 octobre 2025</p>
@@ -16,22 +22,22 @@
         <h2 class="text-2xl font-semibold text-gray-800 mt-6 mb-2">3. Rôles et autorisations</h2>
         <p class="mb-4">
             Le Service définit deux rôles principaux :
-            <ul class="list-disc list-inside mb-4">
-                <li><strong>Administrateur :</strong> Accès complet à toutes les fonctionnalités, y compris la gestion des utilisateurs (agents), des étudiants, du matériel et des données de l'application.</li>
-                <li><strong>Agent :</strong> Accès aux fonctionnalités de gestion des prêts et des retours, ainsi qu'à la consultation des listes d'étudiants et de matériel.</li>
-            </ul>
-            Il est de votre responsabilité de gérer les rôles de manière appropriée et de garantir que seuls les utilisateurs autorisés ont accès aux fonctionnalités sensibles.
+        <ul class="list-disc list-inside mb-4">
+            <li><strong>Administrateur :</strong> Accès complet à toutes les fonctionnalités, y compris la gestion des utilisateurs (agents), des étudiants, du matériel et des données de l'application.</li>
+            <li><strong>Agent :</strong> Accès aux fonctionnalités de gestion des prêts et des retours, ainsi qu'à la consultation des listes d'étudiants et de matériel.</li>
+        </ul>
+        Il est de votre responsabilité de gérer les rôles de manière appropriée et de garantir que seuls les utilisateurs autorisés ont accès aux fonctionnalités sensibles.
         </p>
 
         <h2 class="text-2xl font-semibold text-gray-800 mt-6 mb-2">4. Utilisation acceptable</h2>
         <p class="mb-4">
             Vous vous engagez à ne pas utiliser le Service pour :
-            <ul class="list-disc list-inside mb-4">
-                <li>Toute activité illégale ou frauduleuse.</li>
-                <li>Téléverser ou distribuer des logiciels malveillants, des virus ou tout autre code nuisible.</li>
-                <li>Tenter d'obtenir un accès non autorisé à nos systèmes ou aux comptes d'autres utilisateurs.</li>
-                <li>Usurper l'identité d'une autre personne ou entité.</li>
-            </ul>
+        <ul class="list-disc list-inside mb-4">
+            <li>Toute activité illégale ou frauduleuse.</li>
+            <li>Téléverser ou distribuer des logiciels malveillants, des virus ou tout autre code nuisible.</li>
+            <li>Tenter d'obtenir un accès non autorisé à nos systèmes ou aux comptes d'autres utilisateurs.</li>
+            <li>Usurper l'identité d'une autre personne ou entité.</li>
+        </ul>
         </p>
 
         <h2 class="text-2xl font-semibold text-gray-800 mt-6 mb-2">5. Propriété intellectuelle</h2>

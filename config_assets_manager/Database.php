@@ -1,5 +1,11 @@
 <?php
 
+// Prevent direct script access.
+if (!defined('APP_LOADED')) {
+    http_response_code(403);
+    die('Accès non autorisé.');
+}
+
 class Database
 {
     private $host = DB_HOST;

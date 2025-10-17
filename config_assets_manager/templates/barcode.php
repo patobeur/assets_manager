@@ -1,4 +1,10 @@
-<div class="flex justify-between items-start mb-4">
+<?php
+// Prevent direct script access.
+if (!defined('APP_LOADED')) {
+    http_response_code(403);
+    die('Accès non autorisé.');
+}
+?><div class="flex justify-between items-start mb-4">
     <h1 class="text-2xl font-bold"><?= t('barcode_page_title', 'Étiquettes de codes-barres') ?></h1>
     <button onclick="window.print()" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
         <?= t('print_labels', 'Imprimer les étiquettes') ?>
