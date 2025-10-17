@@ -16,6 +16,8 @@ When the user enters text into the field and clicks the button, the page sends a
 Currently, this generator is implemented to produce **Code 128** barcodes. The implementation specifically handles characters within the **Code Set B** range (ASCII characters 32 to 127), which includes uppercase letters, lowercase letters, numbers, and common symbols.
 
 exemple : ` !"#$%&'()*+,...~`
+
+````bash
 json = [
 {"code":32,"char":" ","name":"Espace"},
 {"code":33,"char":"!","name":"Point d’exclamation"},
@@ -114,3 +116,5 @@ json = [
 {"code":126,"char":"~","name":"Tilde"},
 {"code":127,"char":"⌂","name":"DEL (non imprimable)"}
 ]
+```
+````
