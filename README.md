@@ -75,6 +75,23 @@ Des fichiers d'exemple sont disponibles au téléchargement directement depuis l
 -  **Frontend**: HTML, Tailwind CSS, JavaScript
 -  **Serveur web**: Apache ou Nginx (peut également être exécuté avec le serveur web intégré de PHP pour le développement)
 
+### Compilation des assets (CSS)
+
+Le projet utilise Tailwind CSS. Pour modifier les styles, vous devez installer les dépendances de développement et compiler les fichiers sources.
+
+**Prérequis :** Assurez-vous d'avoir Node.js et npm installés sur votre machine.
+
+1.  **Installer les dépendances :**
+    ```bash
+    npm install
+    ```
+
+2.  **Compiler le CSS :**
+    ```bash
+    npm run build-css
+    ```
+    Cette commande génère le fichier `public/css/tailwind.css` qui est utilisé par l'application. Pour un développement continu, vous pouvez ajouter un script `watch` dans `package.json` pour recompiler automatiquement à chaque modification.
+
 ## Aperçu
 
 | Page de Connexion                           | Page des Utilisateurs                            |

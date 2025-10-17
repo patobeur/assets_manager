@@ -12,7 +12,7 @@ if (!defined('APP_LOADED')) {
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title><?php echo t('school_asset_manager', 'Gestionnaire d\'actifs scolaires'); ?></title>
-	<script src="https://cdn.tailwindcss.com"></script>
+	<link href="css/tailwind.css" rel="stylesheet">
 	<link rel="alternate icon" type="image/png" href="assets/assets_manager_logo_64.png">
 	<style>
 		.navbar {

@@ -1,4 +1,2 @@
-config_assets_manager/config.php
-vendor/
-public/bootstrap.php
-config_assets_manager/modules/log
+node_modules/
+package-lock.json
