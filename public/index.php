@@ -1,11 +1,9 @@
 <?php
 
-require_once 'security.php';
+// Initialize the language system, which also handles session security
+require_once 'language_init.php';
 
 session_start();
-
-// Initialize the language system
-require_once 'language_init.php';
 
 // Define a constant to grant access to the bootstrap file.
 define('APP_LOADED', true);
@@ -550,6 +548,10 @@ switch ($page) {
 		break;
 
 	case 'student':
+		if ($_SESSION['user_role'] !== 'admin') {
+			header('Location: ?page=dashboard');
+			exit;
+		}
 		if (isset($_GET['id'])) {
 			$student_id = intval($_GET['id']);
 

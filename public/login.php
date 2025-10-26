@@ -1,11 +1,9 @@
 <?php
 
-require_once 'security.php';
+// Initialize the language system, which also handles session security
+require_once 'language_init.php';
 
 session_start();
-
-// Initialize the language system first, as it may start the session
-require_once 'language_init.php';
 
 // --- Brute Force Protection ---
 const MAX_LOGIN_ATTEMPTS = 5;

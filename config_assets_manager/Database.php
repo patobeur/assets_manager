@@ -22,7 +22,15 @@ class Database
             $this->conn = new PDO("mysql:host=" . $this->host . ";dbname=" . $this->db_name, $this->username, $this->password);
             $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         } catch (PDOException $exception) {
-            echo "Connection error: " . $exception->getMessage();
+            // Log the detailed error message to the server's error log
+            error_log('Database Connection Error: ' . $exception->getMessage());
+            // Display a generic error message to the user
+            // Use the t() function if it's available, otherwise a plain message
+            if (function_exists('t')) {
+                die(t('database_connection_error'));
+            } else {
+                die('Erreur de connexion à la base de données. Veuillez réessayer plus tard.');
+            }
         }
 
         return $this->conn;
