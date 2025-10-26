@@ -175,7 +175,7 @@ if ($action === 'export') {
 			break;
 
 		case 'agents':
-			if ($_SESSION['user_role'] !== 'admin') {
+			if (!in_array($_SESSION['user_role'], ['admin', 'adminsys'])) {
 				die(t('unauthorized_access', 'Accès non autorisé.'));
 			}
 			$stmt = $pdo->query("SELECT id, first_name, last_name, email, role FROM am_users WHERE role = 'agent' ORDER BY last_name, first_name");
@@ -243,7 +243,7 @@ if ($action === 'export') {
 if (($_SERVER['REQUEST_METHOD'] === 'POST' && ($action === 'create' || $action === 'edit')) || in_array($action, ['delete', 'toggle_status'])) {
 	switch ($page) {
 		case 'students':
-			if ($_SESSION['user_role'] !== 'admin') {
+			if (!in_array($_SESSION['user_role'], ['admin', 'adminsys'])) {
 				header('Location: ?page=dashboard');
 				exit;
 			}
@@ -347,7 +347,7 @@ if (($_SERVER['REQUEST_METHOD'] === 'POST' && ($action === 'create' || $action =
 			exit;
 
 		case 'agents':
-			if ($_SESSION['user_role'] !== 'admin') {
+			if (!in_array($_SESSION['user_role'], ['admin', 'adminsys'])) {
 				header('Location: ?page=dashboard');
 				exit;
 			}
@@ -383,6 +383,7 @@ if (($_SERVER['REQUEST_METHOD'] === 'POST' && ($action === 'create' || $action =
 				$first_name = $_POST['first_name'];
 				$last_name = $_POST['last_name'];
 				$email = filter_var($_POST['email'], FILTER_SANITIZE_EMAIL);
+				$role = $_POST['role'] ?? 'agent';
 
 				if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
 					$_SESSION['error_message'] = t('invalid_agent_email');
@@ -392,19 +393,28 @@ if (($_SERVER['REQUEST_METHOD'] === 'POST' && ($action === 'create' || $action =
 
 				if ($action === 'create') {
 					$password = password_hash($_POST['password'], PASSWORD_DEFAULT);
-					$stmt = $pdo->prepare("INSERT INTO am_users (first_name, last_name, email, password, role) VALUES (?, ?, ?, ?, 'agent')");
-					$stmt->execute([$first_name, $last_name, $email, $password]);
+					$stmt = $pdo->prepare("INSERT INTO am_users (first_name, last_name, email, password, role) VALUES (?, ?, ?, ?, ?)");
+					$stmt->execute([$first_name, $last_name, $email, $password, $role]);
 					$_SESSION['success_message'] = t('agent_created');
 				} elseif ($action === 'edit') {
 					$id = intval($_POST['id']);
+					$sql = "UPDATE am_users SET first_name = ?, last_name = ?, email = ?";
+					$params = [$first_name, $last_name, $email];
 					if (!empty($_POST['password'])) {
 						$password = password_hash($_POST['password'], PASSWORD_DEFAULT);
-						$stmt = $pdo->prepare("UPDATE am_users SET first_name = ?, last_name = ?, email = ?, password = ? WHERE id = ?");
-						$stmt->execute([$first_name, $last_name, $email, $password, $id]);
-					} else {
-						$stmt = $pdo->prepare("UPDATE am_users SET first_name = ?, last_name = ?, email = ? WHERE id = ?");
-						$stmt->execute([$first_name, $last_name, $email, $id]);
+						$sql .= ", password = ?";
+						$params[] = $password;
 					}
+					if ($_SESSION['user_role'] === 'adminsys' && $id !== $_SESSION['user_id']) {
+						$sql .= ", role = ?";
+						$params[] = $role;
+					}
+					$sql .= " WHERE id = ?";
+					$params[] = $id;
+
+					$stmt = $pdo->prepare($sql);
+					$stmt->execute($params);
+
 					$_SESSION['success_message'] = t('agent_updated');
 				}
 			}
@@ -412,7 +422,7 @@ if (($_SERVER['REQUEST_METHOD'] === 'POST' && ($action === 'create' || $action =
 			exit;
 
 		case 'promos':
-			if ($_SESSION['user_role'] !== 'admin') {
+			if (!in_array($_SESSION['user_role'], ['admin', 'adminsys'])) {
 				header('Location: ?page=dashboard');
 				exit;
 			}
@@ -440,7 +450,7 @@ if (($_SERVER['REQUEST_METHOD'] === 'POST' && ($action === 'create' || $action =
 			exit;
 
 		case 'sections':
-			if ($_SESSION['user_role'] !== 'admin') {
+			if (!in_array($_SESSION['user_role'], ['admin', 'adminsys'])) {
 				header('Location: ?page=dashboard');
 				exit;
 			}
@@ -554,7 +564,7 @@ switch ($page) {
 
 		// Currently loaned materials
 		$current_loans = [];
-		if ($_SESSION['user_role'] === 'admin' || $_SESSION['user_role'] === 'agent') {
+		if (in_array($_SESSION['user_role'], ['admin', 'adminsys', 'agent'])) {
 			$stmt = $pdo->query("
 				SELECT l.loan_date, s.first_name AS student_first_name, s.last_name AS student_last_name, m.name AS material_name
 				FROM am_loans l
@@ -570,7 +580,7 @@ switch ($page) {
 		break;
 
 	case 'student':
-		if ($_SESSION['user_role'] !== 'admin') {
+		if (!in_array($_SESSION['user_role'], ['admin', 'adminsys'])) {
 			header('Location: ?page=dashboard');
 			exit;
 		}
@@ -645,7 +655,7 @@ switch ($page) {
 		}
 		break;
 	case 'students':
-		if ($_SESSION['user_role'] !== 'admin') {
+		if (!in_array($_SESSION['user_role'], ['admin', 'adminsys'])) {
 			header('Location: ?page=dashboard');
 			exit;
 		}
@@ -684,7 +694,7 @@ switch ($page) {
 		}
 		break;
 	case 'agents':
-		if ($_SESSION['user_role'] !== 'admin') {
+		if (!in_array($_SESSION['user_role'], ['admin', 'adminsys'])) {
 			header('Location: ?page=dashboard');
 			exit;
 		}
@@ -703,7 +713,7 @@ switch ($page) {
 		}
 		break;
 	case 'promos':
-		if ($_SESSION['user_role'] !== 'admin') {
+		if (!in_array($_SESSION['user_role'], ['admin', 'adminsys'])) {
 			header('Location: ?page=dashboard');
 			exit;
 		}
@@ -722,7 +732,7 @@ switch ($page) {
 		}
 		break;
 	case 'sections':
-		if ($_SESSION['user_role'] !== 'admin') {
+		if (!in_array($_SESSION['user_role'], ['admin', 'adminsys'])) {
 			header('Location: ?page=dashboard');
 			exit;
 		}
@@ -904,7 +914,7 @@ switch ($page) {
 		require_once CONFIG_PATH . '/templates/history.php';
 		break;
 	case 'hydration':
-		if ($_SESSION['user_role'] !== 'admin') {
+		if (!in_array($_SESSION['user_role'], ['admin', 'adminsys'])) {
 			header('Location: ?page=dashboard');
 			exit;
 		}
@@ -943,7 +953,7 @@ switch ($page) {
 		require_once CONFIG_PATH . '/templates/privacy.php';
 		break;
 	case 'barecode':
-		if ($_SESSION['user_role'] !== 'admin') {
+		if (!in_array($_SESSION['user_role'], ['admin', 'adminsys'])) {
 			header('Location: ?page=dashboard');
 			exit;
 		}

@@ -135,7 +135,7 @@ if (!defined('APP_LOADED')) {
 									<?php echo htmlspecialchars($_SESSION['user_first_name']); ?>
 								</button>
 								<div id="profil-dropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-20">
-									<?php if ($_SESSION['user_role'] === 'admin'): ?>
+									<?php if (in_array($_SESSION['user_role'], ['admin', 'adminsys'])): ?>
 										<div class="relative" id="admin-submenu">
 											<button id="admin-submenu-button" class="w-full text-left block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
 												<?php echo t('admin', 'Admin'); ?>
@@ -205,7 +205,7 @@ if (!defined('APP_LOADED')) {
 					<div class="border-t border-gray-200 my-1"></div>
 					<div class="py-2 px-4 text-sm text-gray-500"><?php echo htmlspecialchars($_SESSION['user_first_name']); ?></div>
 
-					<?php if ($_SESSION['user_role'] === 'admin'): ?>
+					<?php if (in_array($_SESSION['user_role'], ['admin', 'adminsys'])): ?>
 						<button id="mobile-admin-submenu-button" class="w-full text-left block py-2 pl-8 pr-4 text-sm text-gray-600 hover:bg-gray-200">
 							<?php echo t('admin', 'Admin'); ?>
 						</button>
