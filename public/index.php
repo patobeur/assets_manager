@@ -175,7 +175,7 @@ if ($action === 'export') {
 			break;
 
 		case 'agents':
-			if ($_SESSION['user_role'] !== 'admin') {
+			if (!in_array($_SESSION['user_role'], ['admin', 'adminsys'])) {
 				die(t('unauthorized_access', 'Accès non autorisé.'));
 			}
 			$stmt = $pdo->query("SELECT id, first_name, last_name, email, role FROM am_users WHERE role = 'agent' ORDER BY last_name, first_name");
@@ -243,7 +243,7 @@ if ($action === 'export') {
 if (($_SERVER['REQUEST_METHOD'] === 'POST' && ($action === 'create' || $action === 'edit')) || in_array($action, ['delete', 'toggle_status'])) {
 	switch ($page) {
 		case 'students':
-			if ($_SESSION['user_role'] !== 'admin') {
+			if (!in_array($_SESSION['user_role'], ['admin', 'adminsys'])) {
 				header('Location: ?page=dashboard');
 				exit;
 			}
@@ -422,7 +422,7 @@ if (($_SERVER['REQUEST_METHOD'] === 'POST' && ($action === 'create' || $action =
 			exit;
 
 		case 'promos':
-			if ($_SESSION['user_role'] !== 'admin') {
+			if (!in_array($_SESSION['user_role'], ['admin', 'adminsys'])) {
 				header('Location: ?page=dashboard');
 				exit;
 			}
@@ -450,7 +450,7 @@ if (($_SERVER['REQUEST_METHOD'] === 'POST' && ($action === 'create' || $action =
 			exit;
 
 		case 'sections':
-			if ($_SESSION['user_role'] !== 'admin') {
+			if (!in_array($_SESSION['user_role'], ['admin', 'adminsys'])) {
 				header('Location: ?page=dashboard');
 				exit;
 			}
@@ -564,7 +564,7 @@ switch ($page) {
 
 		// Currently loaned materials
 		$current_loans = [];
-		if ($_SESSION['user_role'] === 'admin' || $_SESSION['user_role'] === 'agent') {
+		if (in_array($_SESSION['user_role'], ['admin', 'adminsys', 'agent'])) {
 			$stmt = $pdo->query("
 				SELECT l.loan_date, s.first_name AS student_first_name, s.last_name AS student_last_name, m.name AS material_name
 				FROM am_loans l
@@ -580,7 +580,7 @@ switch ($page) {
 		break;
 
 	case 'student':
-		if ($_SESSION['user_role'] !== 'admin') {
+		if (!in_array($_SESSION['user_role'], ['admin', 'adminsys'])) {
 			header('Location: ?page=dashboard');
 			exit;
 		}
@@ -655,7 +655,7 @@ switch ($page) {
 		}
 		break;
 	case 'students':
-		if ($_SESSION['user_role'] !== 'admin') {
+		if (!in_array($_SESSION['user_role'], ['admin', 'adminsys'])) {
 			header('Location: ?page=dashboard');
 			exit;
 		}
@@ -713,7 +713,7 @@ switch ($page) {
 		}
 		break;
 	case 'promos':
-		if ($_SESSION['user_role'] !== 'admin') {
+		if (!in_array($_SESSION['user_role'], ['admin', 'adminsys'])) {
 			header('Location: ?page=dashboard');
 			exit;
 		}
@@ -732,7 +732,7 @@ switch ($page) {
 		}
 		break;
 	case 'sections':
-		if ($_SESSION['user_role'] !== 'admin') {
+		if (!in_array($_SESSION['user_role'], ['admin', 'adminsys'])) {
 			header('Location: ?page=dashboard');
 			exit;
 		}
@@ -914,7 +914,7 @@ switch ($page) {
 		require_once CONFIG_PATH . '/templates/history.php';
 		break;
 	case 'hydration':
-		if ($_SESSION['user_role'] !== 'admin') {
+		if (!in_array($_SESSION['user_role'], ['admin', 'adminsys'])) {
 			header('Location: ?page=dashboard');
 			exit;
 		}
@@ -953,7 +953,7 @@ switch ($page) {
 		require_once CONFIG_PATH . '/templates/privacy.php';
 		break;
 	case 'barecode':
-		if ($_SESSION['user_role'] !== 'admin') {
+		if (!in_array($_SESSION['user_role'], ['admin', 'adminsys'])) {
 			header('Location: ?page=dashboard');
 			exit;
 		}
