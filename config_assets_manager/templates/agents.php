@@ -16,9 +16,12 @@ if (!in_array($_SESSION['user_role'], ['admin', 'adminsys'])) {
 
 $query = "SELECT * FROM am_users";
 if ($_SESSION['user_role'] === 'admin') {
-    $query .= " WHERE role IN ('agent', 'admin')";
+    $query .= " WHERE role = 'agent' OR id = :user_id";
+    $stmt = $pdo->prepare($query);
+    $stmt->execute(['user_id' => $_SESSION['user_id']]);
+} else {
+    $stmt = $pdo->query($query);
 }
-$stmt = $pdo->query($query);
 $agents = $stmt->fetchAll();
 ?>
 

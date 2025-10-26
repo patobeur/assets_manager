@@ -405,7 +405,7 @@ if (($_SERVER['REQUEST_METHOD'] === 'POST' && ($action === 'create' || $action =
 						$sql .= ", password = ?";
 						$params[] = $password;
 					}
-					if ($_SESSION['user_role'] === 'adminsys') {
+					if ($_SESSION['user_role'] === 'adminsys' && $id !== $_SESSION['user_id']) {
 						$sql .= ", role = ?";
 						$params[] = $role;
 					}

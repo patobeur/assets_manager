@@ -22,8 +22,8 @@ if ($action === 'edit') {
         return;
     }
 
-    // Security check: An admin cannot edit another admin or an adminsys
-    if ($_SESSION['user_role'] === 'admin' && in_array($agent['role'], ['admin', 'adminsys'])) {
+    // Security check: An admin cannot edit another admin or an adminsys, but can edit themselves
+    if ($_SESSION['user_role'] === 'admin' && $agent['id'] !== $_SESSION['user_id'] && in_array($agent['role'], ['admin', 'adminsys'])) {
         echo '<p class="text-red-500">Vous n\'êtes pas autorisé à modifier cet utilisateur.</p>';
         return;
     }
@@ -62,7 +62,7 @@ if ($action === 'edit') {
         <?php if ($_SESSION['user_role'] === 'adminsys') : ?>
             <div class="mb-4">
                 <label for="role" class="block text-gray-700 text-sm font-bold mb-2">Rôle</label>
-                <select id="role" name="role" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                <select id="role" name="role" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" <?php echo ($agent && $agent['id'] === $_SESSION['user_id']) ? 'disabled' : ''; ?>>
                     <option value="agent" <?php echo ($agent && $agent['role'] === 'agent') ? 'selected' : ''; ?>>Agent</option>
                     <option value="admin" <?php echo ($agent && $agent['role'] === 'admin') ? 'selected' : ''; ?>>Admin</option>
                     <option value="adminsys" <?php echo ($agent && $agent['role'] === 'adminsys') ? 'selected' : ''; ?>>Adminsys</option>
