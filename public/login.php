@@ -1,4 +1,7 @@
 <?php
+
+require_once 'security.php';
+
 session_start();
 
 // Initialize the language system first, as it may start the session

@@ -1,4 +1,7 @@
 <?php
+
+require_once 'security.php';
+
 session_start();
 
 // Initialize the language system
@@ -242,6 +245,10 @@ if ($action === 'export') {
 if (($_SERVER['REQUEST_METHOD'] === 'POST' && ($action === 'create' || $action === 'edit')) || in_array($action, ['delete', 'toggle_status'])) {
 	switch ($page) {
 		case 'students':
+			if ($_SESSION['user_role'] !== 'admin') {
+				header('Location: ?page=dashboard');
+				exit;
+			}
 			if ($action === 'toggle_status') {
 				$id = intval($_GET['id']);
 				// First, check the current status
@@ -614,6 +621,10 @@ switch ($page) {
 		}
 		break;
 	case 'students':
+		if ($_SESSION['user_role'] !== 'admin') {
+			header('Location: ?page=dashboard');
+			exit;
+		}
 		switch ($action) {
 			case 'list':
 				require_once CONFIG_PATH . '/templates/students.php';
