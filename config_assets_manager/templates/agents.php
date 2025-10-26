@@ -6,7 +6,7 @@ if (!defined('APP_LOADED')) {
     die('Accès non autorisé.');
 }
 
-if ($_SESSION['user_role'] !== 'admin') {
+if (!in_array($_SESSION['user_role'], ['admin', 'adminsys'])) {
     echo '<div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
         <strong class="font-bold">Accès refusé !</strong>
         <span class="block sm:inline">Vous n\'avez pas la permission d\'accéder à cette page.</span>
@@ -14,7 +14,11 @@ if ($_SESSION['user_role'] !== 'admin') {
     return;
 }
 
-$stmt = $pdo->query("SELECT * FROM am_users WHERE role IN ('agent', 'admin')");
+$query = "SELECT * FROM am_users";
+if ($_SESSION['user_role'] === 'admin') {
+    $query .= " WHERE role IN ('agent', 'admin')";
+}
+$stmt = $pdo->query($query);
 $agents = $stmt->fetchAll();
 ?>
 

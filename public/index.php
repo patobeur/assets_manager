@@ -347,7 +347,7 @@ if (($_SERVER['REQUEST_METHOD'] === 'POST' && ($action === 'create' || $action =
 			exit;
 
 		case 'agents':
-			if ($_SESSION['user_role'] !== 'admin') {
+			if (!in_array($_SESSION['user_role'], ['admin', 'adminsys'])) {
 				header('Location: ?page=dashboard');
 				exit;
 			}
@@ -383,6 +383,7 @@ if (($_SERVER['REQUEST_METHOD'] === 'POST' && ($action === 'create' || $action =
 				$first_name = $_POST['first_name'];
 				$last_name = $_POST['last_name'];
 				$email = filter_var($_POST['email'], FILTER_SANITIZE_EMAIL);
+				$role = $_POST['role'] ?? 'agent';
 
 				if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
 					$_SESSION['error_message'] = t('invalid_agent_email');
@@ -392,19 +393,28 @@ if (($_SERVER['REQUEST_METHOD'] === 'POST' && ($action === 'create' || $action =
 
 				if ($action === 'create') {
 					$password = password_hash($_POST['password'], PASSWORD_DEFAULT);
-					$stmt = $pdo->prepare("INSERT INTO am_users (first_name, last_name, email, password, role) VALUES (?, ?, ?, ?, 'agent')");
-					$stmt->execute([$first_name, $last_name, $email, $password]);
+					$stmt = $pdo->prepare("INSERT INTO am_users (first_name, last_name, email, password, role) VALUES (?, ?, ?, ?, ?)");
+					$stmt->execute([$first_name, $last_name, $email, $password, $role]);
 					$_SESSION['success_message'] = t('agent_created');
 				} elseif ($action === 'edit') {
 					$id = intval($_POST['id']);
+					$sql = "UPDATE am_users SET first_name = ?, last_name = ?, email = ?";
+					$params = [$first_name, $last_name, $email];
 					if (!empty($_POST['password'])) {
 						$password = password_hash($_POST['password'], PASSWORD_DEFAULT);
-						$stmt = $pdo->prepare("UPDATE am_users SET first_name = ?, last_name = ?, email = ?, password = ? WHERE id = ?");
-						$stmt->execute([$first_name, $last_name, $email, $password, $id]);
-					} else {
-						$stmt = $pdo->prepare("UPDATE am_users SET first_name = ?, last_name = ?, email = ? WHERE id = ?");
-						$stmt->execute([$first_name, $last_name, $email, $id]);
+						$sql .= ", password = ?";
+						$params[] = $password;
 					}
+					if ($_SESSION['user_role'] === 'adminsys') {
+						$sql .= ", role = ?";
+						$params[] = $role;
+					}
+					$sql .= " WHERE id = ?";
+					$params[] = $id;
+
+					$stmt = $pdo->prepare($sql);
+					$stmt->execute($params);
+
 					$_SESSION['success_message'] = t('agent_updated');
 				}
 			}
@@ -684,7 +694,7 @@ switch ($page) {
 		}
 		break;
 	case 'agents':
-		if ($_SESSION['user_role'] !== 'admin') {
+		if (!in_array($_SESSION['user_role'], ['admin', 'adminsys'])) {
 			header('Location: ?page=dashboard');
 			exit;
 		}

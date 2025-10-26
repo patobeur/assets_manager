@@ -174,7 +174,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Create the admin user
     try {
-        $stmt = $pdo->prepare("INSERT INTO am_users (first_name, last_name, email, password, role) VALUES (?, ?, ?, ?, 'admin')");
+        $stmt = $pdo->prepare("INSERT INTO am_users (first_name, last_name, email, password, role) VALUES (?, ?, ?, ?, 'adminsys')");
         $stmt->execute([$admin_first_name, $admin_last_name, $admin_email, $admin_password]);
     } catch (PDOException $e) {
         die(str_replace('{error_message}', $e->getMessage(), t('admin_creation_error')));
