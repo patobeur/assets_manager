@@ -127,6 +127,8 @@ Voici la structure de dossiers recommandée :
    -  **En ligne** : `http://votredomaine.com/assets_manager/public/`
    -  **En local** : `http://localhost/assets_manager/public/`
 
+   Si vous creez un virtual host en local, faites comme si vous étiez en ligne
+
    Vous serez automatiquement redirigé vers la page d'installation.
 
 4. **Suivez les étapes** :
