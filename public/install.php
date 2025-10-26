@@ -47,8 +47,9 @@ if ($config_path === false) {
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Sanitize and validate input, removing backticks to prevent SQL injection in CREATE DATABASE.
     $db_host = htmlspecialchars(str_replace('`', '', $_POST['db_host']));
-    $db_name = htmlspecialchars(str_replace('`', '', $_POST['db_name']));
     $db_user = htmlspecialchars(str_replace('`', '', $_POST['db_user']));
+    // Allow only alphanumeric characters and underscores in the database name.
+    $db_name = preg_replace('/[^a-zA-Z0-9_]/', '', $_POST['db_name']);
     $db_password = $_POST['db_password']; // No sanitization needed for the password, it will be hashed
     $admin_first_name = htmlspecialchars($_POST['admin_first_name']);
     $admin_last_name = htmlspecialchars($_POST['admin_last_name']);
