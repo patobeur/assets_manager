@@ -351,12 +351,34 @@ if (($_SERVER['REQUEST_METHOD'] === 'POST' && ($action === 'create' || $action =
 				header('Location: ?page=dashboard');
 				exit;
 			}
-
-			if ($action === 'delete') {
+			if ($action === 'toggle_status') {
 				$id = intval($_GET['id']);
-				$stmt = $pdo->prepare("DELETE FROM am_users WHERE id = ?");
+				if ($id === $_SESSION['user_id']) {
+					$_SESSION['error_message'] = t('cannot_change_own_status');
+					header('Location: ?page=agents');
+					exit;
+				}
+				$stmt = $pdo->prepare("SELECT status FROM am_users WHERE id = ?");
 				$stmt->execute([$id]);
-				$_SESSION['success_message'] = t('agent_deleted');
+				$current_status = $stmt->fetchColumn();
+				$new_status = $current_status == 1 ? 0 : 1;
+				$stmt = $pdo->prepare("UPDATE am_users SET status = ? WHERE id = ?");
+				$stmt->execute([$new_status, $id]);
+				$_SESSION['success_message'] = t('agent_status_updated');
+			} elseif ($action === 'delete') {
+				$id = intval($_GET['id']);
+				if ($id === $_SESSION['user_id']) {
+					$_SESSION['error_message'] = t('cannot_delete_own_account');
+					header('Location: ?page=agents');
+					exit;
+				}
+				$stmt = $pdo->prepare("DELETE FROM am_users WHERE id = ? AND status = 0");
+				$stmt->execute([$id]);
+				if ($stmt->rowCount() > 0) {
+					$_SESSION['success_message'] = t('agent_deleted');
+				} else {
+					$_SESSION['error_message'] = t('agent_delete_error_active');
+				}
 			} else { // POST request for create or edit
 				$first_name = $_POST['first_name'];
 				$last_name = $_POST['last_name'];
