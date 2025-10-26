@@ -8,7 +8,7 @@ if (!defined('APP_LOADED')) {
 <footer class="bg-white p-4 mt-auto">
 	<div class="container mx-auto text-center">
 		<p><?php echo t('copyright', ['year' => date('Y')]); ?></p>
-		<p class="text-sm text-gray-500"><?php echo t('demo_site_version', ['version' => '1.0.0']); ?></p>
+		<p class="text-sm text-gray-500"><?php echo t('demo_site_version', ['version' => '1.0.1 (26-10-2025)']); ?></p>
 
 		<?php if (isset($_SESSION['user_id'])): ?>
 			<div class="mt-2">
