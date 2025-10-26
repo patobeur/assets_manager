@@ -43,6 +43,11 @@ Le système permet une gestion complète (CRUD : Créer, Lire, Mettre à jour, S
 -  **Support Multilingue** : L'interface est disponible en français et en anglais. Le système de traduction est conçu pour être facilement extensible à d'autres langues via de simples fichiers de configuration (JSON).
 -  **Sélecteur de Langue** : Un sélecteur de langue discret (`FR | EN`) est présent dans le menu principal pour permettre aux utilisateurs de changer de langue à tout moment, tout en conservant le contexte de la page actuelle.
 
+### Génération de Codes-barres
+
+-  **Générateur Intégré** : L'application inclut un outil de génération de codes-barres au format **Code 128**, créant des images SVG pour une qualité optimale.
+-  **Page d'Étiquettes** : Une page dédiée, accessible depuis le menu d'administration, permet de générer et d'imprimer des étiquettes de codes-barres pour les étudiants et le matériel, facilitant ainsi le déploiement physique du système.
+
 ### Import de Données via CSV
 
 L'application permet d'importer des listes d'étudiants et de matériel en utilisant des fichiers CSV. Cette fonctionnalité est accessible aux administrateurs depuis les pages de gestion des étudiants et du matériel.
@@ -62,18 +67,43 @@ L'application permet d'importer des listes d'étudiants et de matériel en utili
 -  **Format pour le matériel :**
    1. `Nom`
    2. `Description`
-   3. `Statut` (doit être `available`, `loaned`, ou `maintenance`)
+   3. `Statut` (Le **nom** du statut, ex: "available", "loaned", "maintenance". Le système le convertira en ID correspondant.)
    4. `Code-barres`
-   5. `Catégories`
+   5. `Catégorie` (L'**ID** de la catégorie. Si l'ID n'existe pas, la catégorie par défaut (ID 1) sera assignée.)
 
 Des fichiers d'exemple sont disponibles au téléchargement directement depuis l'interface d'importation pour vous aider à préparer vos données.
 
+## Sécurité
+
+L'application a été développée avec la sécurité comme priorité :
+
+-  **Prévention des Injections SQL** : Utilisation de requêtes préparées avec PDO pour toutes les interactions avec la base de données.
+-  **Protection contre XSS** : Échappement systématique des données affichées dans l'interface utilisateur.
+-  **Mots de Passe Sécurisés** : Hachage des mots de passe avec l'algorithme `PASSWORD_DEFAULT` de PHP.
+-  **Protection contre le Brute-force** : Le script de connexion intègre une protection qui verrouille temporairement un compte après plusieurs tentatives de connexion échouées.
+-  **Configuration des Cookies de Session** : Les cookies sont configurés avec les attributs `HttpOnly`, `Secure` (si HTTPS est activé) et `SameSite=Strict` pour renforcer la sécurité des sessions.
+-  **Accès Direct aux Fichiers Empêché** : Une constante `APP_LOADED` est utilisée pour s'assurer que les fichiers PHP ne peuvent pas être exécutés directement via leur URL.
+
 ## Stack Technologique
 
--  **Backend**: PHP
--  **Base de données**: MySQL
--  **Frontend**: HTML, Tailwind CSS, JavaScript
--  **Serveur web**: Apache ou Nginx (peut également être exécuté avec le serveur web intégré de PHP pour le développement)
+-  **Backend**: PHP 8+
+-  **Base de données**: MySQL / MariaDB
+-  **Frontend**:
+   -  **HTML / JavaScript**: Pour la structure et l'interactivité.
+   -  **Tailwind CSS**: Utilisé via un CDN pour un design moderne et réactif sans nécessiter de build local (pas de `npm` ou `node.js` requis).
+-  **Serveur web**: Apache ou Nginx. Peut également être exécuté avec le serveur web intégré de PHP pour le développement.
+
+## Architecture
+
+Quelques concepts clés de l'architecture de l'application :
+
+-  **Hiérarchie des Rôles** : Le système de permissions repose sur trois rôles :
+
+   -  `agent` : Peut gérer les prêts et retours de matériel.
+   -  `admin` : A les droits de l'`agent`, et peut en plus gérer les utilisateurs (`agent` uniquement), les étudiants et le matériel.
+   -  `adminsys` : Super-administrateur qui a tous les droits, y compris la gestion des `admin`, l'accès aux promotions, sections, et à la page d'hydratation.
+
+-  **Système de Modules** : Le dossier `config_assets_manager/modules` permet d'ajouter des fonctionnalités de manière modulaire. Chaque sous-dossier peut contenir des fichiers `header.php` et `footer.php` qui sont automatiquement inclus dans les pages, permettant d'étendre l'application sans modifier le cœur du code.
 
 ## Aperçu
 
@@ -153,50 +183,49 @@ Pour un développement rapide en local, vous pouvez utiliser le serveur web int�
 
 ## Schéma de la Base de Données
 
-La base de données est composée de plusieurs tables qui assurent la gestion des utilisateurs, des étudiants, du matériel et des prêts.
+-  **`am_users`**:
 
--  **`am_users`**: Stocke les informations des utilisateurs de l'application.
+   -  `id`: INT (PK)
+   -  `first_name`, `last_name`, `email` (UNIQUE), `password`: VARCHAR
+   -  `role`: ENUM('agent', 'admin', 'adminsys')
+   -  `status`: INT (1 pour actif, 0 pour inactif)
 
-   -  `id`: Clé primaire (INT)
-   -  `first_name`: Prénom de l'utilisateur (VARCHAR)
-   -  `last_name`: Nom de l'utilisateur (VARCHAR)
-   -  `email`: Email de l'utilisateur, utilisé pour la connexion (VARCHAR, unique)
-   -  `password`: Mot de passe haché (VARCHAR)
-   -  `role`: Rôle de l'utilisateur (`agent` ou `admin`) (ENUM)
+-  **`am_promos`** & **`am_sections`**:
 
--  **`am_promos`**: Table des promotions (ex: "25-27").
+   -  `id`: INT (PK)
+   -  `title`: VARCHAR
 
-   -  `id`: Clé primaire (INT)
-   -  `title`: Nom de la promotion (VARCHAR)
+-  **`am_students`**:
 
--  **`am_sections`**: Table des sections (ex: "BTS COM").
+   -  `id`: INT (PK)
+   -  `first_name`, `last_name`, `barcode` (UNIQUE), `email` (UNIQUE): VARCHAR
+   -  `promo_id`: INT (FK vers `am_promos`)
+   -  `section_id`: INT (FK vers `am_sections`)
+   -  `status`: INT (1 pour actif, 0 pour inactif)
 
-   -  `id`: Clé primaire (INT)
-   -  `title`: Nom de la section (VARCHAR)
+-  **`am_materials_categories`** & **`am_materials_status`**:
 
--  **`am_students`**: Stocke les informations des étudiants.
+   -  `id`: INT (PK)
+   -  `title`: VARCHAR
 
-   -  `id`: Clé primaire (INT)
-   -  `first_name`: Prénom de l'étudiant (VARCHAR)
-   -  `last_name`: Nom de l'étudiant (VARCHAR)
-   -  `barcode`: Code-barres unique de l'étudiant (VARCHAR, unique)
-   -  `email`: Email de l'étudiant (VARCHAR, unique)
-   -  `promo_id`: Clé étrangère référençant `am_promos(id)`
-   -  `section_id`: Clé étrangère référençant `am_sections(id)`
+-  **`am_materials`**:
 
--  **`am_materials`**: Stocke les informations sur le matériel.
+   -  `id`: INT (PK)
+   -  `name`, `barcode` (UNIQUE): VARCHAR
+   -  `description`: TEXT
+   -  `material_categories_id`: INT (FK vers `am_materials_categories`)
+   -  `material_status_id`: INT (FK vers `am_materials_status`, défaut: 1)
 
-   -  `id`: Clé primaire (INT)
-   -  `name`: Nom du matériel (VARCHAR)
-   -  `description`: Description détaillée du matériel (TEXT)
-   -  `status`: Statut du matériel (`available`, `loaned`, `maintenance`) (ENUM)
-   -  `barcode`: Code-barres unique du matériel (VARCHAR, unique)
+-  **`am_loans`**:
 
--  **`am_loans`**: Table de jonction qui enregistre tous les prêts.
-   -  `id`: Clé primaire (INT)
-   -  `student_id`: Clé étrangère référençant `am_students(id)`
-   -  `material_id`: Clé étrangère référençant `am_materials(id)`
-   -  `loan_date`: Date et heure du prêt (DATETIME)
-   -  `return_date`: Date et heure du retour (DATETIME, peut être `NULL`)
-   -  `loan_user_id`: Clé étrangère référençant `am_users(id)` (l'utilisateur qui a validé le prêt)
-   -  `return_user_id`: Clé étrangère référençant `am_users(id)` (l'utilisateur qui a validé le retour, peut être `NULL`)
+   -  `id`: INT (PK)
+   -  `student_id`: INT (FK vers `am_students`)
+   -  `material_id`: INT (FK vers `am_materials`)
+   -  `loan_date`: DATETIME
+   -  `return_date`: DATETIME (NULLable)
+   -  `loan_user_id`: INT (FK vers `am_users`)
+   -  `return_user_id`: INT (FK vers `am_users`, NULLable)
+
+-  **`am_options`**:
+   -  `id`: INT (PK)
+   -  `title`: VARCHAR (utilisé pour stocker diverses options de l'application)
