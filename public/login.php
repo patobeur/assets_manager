@@ -13,55 +13,65 @@ if (!file_exists('bootstrap.php')) {
 }
 require_once 'bootstrap.php';
 
-// --- Brute Force Protection ---
-const MAX_LOGIN_ATTEMPTS = 5;
-const LOCKOUT_TIME = 300; // 5 minutes in seconds
+// Now, use the CONFIG_PATH to load the actual configuration and database files.
+if (!file_exists(CONFIG_PATH . '/config.php')) {
+    // If the config file doesn't exist, the app is not installed.
+    // Redirect to installation.
+    header('Location: install.php');
+    exit;
+}
 
 // Now, use the CONFIG_PATH to load the actual configuration and database files.
 require_once CONFIG_PATH . '/config.php';
 require_once CONFIG_PATH . '/Database.php';
+
+// --- Brute Force Protection ---
+const MAX_LOGIN_ATTEMPTS = 5;
+const LOCKOUT_TIME = 300; // 5 minutes in seconds
 
 // Check if the user is currently locked out
 if (isset($_SESSION['lockout_time']) && time() < $_SESSION['lockout_time']) {
     $remaining_time = $_SESSION['lockout_time'] - time();
     $error = t('login_locked_out', ['minutes' => ceil($remaining_time / 60)], "Trop de tentatives de connexion. Veuillez réessayer dans {minutes} minutes.");
 } else {
-
-
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $db = new Database();
         $pdo = $db->getConnection();
 
-        $stmt = $pdo->prepare("SELECT * FROM am_users WHERE email = ?");
-        $stmt->execute([$_POST['email']]);
-        $user = $stmt->fetch();
-
-        if ($user && password_verify($_POST['password'], $user['password'])) {
-            // On successful login, clear any attempts and lockout time
-            unset($_SESSION['login_attempts']);
-            unset($_SESSION['lockout_time']);
-
-            $_SESSION['user_id'] = $user['id'];
-            $_SESSION['user_role'] = $user['role'];
-            $_SESSION['user_first_name'] = $user['first_name'];
-
-            header('Location: index.php');
-            exit;
+        if ($pdo === null) {
+            $error = t('database_connection_error', 'Erreur de connexion à la base de données. Veuillez réessayer plus tard.');
         } else {
-            // On failed login, increment the attempt counter
-            if (!isset($_SESSION['login_attempts'])) {
-                $_SESSION['login_attempts'] = 0;
-            }
-            $_SESSION['login_attempts']++;
+            $stmt = $pdo->prepare("SELECT * FROM am_users WHERE email = ?");
+            $stmt->execute([$_POST['email']]);
+            $user = $stmt->fetch();
 
-            if ($_SESSION['login_attempts'] >= MAX_LOGIN_ATTEMPTS) {
-                // If attempts exceed the max, set the lockout time
-                $_SESSION['lockout_time'] = time() + LOCKOUT_TIME;
-                unset($_SESSION['login_attempts']); // Reset attempts after lockout
-                $remaining_time = LOCKOUT_TIME;
-                $error = t('login_locked_out', ['minutes' => ceil($remaining_time / 60)], "Trop de tentatives de connexion. Veuillez réessayer dans {minutes} minutes.");
+            if ($user && password_verify($_POST['password'], $user['password'])) {
+                // On successful login, clear any attempts and lockout time
+                unset($_SESSION['login_attempts']);
+                unset($_SESSION['lockout_time']);
+
+                $_SESSION['user_id'] = $user['id'];
+                $_SESSION['user_role'] = $user['role'];
+                $_SESSION['user_first_name'] = $user['first_name'];
+
+                header('Location: index.php');
+                exit;
             } else {
-                $error = t('invalid_credentials', 'Identifiants invalides');
+                // On failed login, increment the attempt counter
+                if (!isset($_SESSION['login_attempts'])) {
+                    $_SESSION['login_attempts'] = 0;
+                }
+                $_SESSION['login_attempts']++;
+
+                if ($_SESSION['login_attempts'] >= MAX_LOGIN_ATTEMPTS) {
+                    // If attempts exceed the max, set the lockout time
+                    $_SESSION['lockout_time'] = time() + LOCKOUT_TIME;
+                    unset($_SESSION['login_attempts']); // Reset attempts after lockout
+                    $remaining_time = LOCKOUT_TIME;
+                    $error = t('login_locked_out', ['minutes' => ceil($remaining_time / 60)], "Trop de tentatives de connexion. Veuillez réessayer dans {minutes} minutes.");
+                } else {
+                    $error = t('invalid_credentials', 'Identifiants invalides');
+                }
             }
         }
     }
