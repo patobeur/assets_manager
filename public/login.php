@@ -22,7 +22,7 @@ const LOCKOUT_TIME = 300; // 5 minutes in seconds
 // Check if the user is currently locked out
 if (isset($_SESSION['lockout_time']) && time() < $_SESSION['lockout_time']) {
     $remaining_time = $_SESSION['lockout_time'] - time();
-    $error = t('login_locked_out', "Trop de tentatives de connexion. Veuillez réessayer dans {minutes} minutes.", ['minutes' => ceil($remaining_time / 60)]);
+    $error = t('login_locked_out', ['minutes' => ceil($remaining_time / 60)], "Trop de tentatives de connexion. Veuillez réessayer dans {minutes} minutes.");
 } else {
 
     // Now, use the CONFIG_PATH to load the actual configuration and database files.
@@ -60,7 +60,7 @@ if (isset($_SESSION['lockout_time']) && time() < $_SESSION['lockout_time']) {
                 $_SESSION['lockout_time'] = time() + LOCKOUT_TIME;
                 unset($_SESSION['login_attempts']); // Reset attempts after lockout
                 $remaining_time = LOCKOUT_TIME;
-                $error = t('login_locked_out', "Trop de tentatives de connexion. Veuillez réessayer dans {minutes} minutes.", ['minutes' => ceil($remaining_time / 60)]);
+                $error = t('login_locked_out', ['minutes' => ceil($remaining_time / 60)], "Trop de tentatives de connexion. Veuillez réessayer dans {minutes} minutes.");
             } else {
                 $error = t('invalid_credentials', 'Identifiants invalides');
             }
@@ -80,7 +80,7 @@ require_once CONFIG_PATH . '/templates/header.php';
     <div class="max-w-md mx-auto mt-10 bg-white p-8 border border-gray-300 rounded">
         <?php if (isset($error)): ?>
             <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
-                <span class="block sm:inline"><?php echo t('invalid_credentials', 'Identifiants invalides'); ?></span>
+                <span class="block sm:inline"><?php echo $error; ?></span>
             </div>
         <?php endif; ?>
 
