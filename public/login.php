@@ -13,13 +13,10 @@ if (!file_exists('bootstrap.php')) {
 }
 require_once 'bootstrap.php';
 
+
 // --- Brute Force Protection ---
 const MAX_LOGIN_ATTEMPTS = 5;
 const LOCKOUT_TIME = 300; // 5 minutes in seconds
-
-// Now, use the CONFIG_PATH to load the actual configuration and database files.
-require_once CONFIG_PATH . '/config.php';
-require_once CONFIG_PATH . '/Database.php';
 
 // Check if the user is currently locked out
 if (isset($_SESSION['lockout_time']) && time() < $_SESSION['lockout_time']) {
@@ -27,6 +24,9 @@ if (isset($_SESSION['lockout_time']) && time() < $_SESSION['lockout_time']) {
     $error = t('login_locked_out', ['minutes' => ceil($remaining_time / 60)], "Trop de tentatives de connexion. Veuillez réessayer dans {minutes} minutes.");
 } else {
 
+    // Now, use the CONFIG_PATH to load the actual configuration and database files.
+    require_once CONFIG_PATH . '/config.php';
+    require_once CONFIG_PATH . '/Database.php';
 
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $db = new Database();
