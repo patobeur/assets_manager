@@ -5,6 +5,16 @@ require_once 'language_init.php';
 
 session_start();
 
+// Define a constant to grant access to the bootstrap file.
+define('APP_LOADED', true);
+
+// Load the bootstrap file to get the configuration path.
+if (!file_exists('bootstrap.php')) {
+    header('Location: install.php');
+    exit;
+}
+require_once 'bootstrap.php';
+
 // --- Brute Force Protection ---
 const MAX_LOGIN_ATTEMPTS = 5;
 const LOCKOUT_TIME = 300; // 5 minutes in seconds
@@ -14,15 +24,6 @@ if (isset($_SESSION['lockout_time']) && time() < $_SESSION['lockout_time']) {
     $remaining_time = $_SESSION['lockout_time'] - time();
     $error = t('login_locked_out', "Trop de tentatives de connexion. Veuillez réessayer dans {minutes} minutes.", ['minutes' => ceil($remaining_time / 60)]);
 } else {
-    // Define a constant to grant access to the bootstrap file.
-    define('APP_LOADED', true);
-
-    // Load the bootstrap file to get the configuration path.
-    if (!file_exists('bootstrap.php')) {
-        header('Location: install.php');
-        exit;
-    }
-    require_once 'bootstrap.php';
 
     // Now, use the CONFIG_PATH to load the actual configuration and database files.
     require_once CONFIG_PATH . '/config.php';
