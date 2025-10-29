@@ -3,8 +3,6 @@
 // Initialize the language system, which also handles session security
 require_once 'language_init.php';
 
-session_start();
-
 // Define a constant to grant access to the bootstrap file.
 define('APP_LOADED', true);
 
