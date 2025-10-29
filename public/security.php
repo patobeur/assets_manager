@@ -4,7 +4,8 @@
 ini_set('display_errors', 0);
 ini_set('log_errors', 1);
 // Specify the path to the error log file.
-ini_set('error_log', __DIR__ . '/../logs/php_errors.log');
+ini_set('error_log', __DIR__ . '/../config_assets_manager/logs/php_errors.log');
+
 // Report all PHP errors.
 error_reporting(E_ALL);
 
